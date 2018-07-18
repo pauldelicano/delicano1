@@ -15,8 +15,8 @@ typedef enum {
     POST_FILE
 } HTTP;
 
-+ (NSURLSessionDataTask *)get:(id)delegate action:(NSString *)action url:(NSString *)url params:(NSDictionary *)params timeout:(int)timeout;
-+ (NSURLSessionDataTask *)post:(id)delegate action:(NSString *)action url:(NSString *)url params:(NSDictionary *)params timeout:(int)timeout;
-+ (NSURLSessionDataTask *)postFile:(id)delegate action:(NSString *)action url:(NSString *)url params:(NSDictionary *)params file:(NSString *)file timeout:(int)timeout;
++ (NSDictionary *)get:(NSString *)url params:(NSDictionary *)params timeout:(int)timeout;
++ (NSDictionary *)post:(NSString *)url params:(NSDictionary *)params timeout:(int)timeout;
++ (NSDictionary *)postFile:(NSString *)url params:(NSDictionary *)params file:(NSString *)file timeout:(int)timeout;
 
 @end

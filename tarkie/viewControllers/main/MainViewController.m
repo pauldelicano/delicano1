@@ -428,7 +428,7 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
     }
 }
 
-- (void)onLoadingFinish:(int)action params:(NSDictionary *)params result:(NSString *)result {
+- (void)onLoadingFinish:(int)action result:(NSString *)result {
     switch(action) {
         case LOADING_ACTION_TIME_SECURITY: {
             if(![result isEqualToString:@"ok"]) {
@@ -463,47 +463,9 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
             break;
         }
         case LOADING_ACTION_SYNC_DATA: {
-            if([result isEqualToString:@"Employee has already existing schedule in this date."] && [params objectForKey:@"schedule_id"] == nil) {
-                LoadingDialogViewController *vcLoading = [self.storyboard instantiateViewControllerWithIdentifier:@"vcLoading"];
-                vcLoading.delegate = self;
-                vcLoading.action = LOADING_ACTION_UPDATE_SCHEDULE;
-                [View addSubview:self.view subview:vcLoading.view animated:YES];
-                self.isLoading = YES;
-                break;
-            }
-            if([result isEqualToString:@"Cannot find visit."] && [[params objectForKey:@"itinerary_id"] longLongValue] == 0) {
-                LoadingDialogViewController *vcLoading = [self.storyboard instantiateViewControllerWithIdentifier:@"vcLoading"];
-                vcLoading.delegate = self;
-                vcLoading.action = LOADING_ACTION_SYNC_DATA;
-                [View addSubview:self.view subview:vcLoading.view animated:YES];
-                self.isLoading = YES;
-                break;
-            }
             vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
             vcMessage.subject = @"Sync Data";
             vcMessage.message = [result isEqualToString:@"ok"] ? @"Sync data successful." : [NSString stringWithFormat:@"%@ %@", @"Failed to sync data.", result];
-            vcMessage.positiveTitle = @"OK";
-            vcMessage.positiveTarget = ^{
-                [View removeView:vcMessage.view animated:YES];
-                self.isLoading = NO;
-                [self applicationDidBecomeActive];
-            };
-            [View addSubview:self.view subview:vcMessage.view animated:NO];
-            [self onRefresh];
-            break;
-        }
-        case LOADING_ACTION_UPDATE_SCHEDULE: {
-            if([result isEqualToString:@"ok"]) {
-                LoadingDialogViewController *vcLoading = [self.storyboard instantiateViewControllerWithIdentifier:@"vcLoading"];
-                vcLoading.delegate = self;
-                vcLoading.action = LOADING_ACTION_SYNC_DATA;
-                [View addSubview:self.view subview:vcLoading.view animated:YES];
-                self.isLoading = YES;
-                break;
-            }
-            vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
-            vcMessage.subject = @"Sync Data";
-            vcMessage.message = [NSString stringWithFormat:@"%@ %@", @"Failed to sync data.", result];
             vcMessage.positiveTitle = @"OK";
             vcMessage.positiveTarget = ^{
                 [View removeView:vcMessage.view animated:YES];

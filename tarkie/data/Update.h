@@ -5,16 +5,16 @@
 
 //COMPANY
 + (BOOL)usersLogout:(NSManagedObjectContext *)db;
-+ (BOOL)employeesDeactivate:(NSManagedObjectContext *)db;
-+ (BOOL)announcementsDeactivate:(NSManagedObjectContext *)db;
++ (void)employeesDeactivate:(NSManagedObjectContext *)db;
++ (void)announcementsDeactivate:(NSManagedObjectContext *)db;
 
 //STORES
-+ (BOOL)storesDeactivate:(NSManagedObjectContext *)db;
-+ (BOOL)storeContactsDeactivate:(NSManagedObjectContext *)db;
++ (void)storesDeactivate:(NSManagedObjectContext *)db;
++ (void)storeContactsDeactivate:(NSManagedObjectContext *)db;
 
 //ATTENDANCE
-+ (BOOL)scheduleTimesDeactivate:(NSManagedObjectContext *)db;
-+ (BOOL)schedulesDeactivate:(NSManagedObjectContext *)db;
++ (void)scheduleTimesDeactivate:(NSManagedObjectContext *)db;
++ (void)schedulesDeactivate:(NSManagedObjectContext *)db;
 
 //VISITS
 

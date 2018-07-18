@@ -5,7 +5,7 @@
 @optional
 
 - (void)onLoadingUpdate:(int)action;
-- (void)onLoadingFinish:(int)action params:(NSDictionary *)params result:(NSString *)result;
+- (void)onLoadingFinish:(int)action result:(NSString *)result;
 
 @end
 
@@ -20,7 +20,6 @@ typedef enum {
     LOADING_ACTION_TIME_SECURITY,
     LOADING_ACTION_UPDATE_MASTER_FILE,
     LOADING_ACTION_SYNC_DATA,
-    LOADING_ACTION_UPDATE_SCHEDULE,
     LOADING_ACTION_SEND_BACKUP_DATA
 } LoadingAction;
 

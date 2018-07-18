@@ -1,8 +1,11 @@
 #import "CameraViewController.h"
+#import "AppDelegate.h"
+#import "Get.h"
 #import "Time.h"
 
 @interface CameraViewController()
 
+@property (strong, nonatomic) AppDelegate *app;
 @property (strong, nonatomic) UIImagePickerController *imagePicker;
 
 @end
@@ -11,6 +14,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.app = (AppDelegate *)UIApplication.sharedApplication.delegate;
     self.imagePicker = UIImagePickerController.alloc.init;
     self.imagePicker.delegate = self;
     self.imagePicker.sourceType = UIImagePickerControllerSourceTypeCamera;
@@ -27,13 +31,19 @@
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info {
     [self.navigationController popViewControllerAnimated:NO];
     UIImage *image = [info objectForKey:UIImagePickerControllerOriginalImage];
-    UIGraphicsBeginImageContext(image.size);
-    [image drawInRect:CGRectMake(0, 0, image.size.width, image.size.height)];
-    NSString *timestamp = [Time formatDate:@"MMM d, yyyy h:mm:ss a" date:NSDate.date];
-    UIFont *timestampFont = [UIFont fontWithName:@"ProximaNova-Regular" size:(30.0f / 568) * UIScreen.mainScreen.bounds.size.height];
+    CGSize size = CGSizeMake(UIScreen.mainScreen.bounds.size.width, image.size.height * (UIScreen.mainScreen.bounds.size.width / image.size.width));
+    UIGraphicsBeginImageContext(size);
+    [image drawInRect:CGRectMake(0, 0, size.width, size.height)];
+
+    CGFloat margin = (6.0f / 568) * UIScreen.mainScreen.bounds.size.height;
+
+    Employees *employee = [Get employee:self.app.db employeeID:[Get userID:self.app.db]];
+    NSString *timestamp = [NSString stringWithFormat:@"%@\n%@ %@\n%@", [Time formatDate:@"MMM d, yyyy h:mm:ss a" date:NSDate.date], employee.firstName, employee.lastName, [Get company:self.app.db].name];
+    UIFont *timestampFont = [UIFont fontWithName:@"ProximaNova-Regular" size:(12.0f / 568) * UIScreen.mainScreen.bounds.size.height];
     CGSize timestampSize = [timestamp sizeWithAttributes:@{NSFontAttributeName:timestampFont}];
-    CGFloat margin = (24.0f / 568) * UIScreen.mainScreen.bounds.size.height;
-    [timestamp drawInRect:CGRectMake(margin, image.size.height - timestampSize.height - margin, timestampSize.width, timestampSize.height) withAttributes:@{NSFontAttributeName:timestampFont, NSForegroundColorAttributeName:UIColor.whiteColor}];
+    [timestamp drawInRect:CGRectMake(margin, size.height - timestampSize.height - margin, timestampSize.width, timestampSize.height) withAttributes:@{NSFontAttributeName:timestampFont, NSForegroundColorAttributeName:UIColor.whiteColor}];
+
+
     image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     [self.cameraDelegate onCameraCapture:self.action image:image];

@@ -1,11 +1,4 @@
 #import "Update.h"
-#import "Users+CoreDataClass.h"
-#import "Employees+CoreDataClass.h"
-#import "Announcements+CoreDataClass.h"
-#import "Stores+CoreDataClass.h"
-#import "StoreContacts+CoreDataClass.h"
-#import "ScheduleTimes+CoreDataClass.h"
-#import "Schedules+CoreDataClass.h"
 #import "Get.h"
 
 @implementation Update
@@ -22,7 +15,7 @@
     return [self save:db];
 }
 
-+ (BOOL)employeesDeactivate:(NSManagedObjectContext *)db {
++ (void)employeesDeactivate:(NSManagedObjectContext *)db {
     NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Employees"];
     NSMutableArray *subpredicates = NSMutableArray.alloc.init;
     [subpredicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
@@ -31,10 +24,9 @@
     for(int x = 0; x < result.count; x++) {
         result[x].isActive = NO;
     }
-    return [self save:db];
 }
 
-+ (BOOL)announcementsDeactivate:(NSManagedObjectContext *)db {
++ (void)announcementsDeactivate:(NSManagedObjectContext *)db {
     NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Announcements"];
     NSMutableArray *subpredicates = NSMutableArray.alloc.init;
     [subpredicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
@@ -44,10 +36,9 @@
     for(int x = 0; x < result.count; x++) {
         result[x].isActive = NO;
     }
-    return [self save:db];
 }
 
-+ (BOOL)storesDeactivate:(NSManagedObjectContext *)db {
++ (void)storesDeactivate:(NSManagedObjectContext *)db {
     NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Stores"];
     NSMutableArray *subpredicates = NSMutableArray.alloc.init;
     [subpredicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
@@ -61,10 +52,9 @@
         result[x].isTag = NO;
         result[x].isActive = NO;
     }
-    return [self save:db];
 }
 
-+ (BOOL)storeContactsDeactivate:(NSManagedObjectContext *)db {
++ (void)storeContactsDeactivate:(NSManagedObjectContext *)db {
     NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"StoreContacts"];
     NSMutableArray *subpredicates = NSMutableArray.alloc.init;
     [subpredicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
@@ -75,10 +65,9 @@
     for(int x = 0; x < result.count; x++) {
         result[x].isActive = NO;
     }
-    return [self save:db];
 }
 
-+ (BOOL)scheduleTimesDeactivate:(NSManagedObjectContext *)db {
++ (void)scheduleTimesDeactivate:(NSManagedObjectContext *)db {
     NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"ScheduleTimes"];
     NSMutableArray *subpredicates = NSMutableArray.alloc.init;
     [subpredicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
@@ -87,10 +76,9 @@
     for(int x = 0; x < result.count; x++) {
         result[x].isActive = NO;
     }
-    return [self save:db];
 }
 
-+ (BOOL)schedulesDeactivate:(NSManagedObjectContext *)db {
++ (void)schedulesDeactivate:(NSManagedObjectContext *)db {
     NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Schedules"];
     NSMutableArray *subpredicates = NSMutableArray.alloc.init;
     [subpredicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
@@ -101,7 +89,6 @@
     for(int x = 0; x < result.count; x++) {
         result[x].isActive = NO;
     }
-    return [self save:db];
 }
 
 + (NSArray *)fetch:(NSManagedObjectContext *)db request:(NSFetchRequest *)request {

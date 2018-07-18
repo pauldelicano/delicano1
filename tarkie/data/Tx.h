@@ -1,36 +1,51 @@
 #import <Foundation/Foundation.h>
+#import <CoreData/CoreData.h>
+
+#import "AnnouncementSeen+CoreDataClass.h"
+
+#import "Stores+CoreDataClass.h"
+#import "StoreContacts+CoreDataClass.h"
+
+#import "Schedules+CoreDataClass.h"
+#import "TimeIn+CoreDataClass.h"
+#import "TimeOut+CoreDataClass.h"
+
+#import "Photos+CoreDataClass.h"
+#import "Visits+CoreDataClass.h"
+#import "CheckIn+CoreDataClass.h"
+#import "CheckOut+CoreDataClass.h"
 
 @interface Tx : NSObject
 
 //COMPANY
-+ (NSURLSessionDataTask *)authorize:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)login:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)syncAnnouncementSeen:(id)delegate params:(NSDictionary *)params;
++ (BOOL)authorize:(NSManagedObjectContext *)db params:(NSDictionary *)params delegate:(id)delegate;
++ (BOOL)login:(NSManagedObjectContext *)db params:(NSDictionary *)params delegate:(id)delegate;
++ (BOOL)syncAnnouncementSeen:(NSManagedObjectContext *)db announcementSeen:(AnnouncementSeen *)announcementSeen delegate:(id)delegate;
 
 //STORE
-+ (NSURLSessionDataTask *)syncStore:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)updateStore:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)syncStoreContact:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)updateStoreContact:(id)delegate params:(NSDictionary *)params;
++ (BOOL)syncStore:(NSManagedObjectContext *)db store:(Stores *)store delegate:(id)delegate;
++ (BOOL)updateStore:(NSManagedObjectContext *)db store:(Stores *)store delegate:(id)delegate;
++ (BOOL)syncStoreContact:(NSManagedObjectContext *)db storeContact:(StoreContacts *)storeContact delegate:(id)delegate;
++ (BOOL)updateStoreContact:(NSManagedObjectContext *)db storeContact:(StoreContacts *)storeContact delegate:(id)delegate;
 
 //ATTENDANCE
-+ (NSURLSessionDataTask *)syncSchedule:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)updateSchedule:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)syncTimeIn:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)uploadTimeInPhoto:(id)delegate params:(NSDictionary *)params file:(NSString *)file;
-+ (NSURLSessionDataTask *)syncTimeOut:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)uploadTimeOutPhoto:(id)delegate params:(NSDictionary *)params file:(NSString *)file;
-+ (NSURLSessionDataTask *)uploadTimeOutSignature:(id)delegate params:(NSDictionary *)params file:(NSString *)file;
++ (BOOL)syncSchedule:(NSManagedObjectContext *)db schedule:(Schedules *)schedule delegate:(id)delegate;
++ (BOOL)updateSchedule:(NSManagedObjectContext *)db schedule:(Schedules *)schedule delegate:(id)delegate;
++ (BOOL)syncTimeIn:(NSManagedObjectContext *)db timeIn:(TimeIn *)timeIn delegate:(id)delegate;
++ (BOOL)uploadTimeInPhoto:(NSManagedObjectContext *)db timeIn:(TimeIn *)timeIn delegate:(id)delegate;
++ (BOOL)syncTimeOut:(NSManagedObjectContext *)db timeOut:(TimeOut *)timeOut delegate:(id)delegate;
++ (BOOL)uploadTimeOutPhoto:(NSManagedObjectContext *)db timeOut:(TimeOut *)timeOut delegate:(id)delegate;
++ (BOOL)uploadTimeOutSignature:(NSManagedObjectContext *)db timeOut:(TimeOut *)timeOut delegate:(id)delegate;
 
 //VISITS
-+ (NSURLSessionDataTask *)syncVisit:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)updateVisit:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)deleteVisit:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)uploadVisitPhoto:(id)delegate params:(NSDictionary *)params file:(NSString *)file;
-+ (NSURLSessionDataTask *)syncCheckIn:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)uploadCheckInPhoto:(id)delegate params:(NSDictionary *)params file:(NSString *)file;
-+ (NSURLSessionDataTask *)syncCheckOut:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)uploadCheckOutPhoto:(id)delegate params:(NSDictionary *)params file:(NSString *)file;
++ (BOOL)uploadVisitPhoto:(NSManagedObjectContext *)db photo:(Photos *)photo delegate:(id)delegate;
++ (BOOL)syncVisit:(NSManagedObjectContext *)db visit:(Visits *)visit delegate:(id)delegate;
++ (BOOL)updateVisit:(NSManagedObjectContext *)db visit:(Visits *)visit delegate:(id)delegate;
++ (BOOL)deleteVisit:(NSManagedObjectContext *)db visit:(Visits *)visit delegate:(id)delegate;
++ (BOOL)syncCheckIn:(NSManagedObjectContext *)db checkIn:(CheckIn *)checkIn delegate:(id)delegate;
++ (BOOL)uploadCheckInPhoto:(NSManagedObjectContext *)db checkIn:(CheckIn *)checkIn delegate:(id)delegate;
++ (BOOL)syncCheckOut:(NSManagedObjectContext *)db checkOut:(CheckOut *)checkOut delegate:(id)delegate;
++ (BOOL)uploadCheckOutPhoto:(NSManagedObjectContext *)db checkOut:(CheckOut *)checkOut delegate:(id)delegate;
 
 //EXPENSE
 

@@ -1,30 +1,28 @@
 #import "Http.h"
-#import "Process.h"
 #import "Image.h"
 
 @implementation Http
 
-+ (NSURLSessionDataTask *)get:(id)delegate action:(NSString *)action url:(NSString *)url params:(NSDictionary *)params timeout:(int)timeout {
-    return [self request:delegate action:(NSString *)action url:url params:params file:nil timeout:timeout method:GET];
++ (NSDictionary *)get:(NSString *)url params:(NSDictionary *)params timeout:(int)timeout {
+    return [self request:url params:params file:nil timeout:timeout method:GET];
 }
 
-+ (NSURLSessionDataTask *)post:(id)delegate action:(NSString *)action url:(NSString *)url params:(NSDictionary *)params timeout:(int)timeout {
-    return [self request:delegate action:(NSString *)action url:url params:params file:nil timeout:timeout method:POST];
++ (NSDictionary *)post:(NSString *)url params:(NSDictionary *)params timeout:(int)timeout {
+    return [self request:url params:params file:nil timeout:timeout method:POST];
 }
 
-+ (NSURLSessionDataTask *)postFile:(id)delegate action:(NSString *)action url:(NSString *)url params:(NSDictionary *)params file:(NSString *)file timeout:(int)timeout {
-    return [self request:delegate action:(NSString *)action url:url params:params file:file timeout:timeout method:POST_FILE];
++ (NSDictionary *)postFile:(NSString *)url params:(NSDictionary *)params file:(NSString *)file timeout:(int)timeout {
+    return [self request:url params:params file:file timeout:timeout method:POST_FILE];
 }
 
-+ (NSURLSessionDataTask *)request:(id)delegate action:(NSString *)action url:(NSString *)url params:(NSDictionary *)params file:(NSString *)file timeout:(int)timeout method:(HTTP)method {
++ (NSDictionary *)request:(NSString *)url params:(NSDictionary *)params file:(NSString *)file timeout:(int)timeout method:(HTTP)method {
     __block NSError *error;
     NSData *paramsData;
     if(params != nil) {
         paramsData = [NSJSONSerialization dataWithJSONObject:params options:0 error:&error];
     }
     if(error != nil) {
-        [delegate onProcessResult:action params:params result:[self createErrorResult:error]];
-        return nil;
+        return [self createErrorResult:error];
     }
     NSMutableURLRequest *request = NSMutableURLRequest.alloc.init;
     request.cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
@@ -68,20 +66,23 @@
         }
     }
     request.URL = [NSURL URLWithString:url];
-    NSURLSessionDataTask *sessionDataTask = [[NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:delegate delegateQueue:nil] dataTaskWithRequest:request completionHandler:^(NSData *sessionData, NSURLResponse *sessionResponse, NSError *sessionError) {
+    __block NSDictionary *result = nil;
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+    [[[NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:nil delegateQueue:nil] dataTaskWithRequest:request completionHandler:^(NSData *sessionData, NSURLResponse *sessionResponse, NSError *sessionError) {
         NSLog(@"info: start\n\turl: %@\n\tparams: %@\n\tresponse: %@\nend", url, [NSString.alloc initWithData:paramsData encoding:NSUTF8StringEncoding], [NSString.alloc initWithData:sessionData encoding:NSUTF8StringEncoding]);
         if(sessionError != nil) {
-            [delegate onProcessResult:action params:params result:[self createErrorResult:sessionError]];
-            return;
+            result = [self createErrorResult:sessionError];
         }
-        NSDictionary *result = [NSJSONSerialization JSONObjectWithData:sessionData options:kNilOptions error:&error];
+        if(result == nil) {
+            result = [NSJSONSerialization JSONObjectWithData:sessionData options:kNilOptions error:&error];
+        }
         if(error != nil) {
-            [delegate onProcessResult:action params:params result:[self createErrorResult:error]];
-            return;
+            result = [self createErrorResult:error];
         }
-        [delegate onProcessResult:action params:params result:result];
-    }];
-    return sessionDataTask;
+        dispatch_semaphore_signal(semaphore);
+    }] resume];
+    dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+    return result;
 }
 
 + (NSString *)jsonToURL:(NSDictionary *)json {

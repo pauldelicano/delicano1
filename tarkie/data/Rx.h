@@ -1,53 +1,54 @@
 #import <Foundation/Foundation.h>
+#import <CoreData/CoreData.h>
 
 @interface Rx : NSObject
 
 //COMPANY
-+ (NSURLSessionDataTask *)company:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)employees:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)settings:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)conventions:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)alertTypes:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)serverTime:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)syncBatchID:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)announcements:(id)delegate params:(NSDictionary *)params;
++ (BOOL)company:(NSManagedObjectContext *)db delegate:(id)delegate;
++ (BOOL)employees:(NSManagedObjectContext *)db delegate:(id)delegate;
++ (BOOL)settings:(NSManagedObjectContext *)db delegate:(id)delegate;
++ (BOOL)conventions:(NSManagedObjectContext *)db delegate:(id)delegate;
++ (BOOL)alertTypes:(NSManagedObjectContext *)db delegate:(id)delegate;
++ (BOOL)serverTime:(NSManagedObjectContext *)db delegate:(id)delegate;
++ (BOOL)syncBatchID:(NSManagedObjectContext *)db delegate:(id)delegate;
++ (BOOL)announcements:(NSManagedObjectContext *)db delegate:(id)delegate;
 
 //STORE
-+ (NSURLSessionDataTask *)stores:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)storeContacts:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)storeCustomFields:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)storeCustomFieldsPages:(id)delegate params:(NSDictionary *)params;
++ (BOOL)stores:(NSManagedObjectContext *)db delegate:(id)delegate;
++ (BOOL)storeContacts:(NSManagedObjectContext *)db delegate:(id)delegate;
++ (BOOL)storeCustomFields:(NSManagedObjectContext *)db delegate:(id)delegate;
++ (BOOL)storeCustomFieldsPages:(NSManagedObjectContext *)db delegate:(id)delegate;
 
 //ATTENDANCE
-+ (NSURLSessionDataTask *)scheduleTimes:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)schedules:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)breakTypes:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)overtimeReasons:(id)delegate params:(NSDictionary *)params;
++ (BOOL)scheduleTimes:(NSManagedObjectContext *)db delegate:(id)delegate;
++ (BOOL)schedules:(NSManagedObjectContext *)db isToday:(BOOL)isToday delegate:(id)delegate;
++ (BOOL)breakTypes:(NSManagedObjectContext *)db delegate:(id)delegate;
++ (BOOL)overtimeReasons:(NSManagedObjectContext *)db delegate:(id)delegate;
 
 //VISITS
-+ (NSURLSessionDataTask *)visits:(id)delegate params:(NSDictionary *)params;
++ (BOOL)visits:(NSManagedObjectContext *)db delegate:(id)delegate;
 
 //EXPENSE
-+ (NSURLSessionDataTask *)expenseTypeCategories:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)expenseTypes:(id)delegate params:(NSDictionary *)params;
++ (BOOL)expenseTypeCategories:(NSManagedObjectContext *)db delegate:(id)delegate;
++ (BOOL)expenseTypes:(NSManagedObjectContext *)db delegate:(id)delegate;
 
 //INVENTORY
-+ (NSURLSessionDataTask *)inventories:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)inventoryBrands:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)inventoryCategories:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)inventoryDiscounts:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)inventoryFacingItems:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)inventoryOrders:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)inventoryPlanoGramTypes:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)inventoryPlanoGramItems:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)inventoryPullOutReasons:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)inventoryReasons:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)inventoryStoreAssign:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)inventorySubBrands:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)inventoryUOMs:(id)delegate params:(NSDictionary *)params;
++ (BOOL)inventories:(NSManagedObjectContext *)db delegate:(id)delegate;
++ (BOOL)inventoryBrands:(NSManagedObjectContext *)db delegate:(id)delegate;
++ (BOOL)inventoryCategories:(NSManagedObjectContext *)db delegate:(id)delegate;
++ (BOOL)inventoryDiscounts:(NSManagedObjectContext *)db delegate:(id)delegate;
++ (BOOL)inventoryFacingItems:(NSManagedObjectContext *)db delegate:(id)delegate;
++ (BOOL)inventoryOrders:(NSManagedObjectContext *)db delegate:(id)delegate;
++ (BOOL)inventoryPlanoGramTypes:(NSManagedObjectContext *)db delegate:(id)delegate;
++ (BOOL)inventoryPlanoGramItems:(NSManagedObjectContext *)db delegate:(id)delegate;
++ (BOOL)inventoryPullOutReasons:(NSManagedObjectContext *)db delegate:(id)delegate;
++ (BOOL)inventoryReasons:(NSManagedObjectContext *)db delegate:(id)delegate;
++ (BOOL)inventoryStoreAssign:(NSManagedObjectContext *)db delegate:(id)delegate;
++ (BOOL)inventorySubBrands:(NSManagedObjectContext *)db delegate:(id)delegate;
++ (BOOL)inventoryUOMs:(NSManagedObjectContext *)db delegate:(id)delegate;
 
 //FORMS
-+ (NSURLSessionDataTask *)forms:(id)delegate params:(NSDictionary *)params;
-+ (NSURLSessionDataTask *)formFields:(id)delegate params:(NSDictionary *)params;
++ (BOOL)forms:(NSManagedObjectContext *)db delegate:(id)delegate;
++ (BOOL)formFields:(NSManagedObjectContext *)db delegate:(id)delegate;
 
 @end
