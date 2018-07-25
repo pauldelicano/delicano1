@@ -31,10 +31,11 @@
 @property (strong, nonatomic) Stores *store;
 @property (strong, nonatomic) ScheduleTimes *scheduleTime;
 @property (strong, nonatomic) UIImage *photo, *signature;
-@property (strong, nonatomic) NSString *photoFilename, *signatureFilename;
+@property (strong, nonatomic) NSString *conventionTimeIn, *conventionTimeOut, *photoFilename, *signatureFilename;
 @property (strong, nonatomic) NSDate *currentDate;
+@property (nonatomic) int currentPage;
 @property (nonatomic) long syncDataCount;
-@property (nonatomic) BOOL viewWillAppear, isLoading, isGPSRequest, isCameraRequest, proceedWithoutGPS, isTimingIn, isTimingOut;
+@property (nonatomic) BOOL settingMultipleTimeIn, settingStore, settingSchedule, settingTimeInPhoto, settingTimeOutPhoto, settingTimeOutSignature, viewWillAppear, isLoading, isGPSRequest, isCameraRequest, proceedWithoutGPS, isTimingIn, isTimingOut;
 
 @end
 
@@ -102,6 +103,14 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
 
 - (void)onRefresh {
     [super onRefresh];
+    self.settingMultipleTimeIn = [Get isSettingEnabled:self.app.db settingID:SETTING_ATTENDANCE_MULTIPLE_TIME_IN_OUT];
+    self.settingStore = [Get isSettingEnabled:self.app.db settingID:SETTING_ATTENDANCE_STORE];
+    self.settingSchedule = [Get isSettingEnabled:self.app.db settingID:SETTING_ATTENDANCE_SCHEDULE];
+    self.settingTimeInPhoto = [Get isSettingEnabled:self.app.db settingID:SETTING_ATTENDANCE_TIME_IN_PHOTO];
+    self.settingTimeOutPhoto = [Get isSettingEnabled:self.app.db settingID:SETTING_ATTENDANCE_TIME_OUT_PHOTO];
+    self.settingTimeOutSignature = [Get isSettingEnabled:self.app.db settingID:SETTING_ATTENDANCE_TIME_OUT_SIGNATURE];
+    self.conventionTimeIn = [Get conventionName:self.app.db conventionID:CONVENTION_TIME_IN];
+    self.conventionTimeOut = [Get conventionName:self.app.db conventionID:CONVENTION_TIME_OUT];
     self.employee = [Get employee:self.app.db employeeID:[Get userID:self.app.db]];
     self.vcDrawer.company = [Get company:self.app.db];
     self.vcDrawer.employee = self.employee;
@@ -147,10 +156,10 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
     icon = nil;
     [self.vcDrawer.menus[MENU_TIME_IN_OUT - 1] setValue:icon == nil ? [UIImage imageNamed:[NSString stringWithFormat:@"%@%@", @"Menu", [name stringByReplacingOccurrencesOfString:@" " withString:@""]]] : icon forKey:@"icon"];
     if([name isEqualToString:@"Time In"]) {
-        name = [Get conventionName:self.app.db conventionID:CONVENTION_TIME_IN];
+        name = self.conventionTimeIn;
     }
     if([name isEqualToString:@"Time Out"]) {
-        name = [Get conventionName:self.app.db conventionID:CONVENTION_TIME_OUT];
+        name = self.conventionTimeOut;
     }
     [self.vcDrawer.menus[MENU_TIME_IN_OUT - 1] setValue:name forKey:@"name"];
     [self.vcDrawer onRefresh];
@@ -303,7 +312,19 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
     switch(menu) {
         case MENU_TIME_IN_OUT: {
             if(!self.isTimeIn) {
-                [self timeIn];
+                if(self.settingMultipleTimeIn || [Get timeInCount:self.app.db date:[Time getFormattedDate:DATE_FORMAT date:NSDate.date]] == 0) {
+                    [self timeIn];
+                }
+                else {
+                    vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
+                    vcMessage.subject = [NSString stringWithFormat:@"Already %@", self.conventionTimeIn];
+                    vcMessage.message = [NSString stringWithFormat:@"You've already %@, you're not allowed to %@ anymore.", self.conventionTimeIn, self.conventionTimeIn];
+                    vcMessage.positiveTitle = @"OK";
+                    vcMessage.positiveTarget = ^{
+                        [View removeView:vcMessage.view animated:YES];
+                    };
+                    [View addSubview:self.view subview:vcMessage.view animated:YES];
+                }
             }
             else {
                 vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
@@ -417,6 +438,7 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
     self.vNavBarButtonsInventory.hidden = ![self.viewControllers[page] isKindOfClass:InventoryViewController.class];
     self.vNavBarButtonsForms.hidden = ![self.viewControllers[page] isKindOfClass:FormsViewController.class];
     self.vNavBarButtonsHistory.hidden = ![self.viewControllers[page] isKindOfClass:HistoryViewController.class];
+    self.currentPage = page;
 }
 
 - (void)onLoadingUpdate:(int)action {
@@ -676,7 +698,7 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
         [View addSubview:self.view subview:vcNoGPS.view animated:YES];
         return;
     }
-    if(self.store == nil) {
+    if(self.settingStore && self.store == nil) {
         DropDownDialogViewController *vcDropDown = [self.storyboard instantiateViewControllerWithIdentifier:@"vcDropDown"];
         vcDropDown.delegate = self;
         vcDropDown.parent = self;
@@ -686,7 +708,7 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
         [self addChildViewController:vcDropDown];
         return;
     }
-    if(self.scheduleTime == nil) {
+    if(self.settingSchedule && self.scheduleTime == nil) {
         DropDownDialogViewController *vcDropDown = [self.storyboard instantiateViewControllerWithIdentifier:@"vcDropDown"];
         vcDropDown.delegate = self;
         vcDropDown.parent = self;
@@ -697,71 +719,78 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
         [self addChildViewController:vcDropDown];
         return;
     }
-    if([self cameraRequest]) {
-        self.isTimingIn = YES;
-        return;
-    }
-    if(self.photo == nil) {
-        CameraViewController *vcCamera = [self.storyboard instantiateViewControllerWithIdentifier:@"vcCamera"];
-        vcCamera.cameraDelegate = self;
-        vcCamera.action = CAMERA_ACTION_TIME_IN;
-        vcCamera.isRearCamera = NO;
-        [self.navigationController pushViewController:vcCamera animated:NO];
-        return;
-    }
-    if(self.photoFilename == nil) {
-        self.photoFilename = [NSString stringWithFormat:@"%lld-%.0f%@", self.employee.employeeID, [NSDate.date timeIntervalSince1970], @".png"];
-        if([Image saveFromImage:[Image documentPath:self.photoFilename] image:self.photo] == nil) {
-            self.photo = nil;
-            self.photoFilename = nil;
+    if(self.settingTimeInPhoto) {
+        if([self cameraRequest]) {
             self.isTimingIn = YES;
-            [self applicationDidBecomeActive];
             return;
+        }
+        if(self.photo == nil) {
+            CameraViewController *vcCamera = [self.storyboard instantiateViewControllerWithIdentifier:@"vcCamera"];
+            vcCamera.cameraDelegate = self;
+            vcCamera.action = CAMERA_ACTION_TIME_IN;
+            vcCamera.isRearCamera = NO;
+            [self.navigationController pushViewController:vcCamera animated:NO];
+            return;
+        }
+        if(self.photoFilename == nil) {
+            self.photoFilename = [NSString stringWithFormat:@"%lld-%.0f%@", self.employee.employeeID, [NSDate.date timeIntervalSince1970], @".png"];
+            if([Image saveFromImage:[Image documentPath:self.photoFilename] image:self.photo] == nil) {
+                self.photo = nil;
+                self.photoFilename = nil;
+                self.isTimingIn = YES;
+                [self applicationDidBecomeActive];
+                return;
+            }
         }
     }
     if(self.currentDate == nil) {
         self.currentDate = NSDate.date;
     }
-    NSString *date = [Time formatDate:DATE_FORMAT date:self.currentDate];
-    NSString *time = [Time formatDate:TIME_FORMAT date:self.currentDate];
+    NSString *date = [Time getFormattedDate:DATE_FORMAT date:self.currentDate];
+    NSString *time = [Time getFormattedDate:TIME_FORMAT date:self.currentDate];
     NSString *syncBatchID = [Get syncBatchID:self.app.db];
     Sequences *sequence = [Get sequence:self.app.db];
-    GPS *gps;
+    TimeIn *timeIn = [NSEntityDescription insertNewObjectForEntityForName:@"TimeIn" inManagedObjectContext:self.app.db];
     if(!self.proceedWithoutGPS) {
-        gps = [NSEntityDescription insertNewObjectForEntityForName:@"GPS" inManagedObjectContext:self.app.db];
+        GPS *gps = [NSEntityDescription insertNewObjectForEntityForName:@"GPS" inManagedObjectContext:self.app.db];
         sequence.gps += 1;
         gps.gpsID = sequence.gps;
-        gps.date = [Time formatDate:DATE_FORMAT date:self.app.location.timestamp];
-        gps.time = [Time formatDate:TIME_FORMAT date:self.app.location.timestamp];
+        gps.date = [Time getFormattedDate:DATE_FORMAT date:self.app.location.timestamp];
+        gps.time = [Time getFormattedDate:TIME_FORMAT date:self.app.location.timestamp];
         gps.latitude = self.app.location.coordinate.latitude;
         gps.longitude = self.app.location.coordinate.longitude;
+        timeIn.gpsID = gps.gpsID;
     }
-    Schedules *schedule = [Get schedule:self.app.db webScheduleID:0 scheduleDate:date];
-    if(schedule == nil) {
-        schedule = [NSEntityDescription insertNewObjectForEntityForName:@"Schedules" inManagedObjectContext:self.app.db];
-        sequence.schedules += 1;
-        schedule.scheduleID = sequence.schedules;
-        schedule.employeeID = self.employee.employeeID;
-        schedule.date = date;
-        schedule.time = time;
-        schedule.scheduleDate = date;
-        schedule.isFromWeb = NO;
-        schedule.isActive = YES;
-        schedule.isSync = NO;
+    if(self.settingStore) {
+        timeIn.storeID = self.store.storeID;
     }
-    schedule.syncBatchID = syncBatchID;
-    schedule.timeIn = self.scheduleTime.timeIn;
-    schedule.timeOut = self.scheduleTime.timeIn;
-    TimeIn *timeIn = [NSEntityDescription insertNewObjectForEntityForName:@"TimeIn" inManagedObjectContext:self.app.db];
+    if(self.settingSchedule) {
+        Schedules *schedule = [Get schedule:self.app.db webScheduleID:0 scheduleDate:date];
+        if(schedule == nil) {
+            schedule = [NSEntityDescription insertNewObjectForEntityForName:@"Schedules" inManagedObjectContext:self.app.db];
+            sequence.schedules += 1;
+            schedule.scheduleID = sequence.schedules;
+            schedule.employeeID = self.employee.employeeID;
+            schedule.date = date;
+            schedule.time = time;
+            schedule.scheduleDate = date;
+            schedule.isFromWeb = NO;
+            schedule.isActive = YES;
+            schedule.isSync = NO;
+        }
+        schedule.syncBatchID = syncBatchID;
+        schedule.timeIn = self.scheduleTime.timeIn;
+        schedule.timeOut = self.scheduleTime.timeIn;
+        timeIn.scheduleID = schedule.scheduleID;
+    }
+    if(self.settingTimeInPhoto) {
+        timeIn.photo = self.photoFilename;
+    }
     sequence.timeIn += 1;
     timeIn.timeInID = sequence.timeIn;
     timeIn.date = date;
     timeIn.time = time;
     timeIn.employeeID = self.employee.employeeID;
-    timeIn.gpsID = gps.gpsID;
-    timeIn.storeID = self.store.storeID;
-    timeIn.scheduleID = schedule.scheduleID;
-    timeIn.photo = self.photoFilename;
     timeIn.syncBatchID = syncBatchID;
     timeIn.batteryLevel = [NSString stringWithFormat:@"%f", UIDevice.currentDevice.batteryLevel];
     timeIn.isSync = NO;
@@ -772,6 +801,7 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
         [self cancelTimeIn];
         [self updateTimeInOut];
         [self.app startUpdatingLocation];
+        [self.viewControllers[self.currentPage] onRefresh];
     }
 }
 
@@ -791,7 +821,7 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
         self.isTimingOut = YES;
         return;
     }
-    if(self.store == nil) {
+    if(self.settingStore && self.store == nil) {
         DropDownDialogViewController *vcDropDown = [self.storyboard instantiateViewControllerWithIdentifier:@"vcDropDown"];
         vcDropDown.delegate = self;
         vcDropDown.parent = self;
@@ -802,26 +832,28 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
         [vcDropDown onStoresSelect:[Get store:self.app.db storeID:[Get timeIn:self.app.db].storeID]];
         return;
     }
-    if([self cameraRequest]) {
-        self.isTimingOut = YES;
-        return;
-    }
-    if(self.photo == nil) {
-        CameraViewController *vcCamera = [self.storyboard instantiateViewControllerWithIdentifier:@"vcCamera"];
-        vcCamera.cameraDelegate = self;
-        vcCamera.action = CAMERA_ACTION_TIME_OUT;
-        vcCamera.isRearCamera = NO;
-        [self.navigationController pushViewController:vcCamera animated:NO];
-        return;
-    }
-    if(self.photoFilename == nil) {
-        self.photoFilename = [NSString stringWithFormat:@"%lld-%.0f%@", self.employee.employeeID, [NSDate.date timeIntervalSince1970], @".png"];
-        if([Image saveFromImage:[Image documentPath:self.photoFilename] image:self.photo] == nil) {
-            self.photo = nil;
-            self.photoFilename = nil;
+    if(self.settingTimeOutPhoto) {
+        if([self cameraRequest]) {
             self.isTimingOut = YES;
-            [self applicationDidBecomeActive];
             return;
+        }
+        if(self.photo == nil) {
+            CameraViewController *vcCamera = [self.storyboard instantiateViewControllerWithIdentifier:@"vcCamera"];
+            vcCamera.cameraDelegate = self;
+            vcCamera.action = CAMERA_ACTION_TIME_OUT;
+            vcCamera.isRearCamera = NO;
+            [self.navigationController pushViewController:vcCamera animated:NO];
+            return;
+        }
+        if(self.photoFilename == nil) {
+            self.photoFilename = [NSString stringWithFormat:@"%lld-%.0f%@", self.employee.employeeID, [NSDate.date timeIntervalSince1970], @".png"];
+            if([Image saveFromImage:[Image documentPath:self.photoFilename] image:self.photo] == nil) {
+                self.photo = nil;
+                self.photoFilename = nil;
+                self.isTimingOut = YES;
+                [self applicationDidBecomeActive];
+                return;
+            }
         }
     }
     if(self.currentDate == nil) {
@@ -835,7 +867,7 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
         [self.navigationController pushViewController:vcAttendanceSummary animated:YES];
         return;
     }
-    if(self.signatureFilename == nil) {
+    if(self.settingTimeOutSignature && self.signatureFilename == nil) {
         self.signatureFilename = [NSString stringWithFormat:@"%lld-%.0f%@", self.employee.employeeID, [NSDate.date timeIntervalSince1970], @".png"];
         if([Image saveFromImage:[Image documentPath:self.signatureFilename] image:self.signature] == nil) {
             self.signature = nil;
@@ -845,28 +877,34 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
             return;
         }
     }
-    NSString *date = [Time formatDate:DATE_FORMAT date:self.currentDate];
-    NSString *time = [Time formatDate:TIME_FORMAT date:self.currentDate];
+    NSString *date = [Time getFormattedDate:DATE_FORMAT date:self.currentDate];
+    NSString *time = [Time getFormattedDate:TIME_FORMAT date:self.currentDate];
     NSString *syncBatchID = [Get syncBatchID:self.app.db];
     Sequences *sequence = [Get sequence:self.app.db];
+    TimeOut *timeOut = [NSEntityDescription insertNewObjectForEntityForName:@"TimeOut" inManagedObjectContext:self.app.db];
     GPS *gps = [NSEntityDescription insertNewObjectForEntityForName:@"GPS" inManagedObjectContext:self.app.db];
     sequence.gps += 1;
     gps.gpsID = sequence.gps;
-    gps.date = [Time formatDate:DATE_FORMAT date:self.app.location.timestamp];
-    gps.time = [Time formatDate:TIME_FORMAT date:self.app.location.timestamp];
+    gps.date = [Time getFormattedDate:DATE_FORMAT date:self.app.location.timestamp];
+    gps.time = [Time getFormattedDate:TIME_FORMAT date:self.app.location.timestamp];
     gps.latitude = self.app.location.coordinate.latitude;
     gps.longitude = self.app.location.coordinate.longitude;
-    TimeOut *timeOut = [NSEntityDescription insertNewObjectForEntityForName:@"TimeOut" inManagedObjectContext:self.app.db];
+    timeOut.gpsID = gps.gpsID;
+    if(self.settingStore) {
+        timeOut.storeID = self.store.storeID;
+    }
+    if(self.settingTimeOutPhoto) {
+        timeOut.photo = self.photoFilename;
+    }
+    if(self.settingTimeOutSignature) {
+        timeOut.signature = self.signatureFilename;
+    }
     sequence.timeOut += 1;
     timeOut.timeOutID = sequence.timeOut;
     timeOut.timeInID = [Get timeIn:self.app.db].timeInID;
     timeOut.date = date;
     timeOut.time = time;
     timeOut.employeeID = self.employee.employeeID;
-    timeOut.gpsID = gps.gpsID;
-    timeOut.storeID = self.store.storeID;
-    timeOut.photo = self.photoFilename;
-    timeOut.signature = self.signatureFilename;
     timeOut.syncBatchID = syncBatchID;
     timeOut.isSync = NO;
     timeOut.isPhotoUpload = NO;

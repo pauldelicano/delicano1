@@ -75,13 +75,13 @@
     item.textColor = self.textColor;
     item.selected = indexPath == self.selectedIndexPath;
     NSDate *date = self.dates[indexPath.row];
-    item.lDate.text = [Time formatDate:@"MMM d" date:date];
-    item.lDay.text = [Time formatDate:@"EEE" date:date];
+    item.lDate.text = [Time getFormattedDate:@"MMM d" date:date];
+    item.lDay.text = [Time getFormattedDate:@"EEE" date:date];
     return item;
 }
 
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
-    if([[Time formatDate:DATE_FORMAT date:self.dates[indexPath.row]] isEqualToString:[Time formatDate:DATE_FORMAT date:self.dates[0]]] && self.selectedIndexPath != nil) {
+    if([[Time getFormattedDate:DATE_FORMAT date:self.dates[indexPath.row]] isEqualToString:[Time getFormattedDate:DATE_FORMAT date:self.dates[0]]] && self.selectedIndexPath != nil) {
         if(self.countLeft == 0) {
             self.isLeft = YES;
             self.isRight = NO;
@@ -109,7 +109,7 @@
             self.countLeft = 0;
         }
     }
-    if([[Time formatDate:DATE_FORMAT date:self.dates[indexPath.row]] isEqualToString:[Time formatDate:DATE_FORMAT date:self.dates[self.dates.count - 1]]]) {
+    if([[Time getFormattedDate:DATE_FORMAT date:self.dates[indexPath.row]] isEqualToString:[Time getFormattedDate:DATE_FORMAT date:self.dates[self.dates.count - 1]]]) {
         if(self.countRight == 0) {
             self.isRight = YES;
             self.isLeft = NO;

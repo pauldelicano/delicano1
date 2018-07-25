@@ -51,8 +51,12 @@
 + (long)userID:(NSManagedObjectContext *)db;
 + (Employees *)employee:(NSManagedObjectContext *)db employeeID:(long)employeeID;
 + (Settings *)setting:(NSManagedObjectContext *)db settingID:(long)settingID;
++ (SettingsTeams *)settingTeam:(NSManagedObjectContext *)db settingID:(long)settingID;
 + (SettingsTeams *)settingTeam:(NSManagedObjectContext *)db settingID:(long)settingID teamID:(long)teamID;
-+ (BOOL)isSettingEnabled:(NSManagedObjectContext *)db settingID:(long)settingID teamID:(long)teamID;
++ (BOOL)isSettingEnabled:(NSManagedObjectContext *)db settingID:(long)settingID;
++ (NSString *)dateFormat:(NSManagedObjectContext *)db;
++ (NSString *)timeFormat:(NSManagedObjectContext *)db;
++ (NSString *)currencySymbol:(NSManagedObjectContext *)db;
 + (Conventions *)convention:(NSManagedObjectContext *)db conventionID:(long)conventionID;
 + (NSString *)conventionName:(NSManagedObjectContext *)db conventionID:(long)conventionID;
 + (AlertTypes *)alertType:(NSManagedObjectContext *)db alertTypeID:(long)alertTypeID;
@@ -78,6 +82,7 @@
 + (Schedules *)schedule:(NSManagedObjectContext *)db webScheduleID:(long)webScheduleID scheduleDate:(NSString *)scheduleDate;
 + (long)syncSchedulesCount:(NSManagedObjectContext *)db;
 + (TimeIn *)timeIn:(NSManagedObjectContext *)db;
++ (long)timeInCount:(NSManagedObjectContext *)db date:(NSString *)date;
 + (TimeIn *)timeIn:(NSManagedObjectContext *)db timeInID:(long)timeInID;
 + (BOOL)isTimeIn:(NSManagedObjectContext *)db;
 + (long)syncTimeInCount:(NSManagedObjectContext *)db;

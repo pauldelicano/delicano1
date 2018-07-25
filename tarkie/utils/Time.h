@@ -6,6 +6,8 @@
 #define TIME_FORMAT @"HH:mm:ss"
 
 + (NSDate *)getDateFromString:(NSString *)string;
-+ (NSString *)formatDate:(NSString *)format date:(NSDate *)date;
++ (NSString *)getFormattedDate:(NSString *)format date:(NSDate *)date;
++ (NSString *)formatDate:(NSString *)format date:(NSString *)date;
++ (NSString *)formatTime:(NSString *)format time:(NSString *)time;
 
 @end

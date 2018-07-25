@@ -1,4 +1,5 @@
 #import "Tx.h"
+#import "App.h"
 #import "Process.h"
 #import "Get.h"
 #import "Load.h"
@@ -35,8 +36,8 @@
                 }
                 syncBatch.syncBatchID = [[data[x] objectForKey:@"sync_batch_id"] stringValue];
                 NSDate *currentDate = NSDate.date;
-                syncBatch.date = [Time formatDate:DATE_FORMAT date:currentDate];
-                syncBatch.time = [Time formatDate:TIME_FORMAT date:currentDate];
+                syncBatch.date = [Time getFormattedDate:DATE_FORMAT date:currentDate];
+                syncBatch.time = [Time getFormattedDate:TIME_FORMAT date:currentDate];
             }
             if(![Update save:db]) {
                 message = @"";
@@ -73,8 +74,8 @@
                 }
                 user.userID = userID;
                 NSDate *currentDate = NSDate.date;
-                user.date = [Time formatDate:DATE_FORMAT date:currentDate];
-                user.time = [Time formatDate:TIME_FORMAT date:currentDate];
+                user.date = [Time getFormattedDate:DATE_FORMAT date:currentDate];
+                user.time = [Time getFormattedDate:TIME_FORMAT date:currentDate];
                 user.isLogout = NO;
                 Employees *employee = [Get employee:db employeeID:userID];
                 if(employee == nil) {
@@ -141,6 +142,7 @@
     [params setObject:[NSString stringWithFormat:@"%lld", store.storeID] forKey:@"local_record_id"];
     [params setObject:store.syncBatchID forKey:@"sync_batch_id"];
     [params setObject:store.name forKey:@"store_name"];
+    [params setObject:store.shortName forKey:@"short_name"];
     [params setObject:store.contactNumber forKey:@"contact_number"];
     [params setObject:store.email forKey:@"email"];
     [params setObject:store.address forKey:@"address"];
@@ -190,6 +192,7 @@
     [params setObject:[Get apiKey:db] forKey:@"api_key"];
     [params setObject:[NSString stringWithFormat:@"%lld", store.webStoreID] forKey:@"store_id"];
     [params setObject:store.name forKey:@"store_name"];
+    [params setObject:store.shortName forKey:@"short_name"];
     [params setObject:store.contactNumber forKey:@"contact_number"];
     [params setObject:store.email forKey:@"email"];
     [params setObject:store.address forKey:@"address"];

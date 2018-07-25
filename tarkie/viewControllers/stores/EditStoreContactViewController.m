@@ -4,6 +4,7 @@
 #import "Get.h"
 #import "Update.h"
 #import "View.h"
+#import "Time.h"
 
 @interface EditStoreContactViewController()
 
@@ -59,7 +60,7 @@
     self.tfEmail.text = self.storeContact.email;
     self.tfMobileNumber.text = self.storeContact.mobileNumber;
     self.tfLandlineNumber.text = self.storeContact.landlineNumber;
-    self.tfBirthdate.text = self.storeContact.birthdate;
+    self.tfBirthdate.text = [Time formatDate:[Get dateFormat:self.app.db] date:self.storeContact.birthdate];
     self.tfRemarks.text = self.storeContact.remarks;
 }
 

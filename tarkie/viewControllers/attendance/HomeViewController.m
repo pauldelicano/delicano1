@@ -78,6 +78,7 @@ static MessageDialogViewController *vcMessage;
     [super onRefresh];
     self.conventionVisits = [Get conventionName:self.app.db conventionID:CONVENTION_VISITS];
     [self.btnVisits setTitle:[NSString stringWithFormat:@"New %@", self.conventionVisits] forState:UIControlStateNormal];
+    [self.btnExpense setTitle:[Get currencySymbol:self.app.db] forState:UIControlStateNormal];
     [self.visits removeAllObjects];
     [self.forms removeAllObjects];
     [self.inventories removeAllObjects];
@@ -220,10 +221,10 @@ static MessageDialogViewController *vcMessage;
         visit.employeeID = self.userID;
         visit.syncBatchID = [Get syncBatchID:self.app.db];
         NSDate *currentDate = NSDate.date;
-        visit.createdDate = [Time formatDate:DATE_FORMAT date:currentDate];
-        visit.createdTime = [Time formatDate:TIME_FORMAT date:currentDate];
-        visit.startDate = [Time formatDate:DATE_FORMAT date:currentDate];
-        visit.endDate = [Time formatDate:DATE_FORMAT date:currentDate];
+        visit.createdDate = [Time getFormattedDate:DATE_FORMAT date:currentDate];
+        visit.createdTime = [Time getFormattedDate:TIME_FORMAT date:currentDate];
+        visit.startDate = [Time getFormattedDate:DATE_FORMAT date:currentDate];
+        visit.endDate = [Time getFormattedDate:DATE_FORMAT date:currentDate];
         visit.notes = @"";
         visit.isCheckOut = NO;
         visit.isCheckIn = NO;
@@ -314,7 +315,7 @@ static MessageDialogViewController *vcMessage;
 
 - (void)updateDisplayTime:(UIFont *)font {
     NSDate *currentDate = NSDate.date;
-    NSString *displayTime = [Time formatDate:@"h:mm a" date:currentDate];
+    NSString *displayTime = [Time getFormattedDate:@"h:mm a" date:currentDate];
     NSMutableAttributedString *attributedText = [NSMutableAttributedString.alloc initWithString:displayTime];
     if(displayTime.length >= 3) {
         NSRange range = NSMakeRange(displayTime.length - 3, 3);
@@ -322,7 +323,7 @@ static MessageDialogViewController *vcMessage;
         [attributedText addAttribute:(NSString *)kCTSuperscriptAttributeName value:@"1" range:range];
     }
     self.lTimeAttendance.attributedText = attributedText;
-    self.lDateAttendance.text = [Time formatDate:@"EEEE, MMM d, YYYY" date:currentDate];
+    self.lDateAttendance.text = [Time getFormattedDate:@"EEEE, MMM d, YYYY" date:currentDate];
 }
 
 @end

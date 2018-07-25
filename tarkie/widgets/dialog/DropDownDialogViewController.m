@@ -1,14 +1,19 @@
 #import "DropDownDialogViewController.h"
 #import "ScheduleTimes+CoreDataClass.h"
+#import "AppDelegate.h"
 #import "App.h"
+#import "Get.h"
 #import "View.h"
+#import "Time.h"
 #import "HomeTableViewCell.h"
 #import "VisitDetailsViewController.h"
 
 @interface DropDownDialogViewController()
 
+@property (strong, nonatomic) AppDelegate *app;
 @property (strong, nonatomic) id item;
 @property (nonatomic) UIEdgeInsets tfNotesLayoutMargins;
+@property (strong, nonatomic) NSString *timeFormat;
 @property (nonatomic) BOOL viewDidAppear;
 
 @end
@@ -17,11 +22,13 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.app = (AppDelegate *)UIApplication.sharedApplication.delegate;
     self.tvItems.tableFooterView = UIView.alloc.init;
     self.tvItems.hidden = YES;
     self.tvItemsHeight.constant = self.tfDropDown.frame.size.height * 5;
     self.tfNotesLayoutMargins = self.tfNotes.layoutMargins;
     self.tfNotes.layoutMargins = UIEdgeInsetsZero;
+    self.timeFormat = [Get timeFormat:self.app.db];
     self.viewDidAppear = NO;
 }
 
@@ -113,7 +120,7 @@
         }
         case DROP_DOWN_TYPE_SCHEDULE: {
             ScheduleTimes *scheduleTime = (ScheduleTimes *)self.items[indexPath.row];
-            item.lName.text = [NSString stringWithFormat:@"%@ - %@", scheduleTime.timeIn, scheduleTime.timeOut];
+            item.lName.text = [NSString stringWithFormat:@"%@ - %@", [Time formatTime:self.timeFormat time:scheduleTime.timeIn], [Time formatTime:self.timeFormat time:scheduleTime.timeOut]];
             break;
         }
         case DROP_DOWN_TYPE_CHECK_OUT_STATUS: {
@@ -132,7 +139,7 @@
         }
         case DROP_DOWN_TYPE_SCHEDULE: {
             ScheduleTimes *scheduleTime = (ScheduleTimes *)self.items[indexPath.row];
-            self.tfDropDown.text = [NSString stringWithFormat:@"%@ - %@", scheduleTime.timeIn, scheduleTime.timeOut];
+            self.tfDropDown.text = [NSString stringWithFormat:@"%@ - %@", [Time formatTime:self.timeFormat time:scheduleTime.timeIn], [Time formatTime:self.timeFormat time:scheduleTime.timeOut]];
             self.item = scheduleTime;
             self.tvItems.hidden = !self.tvItems.hidden;
             break;
@@ -212,7 +219,7 @@
 }
 
 - (void)onStoresSelect:(Stores *)store {
-    self.tfDropDown.text = store.name;
+    self.tfDropDown.text = [Get isSettingEnabled:self.app.db settingID:SETTING_STORE_DISPLAY_LONG_NAME] ? store.name : store.shortName;
     self.item = store;
 }
 

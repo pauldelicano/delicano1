@@ -1,12 +1,16 @@
 #import "AttendanceSummaryViewController.h"
+#import "AppDelegate.h"
 #import "App.h"
+#import "Get.h"
 #import "Image.h"
 #import "View.h"
 #import "Time.h"
 
 @interface AttendanceSummaryViewController()
 
-@property (nonatomic) BOOL viewWillAppear;
+@property (strong, nonatomic) AppDelegate *app;
+@property (strong, nonatomic) NSString *dateFormat, *timeFormat;
+@property (nonatomic) BOOL settingTimeOutSignature, viewWillAppear;
 
 @end
 
@@ -14,6 +18,10 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.app = (AppDelegate *)UIApplication.sharedApplication.delegate;
+    self.dateFormat = DATE_FORMAT;
+    self.timeFormat = [Get timeFormat:self.app.db];
+    self.settingTimeOutSignature = [Get isSettingEnabled:self.app.db settingID:SETTING_ATTENDANCE_TIME_OUT_SIGNATURE];
     self.viewWillAppear = NO;
 }
 
@@ -39,9 +47,9 @@
 
 - (void)onRefresh {
     [super onRefresh];
-    self.lTimeIn.text = [NSString stringWithFormat:@"%@ %@", self.timeIn.date, self.timeIn.time];
+    self.lTimeIn.text = [NSString stringWithFormat:@"%@ %@", [Time formatDate:self.dateFormat date:self.timeIn.date], [Time formatTime:self.timeFormat time:self.timeIn.time]];
     if(self.timeOut != nil) {
-        self.lTimeOut.text = [NSString stringWithFormat:@"%@ %@", self.timeOut.date, self.timeOut.time];
+        self.lTimeOut.text = [NSString stringWithFormat:@"%@ %@", [Time formatDate:self.dateFormat date:self.timeOut.date], [Time formatTime:self.timeFormat time:self.timeOut.time]];
         self.btnAddSignature.hidden = YES;
         self.ivSignature.image = [Image fromDocument:self.timeOut.signature];
         self.ivSignature.hidden = NO;
@@ -50,8 +58,8 @@
         self.btnTimeOut.hidden = YES;
     }
     else {
-        self.lTimeOut.text = [Time formatDate:[NSString stringWithFormat:@"%@ %@", DATE_FORMAT, TIME_FORMAT] date:self.timeOutPreview];
-        self.btnAddSignature.hidden = NO;
+        self.lTimeOut.text = [Time getFormattedDate:[NSString stringWithFormat:@"%@ %@", self.dateFormat, self.timeFormat] date:self.timeOutPreview];
+        self.btnAddSignature.hidden = !self.settingTimeOutSignature;
         self.ivSignature.hidden = YES;
         self.btnEditSignature.hidden = YES;
         self.btnCancel.hidden = NO;
@@ -85,7 +93,10 @@
 
 - (IBAction)timeOut:(id)sender {
     if(self.ivSignature.image == nil) {
-        return;
+        if(self.settingTimeOutSignature) {
+            return;
+        }
+        self.ivSignature.image = UIImage.alloc.init;
     }
     [self.navigationController popViewControllerAnimated:YES];
     [self.delegate onAttendanceSummaryTimeOut:self.ivSignature.image];

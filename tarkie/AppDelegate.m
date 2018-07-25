@@ -11,9 +11,10 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     self.psc = [self persistentStoreCoordinatorInit:@"tarkie.db"];
-    self.db = [self managedObjectContextInit:self.psc];
-    self.dbSync = [self managedObjectContextInit:self.psc];
-    self.dbTracking = [self managedObjectContextInit:self.psc];
+//    self.db = [self managedObjectContextInit:self.psc councurrencyType:NSMainQueueConcurrencyType];
+    self.db = [self managedObjectContextInit:self.psc councurrencyType:NSPrivateQueueConcurrencyType];
+    self.dbSync = [self managedObjectContextInit:self.psc councurrencyType:NSPrivateQueueConcurrencyType];
+    self.dbTracking = [self managedObjectContextInit:self.psc councurrencyType:NSMainQueueConcurrencyType];
     self.locationManager = [self locationManagerInit:self];
     self.userNotificationCenter = [self userNotificationCenterInit:self];
     return YES;
@@ -40,8 +41,8 @@
     return persistentStoreCoordinator;
 }
 
-- (NSManagedObjectContext *)managedObjectContextInit:(NSPersistentStoreCoordinator *)persistentStoreCoordinator {
-    NSManagedObjectContext *managedObjectContext = [NSManagedObjectContext.alloc initWithConcurrencyType:NSMainQueueConcurrencyType];
+- (NSManagedObjectContext *)managedObjectContextInit:(NSPersistentStoreCoordinator *)persistentStoreCoordinator councurrencyType:(NSManagedObjectContextConcurrencyType)concurrencyType {
+    NSManagedObjectContext *managedObjectContext = [NSManagedObjectContext.alloc initWithConcurrencyType:concurrencyType];
     managedObjectContext.persistentStoreCoordinator = persistentStoreCoordinator;
     return managedObjectContext;
 }

@@ -60,7 +60,7 @@
     self.lName.text = [NSString stringWithFormat:@"%@ %@", self.store.storeID != 0 ? @"Edit" : @"Add", self.conventionStores];
     self.lStoreName.text = [NSString stringWithFormat:@"%@ %@", self.conventionStores, @" Name"];
     if(self.store != nil) {
-        self.tfStoreName.text = self.store.name;
+        self.tfStoreName.text = [Get isSettingEnabled:self.app.db settingID:SETTING_STORE_DISPLAY_LONG_NAME] ? self.store.name : self.store.shortName;
         self.tfContactNumber.text = self.store.contactNumber;
         self.tfEmail.text = self.store.email;
         self.tfAddress.value = self.store.address;
@@ -89,6 +89,7 @@
     }
     self.store.employeeID = [Get userID:self.app.db];
     self.store.name = self.tfStoreName.text;
+    self.store.shortName = self.tfStoreName.text;
     self.store.contactNumber = self.tfContactNumber.text;
     self.store.email = self.tfEmail.text;
     self.store.address = self.tfAddress.text;

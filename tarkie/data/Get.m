@@ -1,4 +1,5 @@
 #import "Get.h"
+#import "App.h"
 #import "Update.h"
 #import "Time.h"
 
@@ -55,7 +56,7 @@
 
 + (BOOL)isModuleEnabled:(NSManagedObjectContext *)db moduleID:(long)moduleID {
     if(moduleID == 3 || moduleID == 4 || moduleID == 5) {
-        return NO;//paul
+//        return NO;//paul
     }
     return [self module:db moduleID:moduleID].isEnabled;
 }
@@ -89,6 +90,10 @@
     return [self fetch:db request:request].lastObject;
 }
 
++ (SettingsTeams *)settingTeam:(NSManagedObjectContext *)db settingID:(long)settingID {
+    return [self settingTeam:db settingID:settingID teamID:[Get employee:db employeeID:[Get userID:db]].teamID];
+}
+
 + (SettingsTeams *)settingTeam:(NSManagedObjectContext *)db settingID:(long)settingID teamID:(long)teamID {
     NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"SettingsTeams"];
     NSMutableArray *subpredicates = NSMutableArray.alloc.init;
@@ -98,8 +103,83 @@
     return [self fetch:db request:request].lastObject;
 }
 
-+ (BOOL)isSettingEnabled:(NSManagedObjectContext *)db settingID:(long)settingID teamID:(long)teamID {
-    return [[self settingTeam:db settingID:settingID teamID:teamID].value isEqualToString:@"yes"];
++ (BOOL)isSettingEnabled:(NSManagedObjectContext *)db settingID:(long)settingID {
+    return [[self settingTeam:db settingID:settingID].value isEqualToString:@"yes"];
+}
+
++ (NSString *)dateFormat:(NSManagedObjectContext *)db {
+    NSString *format = DATE_FORMAT;
+    NSString *setting = [self settingTeam:db settingID:SETTING_COMPANY_DATE_FORMAT].value;
+    if([setting isEqualToString:@"1"]) {
+        format = @"MMMM d, yyyy";
+    }
+    if([setting isEqualToString:@"2"]) {
+        format = @"dd-MMM-yy";
+    }
+    if([setting isEqualToString:@"3"]) {
+        format = @"yyyy-MM-dd";
+    }
+    if([setting isEqualToString:@"4"]) {
+        format = @"MM/dd/yyyy";
+    }
+    if([setting isEqualToString:@"5"]) {
+        format = @"MMM d, yyyy";
+    }
+    return format;
+}
+
++ (NSString *)timeFormat:(NSManagedObjectContext *)db {
+    NSString *format = TIME_FORMAT;
+    NSString *setting = [self settingTeam:db settingID:SETTING_COMPANY_TIME_FORMAT].value;
+    if([setting isEqualToString:@"12"]) {
+        format = @"hh:mm a";
+    }
+    if([setting isEqualToString:@"24"]) {
+        format = @"HH:mm";
+    }
+    return format;
+}
+
++ (NSString *)currencySymbol:(NSManagedObjectContext *)db {
+    NSString *currencySymbol = @"$";
+    NSString *currencyCode = [self settingTeam:db settingID:SETTING_COMPANY_CURRENCY].value;
+    if([currencyCode isEqualToString:@"AUD"]) {
+        currencySymbol = @"$";
+    }
+    if([currencyCode isEqualToString:@"CAD"]) {
+        currencySymbol = @"$";
+    }
+    if([currencyCode isEqualToString:@"EUR"]) {
+        currencySymbol = @"€";
+    }
+    if([currencyCode isEqualToString:@"HKD"]) {
+        currencySymbol = @"$";
+    }
+    if([currencyCode isEqualToString:@"JPY"]) {
+        currencySymbol = @"¥";
+    }
+    if([currencyCode isEqualToString:@"PHP"]) {
+        currencySymbol = @"₱";
+    }
+    if([currencyCode isEqualToString:@"GBP"]) {
+        currencySymbol = @"£";
+    }
+    if([currencyCode isEqualToString:@"SGD"]) {
+        currencySymbol = @"$";
+    }
+    if([currencyCode isEqualToString:@"TWD"]) {
+        currencySymbol = @"NT$";
+    }
+    if([currencyCode isEqualToString:@"THB"]) {
+        currencySymbol = @"฿";
+    }
+    if([currencyCode isEqualToString:@"TRY"]) {
+        currencySymbol = @"₺";
+    }
+    if([currencyCode isEqualToString:@"USD"]) {
+        currencySymbol = @"$";
+    }
+    return currencySymbol;
 }
 
 + (Conventions *)convention:(NSManagedObjectContext *)db conventionID:(long)conventionID {
@@ -158,7 +238,7 @@
     request.includesSubentities = NO;
     NSMutableArray *subpredicates = NSMutableArray.alloc.init;
     NSDate *currentDate = NSDate.date;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"scheduledDate < %@ OR (scheduledDate == %@ AND scheduledTime <= %@)", [Time formatDate:DATE_FORMAT date:currentDate], [Time formatDate:DATE_FORMAT date:currentDate], [Time formatDate:TIME_FORMAT date:currentDate]]];
+    [subpredicates addObject:[NSPredicate predicateWithFormat:@"scheduledDate < %@ OR (scheduledDate == %@ AND scheduledTime <= %@)", [Time getFormattedDate:DATE_FORMAT date:currentDate], [Time getFormattedDate:DATE_FORMAT date:currentDate], [Time getFormattedDate:TIME_FORMAT date:currentDate]]];
     [subpredicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
     [subpredicates addObject:[NSPredicate predicateWithFormat:@"isSeen == %@", @NO]];
     [subpredicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
@@ -267,6 +347,15 @@
 + (TimeIn *)timeIn:(NSManagedObjectContext *)db {
     NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"TimeIn"];
     return [self fetch:db request:request].lastObject;
+}
+
++ (long)timeInCount:(NSManagedObjectContext *)db date:(NSString *)date {
+    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"TimeIn"];
+    request.includesSubentities = NO;
+    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
+    [subpredicates addObject:[NSPredicate predicateWithFormat:@"date == %@", date]];
+    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
+    return [self fetch:db request:request].count;
 }
 
 + (TimeIn *)timeIn:(NSManagedObjectContext *)db timeInID:(long)timeInID {

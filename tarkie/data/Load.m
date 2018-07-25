@@ -140,7 +140,7 @@
         [subpredicates addObject:[NSPredicate predicateWithFormat:@"subject CONTAINS[cd] %@ OR message CONTAINS[cd] %@", searchFilter.lowercaseString, searchFilter.lowercaseString]];
     }
     NSDate *currentDate = NSDate.date;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:isScheduled? @"scheduledDate < %@ OR (scheduledDate == %@ AND scheduledTime <= %@)" : @"scheduledDate > %@ OR (scheduledDate == %@ AND scheduledTime > %@)", [Time formatDate:DATE_FORMAT date:currentDate], [Time formatDate:DATE_FORMAT date:currentDate], [Time formatDate:TIME_FORMAT date:currentDate]]];
+    [subpredicates addObject:[NSPredicate predicateWithFormat:isScheduled? @"scheduledDate < %@ OR (scheduledDate == %@ AND scheduledTime <= %@)" : @"scheduledDate > %@ OR (scheduledDate == %@ AND scheduledTime > %@)", [Time getFormattedDate:DATE_FORMAT date:currentDate], [Time getFormattedDate:DATE_FORMAT date:currentDate], [Time getFormattedDate:TIME_FORMAT date:currentDate]]];
     [subpredicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
     [subpredicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
     request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
@@ -162,9 +162,11 @@
 + (NSArray<Stores *> *)stores:(NSManagedObjectContext *)db searchFilter:(NSString *)searchFilter {
     NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Stores"];
     NSMutableArray *subpredicates = NSMutableArray.alloc.init;
+    BOOL displayLongName = [Get isSettingEnabled:db settingID:SETTING_STORE_DISPLAY_LONG_NAME];
     if(searchFilter.length > 0) {
-        [subpredicates addObject:[NSPredicate predicateWithFormat:@"name CONTAINS[cd] %@", searchFilter.lowercaseString]];
+        [subpredicates addObject:[NSPredicate predicateWithFormat:@"%@ CONTAINS[cd] %@", displayLongName ? @"name" : @"shortName", searchFilter.lowercaseString]];
     }
+    [subpredicates addObject:[NSPredicate predicateWithFormat:@"%@.length > 0", displayLongName ? @"name" : @"shortName"]];
     [subpredicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
     [subpredicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
     request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
@@ -346,7 +348,7 @@
     NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Visits"];
     NSMutableArray *subpredicates = NSMutableArray.alloc.init;
     [subpredicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"%@ BETWEEN {startDate, endDate}", [Time formatDate:DATE_FORMAT date:date]]];
+    [subpredicates addObject:[NSPredicate predicateWithFormat:@"%@ BETWEEN {startDate, endDate}", [Time getFormattedDate:DATE_FORMAT date:date]]];
     if(isNoCheckOutOnly) {
         [subpredicates addObject:[NSPredicate predicateWithFormat:@"isCheckOut == %@", @NO]];
     }

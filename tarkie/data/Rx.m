@@ -335,8 +335,8 @@
                     timeSecurity = [NSEntityDescription insertNewObjectForEntityForName:@"TimeSecurity" inManagedObjectContext:db];
                 }
                 NSDate *server = [Time getDateFromString:[data[x] objectForKey:@"date_time"]];
-                timeSecurity.serverDate = [Time formatDate:DATE_FORMAT date:server];
-                timeSecurity.serverTime = [Time formatDate:TIME_FORMAT date:server];
+                timeSecurity.serverDate = [Time getFormattedDate:DATE_FORMAT date:server];
+                timeSecurity.serverTime = [Time getFormattedDate:TIME_FORMAT date:server];
                 timeSecurity.upTime = NSProcessInfo.processInfo.systemUptime;
             }
             if(![Update save:db]) {
@@ -372,8 +372,8 @@
                 }
                 syncBatch.syncBatchID = [[data[x] objectForKey:@"sync_batch_id"] stringValue];
                 NSDate *currentDate = NSDate.date;
-                syncBatch.date = [Time formatDate:DATE_FORMAT date:currentDate];
-                syncBatch.time = [Time formatDate:TIME_FORMAT date:currentDate];
+                syncBatch.date = [Time getFormattedDate:DATE_FORMAT date:currentDate];
+                syncBatch.time = [Time getFormattedDate:TIME_FORMAT date:currentDate];
             }
             if(![Update save:db]) {
                 message = @"";
@@ -470,9 +470,9 @@
                     sequence.stores += 1;
                     store.storeID = sequence.stores;
                     store.webStoreID = webStoreID;
+                    store.employeeID = userID;
                     store.isFromWeb = YES;
                 }
-                store.employeeID = userID;
                 store.name = [data[x] objectForKey:@"store_name"];
                 store.shortName = [data[x] objectForKey:@"short_name"];
                 store.contactNumber = [data[x] objectForKey:@"contact_number"];
@@ -660,8 +660,8 @@
     long userID = [Get userID:db];
     [params setObject:[NSString stringWithFormat:@"%ld", userID] forKey:@"employee_id"];
     NSDate *currentDate = NSDate.date;
-    [params setObject:[Time formatDate:DATE_FORMAT date:currentDate] forKey:@"start_date"];
-    [params setObject:[Time formatDate:DATE_FORMAT date:isToday ? currentDate : [currentDate dateByAddingTimeInterval:60 * 60 * 24 * 15]] forKey:@"end_date"];
+    [params setObject:[Time getFormattedDate:DATE_FORMAT date:currentDate] forKey:@"start_date"];
+    [params setObject:[Time getFormattedDate:DATE_FORMAT date:isToday ? currentDate : [currentDate dateByAddingTimeInterval:60 * 60 * 24 * 15]] forKey:@"end_date"];
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @"get-schedule"] params:params timeout:HTTP_TIMEOUT_RX];
     NSDictionary *init = [[response objectForKey:@"init"] lastObject];
     NSString *status = [init objectForKey:@"status"];
@@ -685,8 +685,8 @@
                     sequence.schedules += 1;
                     schedule.scheduleID = sequence.schedules;
                     NSDate *currentDate = NSDate.date;
-                    schedule.date = [Time formatDate:DATE_FORMAT date:currentDate];
-                    schedule.time = [Time formatDate:TIME_FORMAT date:currentDate];
+                    schedule.date = [Time getFormattedDate:DATE_FORMAT date:currentDate];
+                    schedule.time = [Time getFormattedDate:TIME_FORMAT date:currentDate];
                     schedule.employeeID = userID;
                     schedule.isFromWeb = YES;
                 }
@@ -793,8 +793,8 @@
     [params setObject:[Get apiKey:db] forKey:@"api_key"];
     [params setObject:[NSString stringWithFormat:@"%ld", [Get userID:db]] forKey:@"employee_id"];
     NSDate *currentDate = NSDate.date;
-    [params setObject:[Time formatDate:DATE_FORMAT date:[currentDate dateByAddingTimeInterval:60 * 60 * 24 * -15]] forKey:@"start_date"];
-    [params setObject:[Time formatDate:DATE_FORMAT date:[currentDate dateByAddingTimeInterval:60 * 60 * 24 * 15]] forKey:@"end_date"];
+    [params setObject:[Time getFormattedDate:DATE_FORMAT date:[currentDate dateByAddingTimeInterval:60 * 60 * 24 * -15]] forKey:@"start_date"];
+    [params setObject:[Time getFormattedDate:DATE_FORMAT date:[currentDate dateByAddingTimeInterval:60 * 60 * 24 * 15]] forKey:@"end_date"];
     [params setObject:@"yes" forKey:@"get_deleted"];
     [params setObject:@"pending" forKey:@"status"];
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @"get-itinerary"] params:params timeout:HTTP_TIMEOUT_RX];
@@ -853,7 +853,7 @@
                 store.geoFenceRadius = [[data[x] objectForKey:@"store_radius"] longLongValue];
 
                 visit.storeID = store.storeID;
-                visit.name = store.name;
+                visit.name = [Get isSettingEnabled:db settingID:SETTING_STORE_DISPLAY_LONG_NAME] ? store.name : store.shortName;
                 visit.employeeID = employeeID;
                 visit.startDate = [data[x] objectForKey:@"start_date"];
                 visit.endDate = [data[x] objectForKey:@"end_date"];

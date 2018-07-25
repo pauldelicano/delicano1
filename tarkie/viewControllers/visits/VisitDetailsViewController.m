@@ -20,10 +20,10 @@
 @property (nonatomic) UIEdgeInsets vInventoryLayoutMargins, vFormsLayoutMargins;
 @property (strong, nonatomic) Stores *store;
 @property (strong, nonatomic) UIImage *photo;
-@property (strong, nonatomic) NSString *photoFilename, *visitStatus, *visitNotes, *conventionStores, *conventionVisits, *conventionInvoice, *conventionDeliveries;
+@property (strong, nonatomic) NSString *timeFormat, *photoFilename, *visitStatus, *visitNotes, *conventionStores, *conventionVisits, *conventionInvoice, *conventionDeliveries;
 @property (strong, nonatomic) NSDate *currentDate;
 @property (nonatomic) long userID;
-@property (nonatomic) BOOL viewWillAppear, isInventory, isForms, inventoryLoaded, formsLoaded, isCheckingIn, isCheckingOut;
+@property (nonatomic) BOOL displayLongName, viewWillAppear, isInventory, isForms, inventoryLoaded, formsLoaded, isCheckingIn, isCheckingOut;
 
 @end
 
@@ -45,6 +45,8 @@ static MessageDialogViewController *vcMessage;
     self.images = NSMutableArray.alloc.init;
     self.userID = [Get userID:self.app.db];
     self.store = nil;
+    self.timeFormat = [Get timeFormat:self.app.db];
+    self.displayLongName = [Get isSettingEnabled:self.app.db settingID:SETTING_STORE_DISPLAY_LONG_NAME];
     self.viewWillAppear = NO;
 }
 
@@ -121,7 +123,7 @@ static MessageDialogViewController *vcMessage;
     if(self.visit.storeID != 0) {
         self.lName.text = self.conventionVisits;
         Stores *store = [Get store:self.app.db storeID:self.visit.storeID];
-        self.lStoreName.text = store.name;
+        self.lStoreName.text = self.displayLongName ? store.name : store.shortName;
         self.lStoreAddress.text = store.address.length > 0 ? store.address : @"No address";
     }
     else {
@@ -156,7 +158,7 @@ static MessageDialogViewController *vcMessage;
     self.lInvoice.text = self.conventionInvoice;
     self.lDeliveries.text = self.conventionDeliveries;
     self.lInvoiceValue.text = self.visit.invoice.length > 0 ? self.visit.invoice : @"N/A";
-    self.lDeliveriesValue.text = [NSString stringWithFormat:@"P%.02f", [self.visit.deliveries floatValue]];
+    self.lDeliveriesValue.text = [NSString stringWithFormat:@"%@%.02f", [Get currencySymbol:self.app.db], [self.visit.deliveries floatValue]];
     self.tfNotes.value = self.visit.notes;
     [self.view layoutIfNeeded];
 }
@@ -185,7 +187,7 @@ static MessageDialogViewController *vcMessage;
 
 - (IBAction)save:(id)sender {
     if(self.store.storeID != 0) {
-        self.visit.name = self.store.name;
+        self.visit.name = self.self.displayLongName ? self.store.name : self.store.shortName;
         self.visit.storeID = self.store.storeID;
     }
     NSString *notes = self.tfNotes.text;
@@ -274,7 +276,7 @@ static MessageDialogViewController *vcMessage;
 - (void)onStoresSelect:(Stores *)stores {
     self.store = stores;
     self.lName.text = @"Visit";
-    self.lStoreName.text = self.store.name;
+    self.lStoreName.text = self.displayLongName ? self.store.name : self.store.shortName;
     self.lStoreAddress.text = self.store.address.length > 0 ? self.store.address : @"No address";
 }
 
@@ -315,8 +317,8 @@ static MessageDialogViewController *vcMessage;
                 sequence.photos += 1;
                 photo.photoID = sequence.photos;
                 photo.employeeID = self.userID;
-                photo.date = [Time formatDate:DATE_FORMAT date:currentDate];
-                photo.time = [Time formatDate:TIME_FORMAT date:currentDate];
+                photo.date = [Time getFormattedDate:DATE_FORMAT date:currentDate];
+                photo.time = [Time getFormattedDate:TIME_FORMAT date:currentDate];
                 photo.filename = filename;
                 photo.syncBatchID = [Get syncBatchID:self.app.db];
                 photo.isSignature = NO;
@@ -436,15 +438,15 @@ static MessageDialogViewController *vcMessage;
         }
     }
     self.currentDate = NSDate.date;
-    NSString *date = [Time formatDate:DATE_FORMAT date:self.currentDate];
-    NSString *time = [Time formatDate:TIME_FORMAT date:self.currentDate];
+    NSString *date = [Time getFormattedDate:DATE_FORMAT date:self.currentDate];
+    NSString *time = [Time getFormattedDate:TIME_FORMAT date:self.currentDate];
     NSString *syncBatchID = [Get syncBatchID:self.app.db];
     Sequences *sequence = [Get sequence:self.app.db];
     GPS *gps = [NSEntityDescription insertNewObjectForEntityForName:@"GPS" inManagedObjectContext:self.app.db];
     sequence.gps += 1;
     gps.gpsID = sequence.gps;
-    gps.date = [Time formatDate:DATE_FORMAT date:self.app.location.timestamp];
-    gps.time = [Time formatDate:TIME_FORMAT date:self.app.location.timestamp];
+    gps.date = [Time getFormattedDate:DATE_FORMAT date:self.app.location.timestamp];
+    gps.time = [Time getFormattedDate:TIME_FORMAT date:self.app.location.timestamp];
     gps.latitude = self.app.location.coordinate.latitude;
     gps.longitude = self.app.location.coordinate.longitude;
     CheckIn *checkIn = [NSEntityDescription insertNewObjectForEntityForName:@"CheckIn" inManagedObjectContext:self.app.db];
@@ -519,15 +521,15 @@ static MessageDialogViewController *vcMessage;
         return;
     }
     self.currentDate = NSDate.date;
-    NSString *date = [Time formatDate:DATE_FORMAT date:self.currentDate];
-    NSString *time = [Time formatDate:TIME_FORMAT date:self.currentDate];
+    NSString *date = [Time getFormattedDate:DATE_FORMAT date:self.currentDate];
+    NSString *time = [Time getFormattedDate:TIME_FORMAT date:self.currentDate];
     NSString *syncBatchID = [Get syncBatchID:self.app.db];
     Sequences *sequence = [Get sequence:self.app.db];
     GPS *gps = [NSEntityDescription insertNewObjectForEntityForName:@"GPS" inManagedObjectContext:self.app.db];
     sequence.gps += 1;
     gps.gpsID = sequence.gps;
-    gps.date = [Time formatDate:DATE_FORMAT date:self.app.location.timestamp];
-    gps.time = [Time formatDate:TIME_FORMAT date:self.app.location.timestamp];
+    gps.date = [Time getFormattedDate:DATE_FORMAT date:self.app.location.timestamp];
+    gps.time = [Time getFormattedDate:TIME_FORMAT date:self.app.location.timestamp];
     gps.latitude = self.app.location.coordinate.latitude;
     gps.longitude = self.app.location.coordinate.longitude;
     CheckOut *checkOut = [NSEntityDescription insertNewObjectForEntityForName:@"CheckOut" inManagedObjectContext:self.app.db];
@@ -564,7 +566,7 @@ static MessageDialogViewController *vcMessage;
 
 - (void)updateCheckIn {
     if(self.visit.isCheckIn) {
-        [self.btnCheckIn setTitle:[NSString stringWithFormat:@"IN - %@", [Get checkIn:self.app.db visitID:self.visit.visitID].time] forState:UIControlStateNormal];
+        [self.btnCheckIn setTitle:[NSString stringWithFormat:@"IN - %@", [Time formatTime:self.timeFormat time:[Get checkIn:self.app.db visitID:self.visit.visitID].time]] forState:UIControlStateNormal];
         self.btnCheckIn.backgroundColor = [UIColor colorNamed:@"Grey700"];
     }
     else {
@@ -577,7 +579,7 @@ static MessageDialogViewController *vcMessage;
 - (void)updateCheckOut {
     if(self.visit.isCheckIn) {
         if(self.visit.isCheckOut) {
-            [self.btnCheckOut setTitle:[NSString stringWithFormat:@"OUT - %@", [Get checkOut:self.app.db checkInID:[Get checkIn:self.app.db visitID:self.visit.visitID].checkInID].time] forState:UIControlStateNormal];
+            [self.btnCheckOut setTitle:[NSString stringWithFormat:@"OUT - %@", [Time formatTime:self.timeFormat time:[Get checkOut:self.app.db checkInID:[Get checkIn:self.app.db visitID:self.visit.visitID].checkInID].time]] forState:UIControlStateNormal];
             self.btnCheckOut.backgroundColor = [UIColor colorNamed:@"Grey600"];
         }
         else {

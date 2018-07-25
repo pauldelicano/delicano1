@@ -38,7 +38,7 @@
     CGFloat margin = (6.0f / 568) * UIScreen.mainScreen.bounds.size.height;
 
     Employees *employee = [Get employee:self.app.db employeeID:[Get userID:self.app.db]];
-    NSString *timestamp = [NSString stringWithFormat:@"%@\n%@ %@\n%@", [Time formatDate:@"MMM d, yyyy h:mm:ss a" date:NSDate.date], employee.firstName, employee.lastName, [Get company:self.app.db].name];
+    NSString *timestamp = [NSString stringWithFormat:@"%@\n%@ %@\n%@", [Time getFormattedDate:[NSString stringWithFormat:@"%@ %@", [Get dateFormat:self.app.db], [Get timeFormat:self.app.db]] date:NSDate.date], employee.firstName, employee.lastName, [Get company:self.app.db].name];
     UIFont *timestampFont = [UIFont fontWithName:@"ProximaNova-Regular" size:(12.0f / 568) * UIScreen.mainScreen.bounds.size.height];
     CGSize timestampSize = [timestamp sizeWithAttributes:@{NSFontAttributeName:timestampFont}];
     [timestamp drawInRect:CGRectMake(margin, size.height - timestampSize.height - margin, timestampSize.width, timestampSize.height) withAttributes:@{NSFontAttributeName:timestampFont, NSForegroundColorAttributeName:UIColor.whiteColor}];

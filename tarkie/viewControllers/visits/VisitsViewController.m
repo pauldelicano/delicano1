@@ -14,6 +14,7 @@
 @property (strong, nonatomic) MainViewController *main;
 @property (strong, nonatomic) NSMutableArray<Visits *> *visits;
 @property (strong, nonatomic) NSDate *selectedDate;
+@property (strong, nonatomic) NSString *timeFormat;
 @property (nonatomic) BOOL viewDidAppear;
 
 @end
@@ -29,6 +30,7 @@
     self.tvVisits.tableFooterView = UIView.alloc.init;
     self.visits = NSMutableArray.alloc.init;
     self.selectedDate = nil;
+    self.timeFormat = [Get timeFormat:self.app.db];
     self.viewDidAppear = NO;
 }
 
@@ -46,7 +48,7 @@
 - (void)onRefresh {
     [super onRefresh];
     if(self.selectedDate != nil) {
-        self.lDate.text = [Time formatDate:@"MMM d, yyyy" date:self.selectedDate];
+        self.lDate.text = [Time getFormattedDate:[Get dateFormat:self.app.db] date:self.selectedDate];
         [self.visits removeAllObjects];
         [self.visits addObjectsFromArray:[Load visits:self.app.db date:self.selectedDate isNoCheckOutOnly:NO]];
         [self.tvVisits reloadData];
@@ -79,10 +81,10 @@
     NSString *checkout = @"NO OUT";
     if(visit.isCheckIn) {
         CheckIn *checkIn = [Get checkIn:self.app.db visitID:visit.visitID];
-        checkin = checkIn.time;
+        checkin = [Time formatTime:self.timeFormat time:checkIn.time];
         if(visit.isCheckOut) {
             CheckOut *checkOut = [Get checkOut:self.app.db checkInID:checkIn.checkInID];
-            checkout = checkOut.time;
+            checkout = [Time formatTime:self.timeFormat time:checkOut.time];
         }
     }
     item.lStatus.text = visit.isCheckIn ? [NSString stringWithFormat:@"%@ - %@", checkin, checkout] : @"ACTIVE";

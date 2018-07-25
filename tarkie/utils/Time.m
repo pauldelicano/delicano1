@@ -8,10 +8,22 @@
     return [dateFormatter dateFromString:string];
 }
 
-+ (NSString *)formatDate:(NSString *)format date:(NSDate *)date {
++ (NSString *)getFormattedDate:(NSString *)format date:(NSDate *)date {
     NSDateFormatter *dateFormatter = NSDateFormatter.alloc.init;
     dateFormatter.dateFormat = format;
     return [dateFormatter stringFromDate:date];
+}
+
++ (NSString *)formatDate:(NSString *)format date:(NSString *)date {
+    NSDateFormatter *dateFormatter = NSDateFormatter.alloc.init;
+    dateFormatter.dateFormat = DATE_FORMAT;
+    return [self getFormattedDate:format date:[dateFormatter dateFromString:date]];
+}
+
++ (NSString *)formatTime:(NSString *)format time:(NSString *)time {
+    NSDateFormatter *dateFormatter = NSDateFormatter.alloc.init;
+    dateFormatter.dateFormat = TIME_FORMAT;
+    return [self getFormattedDate:format date:[dateFormatter dateFromString:time]];
 }
 
 @end

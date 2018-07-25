@@ -27,8 +27,8 @@
             announcementSeen.announcementID = self.announcement.announcementID;
         }
         NSDate *currentDate = NSDate.date;
-        announcementSeen.date = [Time formatDate:DATE_FORMAT date:currentDate];
-        announcementSeen.time = [Time formatDate:TIME_FORMAT date:currentDate];
+        announcementSeen.date = [Time getFormattedDate:DATE_FORMAT date:currentDate];
+        announcementSeen.time = [Time getFormattedDate:TIME_FORMAT date:currentDate];
         announcementSeen.isSync = NO;
         [Update save:self.app.db];
     }
@@ -47,11 +47,11 @@
 }
 
 - (void)onRefresh {
-    self.lName.text = self.announcement.scheduledDate;
+    self.lName.text = [Time formatDate:[Get dateFormat:self.app.db] date:self.announcement.scheduledDate];
     Employees *createdBy = [Get employee:self.app.db employeeID:self.announcement.createdByID];
     self.ivPhoto.image = [Image saveFromURL:[Image cachesPath:[NSString stringWithFormat:@"EMPLOYEE_PHOTO_%lld%@", createdBy.employeeID, @".png"]] url:createdBy.photoURL];
     self.lSubject.text = self.announcement.subject;
-    self.lDetails.text = [NSString stringWithFormat:@"%@ %@ | %@", createdBy.firstName, createdBy.lastName, self.announcement.scheduledTime];
+    self.lDetails.text = [NSString stringWithFormat:@"%@ %@ | %@", createdBy.firstName, createdBy.lastName, [Time formatTime:[Get timeFormat:self.app.db] time:self.announcement.scheduledTime]];
     self.lMessage.text = self.announcement.message;
 }
 

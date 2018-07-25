@@ -6,9 +6,11 @@
 
 @interface LoadingDialogViewController()
 
+@property (strong, nonatomic) UIApplication *application;
 @property (strong, nonatomic) AppDelegate *app;
 @property (strong, nonatomic) Process *process;
 @property (strong, nonatomic) NSString *loadingMessage;
+@property (nonatomic) UIBackgroundTaskIdentifier background;
 @property (nonatomic) long progress;
 @property (nonatomic) BOOL viewDidAppear;
 
@@ -18,7 +20,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.app = (AppDelegate *)UIApplication.sharedApplication.delegate;
+    self.application = UIApplication.sharedApplication;
+    self.app = (AppDelegate *)self.application.delegate;
     self.process = Process.alloc.init;
     self.process.delegate = self;
     self.viewDidAppear = NO;
@@ -40,6 +43,10 @@
     switch(self.action) {
         case LOADING_ACTION_AUTHORIZE: {
             self.loadingMessage = @"Authorizing device... Please wait.";
+            self.background = [self.application beginBackgroundTaskWithExpirationHandler:^{
+                [self.application endBackgroundTask:self.background];
+                self.background = UIBackgroundTaskInvalid;
+            }];
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 [self.process authorize:self.app.db params:self.params];
             });
@@ -47,6 +54,10 @@
         }
         case LOADING_ACTION_LOGIN: {
             self.loadingMessage = @"Logging in... Please wait.";
+            self.background = [self.application beginBackgroundTaskWithExpirationHandler:^{
+                [self.application endBackgroundTask:self.background];
+                self.background = UIBackgroundTaskInvalid;
+            }];
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 [self.process login:self.app.db params:self.params];
             });
@@ -54,6 +65,10 @@
         }
         case LOADING_ACTION_TIME_SECURITY: {
             self.loadingMessage = @"Getting server time... Please wait.";
+            self.background = [self.application beginBackgroundTaskWithExpirationHandler:^{
+                [self.application endBackgroundTask:self.background];
+                self.background = UIBackgroundTaskInvalid;
+            }];
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 [self.process timeSecurity:self.app.db];
             });
@@ -61,6 +76,10 @@
         }
         case LOADING_ACTION_UPDATE_MASTER_FILE: {
             self.loadingMessage = @"Updating master file... Please wait.";
+            self.background = [self.application beginBackgroundTaskWithExpirationHandler:^{
+                [self.application endBackgroundTask:self.background];
+                self.background = UIBackgroundTaskInvalid;
+            }];
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 [self.process updateMasterFile:self.app.db isAttendance:[Get isModuleEnabled:self.app.db moduleID:MODULE_ATTENDANCE] isVisits:[Get isModuleEnabled:self.app.db moduleID:MODULE_VISITS] isExpense:[Get isModuleEnabled:self.app.db moduleID:MODULE_EXPENSE] isInventory:[Get isModuleEnabled:self.app.db moduleID:MODULE_INVENTORY] isForms:[Get isModuleEnabled:self.app.db moduleID:MODULE_FORMS]];
             });
@@ -68,6 +87,10 @@
         }
         case LOADING_ACTION_SYNC_DATA: {
             self.loadingMessage = @"Syncing data... Please wait.";
+            self.background = [self.application beginBackgroundTaskWithExpirationHandler:^{
+                [self.application endBackgroundTask:self.background];
+                self.background = UIBackgroundTaskInvalid;
+            }];
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 [self.process syncData:self.app.db];
             });
@@ -75,6 +98,10 @@
         }
         case LOADING_ACTION_SEND_BACKUP_DATA: {
             self.loadingMessage = @"Sending backup data... Please wait.";
+            self.background = [self.application beginBackgroundTaskWithExpirationHandler:^{
+                [self.application endBackgroundTask:self.background];
+                self.background = UIBackgroundTaskInvalid;
+            }];
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 [self.process sendBackupData:self.app.db];
             });
@@ -96,6 +123,8 @@
         if(self.progress >= self.process.count || ![result isEqualToString:@"ok"]) {
             [View removeView:self.view animated:NO];
             [self.delegate onLoadingFinish:self.action result:result];
+            [self.application endBackgroundTask:self.background];
+            self.background = UIBackgroundTaskInvalid;
         }
     });
 }
