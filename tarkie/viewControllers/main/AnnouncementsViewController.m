@@ -12,6 +12,7 @@
 @interface AnnouncementsViewController()
 
 @property (strong, nonatomic) AppDelegate *app;
+@property (strong, nonatomic) NSCache *cache;
 @property (strong, nonatomic) NSMutableArray<Announcements*> *announcements;
 @property (strong, nonatomic) NSString *searchFilter;
 @property (nonatomic) BOOL viewWillAppear;
@@ -60,10 +61,16 @@
     AnnouncementItemTableViewCell *item = [tableView dequeueReusableCellWithIdentifier:@"item" forIndexPath:indexPath];
     Announcements *announcement = self.announcements[indexPath.row];
     Employees *createdBy = [Get employee:self.app.db employeeID:announcement.createdByID];
-    item.ivPhoto.image = [Image saveFromURL:[Image cachesPath:[NSString stringWithFormat:@"EMPLOYEE_PHOTO_%lld%@", createdBy.employeeID, @".png"]] url:createdBy.photoURL];
+    item.ivPhoto.image = nil;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        UIImage *image = [Image saveFromURL:[Image cachesPath:[NSString stringWithFormat:@"EMPLOYEE_PHOTO_%lld%@", createdBy.employeeID, @".png"]] url:createdBy.photoURL];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            item.ivPhoto.image = image;
+        });
+    });
     item.lName.font = [UIFont fontWithName:!announcement.isSeen ? @"ProximaNova-Semibold" : @"ProximaNova-Regular" size:item.lName.font.pointSize];
     item.lName.text = announcement.subject;
-    item.lDetails.text = [NSString stringWithFormat:@"%@ %@ | %@ | %@", createdBy.firstName, createdBy.lastName, [Time formatTime:[Get timeFormat:self.app.db] time:announcement.scheduledTime], [Time formatDate:[Get dateFormat:self.app.db] date:announcement.scheduledDate]];
+    item.lDetails.text = [NSString stringWithFormat:@"%@ %@ | %@ | %@", createdBy.firstName, createdBy.lastName, [Time formatTime:self.app.settingDisplayTimeFormat time:announcement.scheduledTime], [Time formatDate:self.app.settingDisplayDateFormat date:announcement.scheduledDate]];
     return item;
 }
 

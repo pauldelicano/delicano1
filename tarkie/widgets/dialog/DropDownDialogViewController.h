@@ -39,5 +39,6 @@ typedef enum {
 @property (nonatomic) DropDownAction action;
 @property (strong, nonatomic) UIViewController *parent;
 @property (strong, nonatomic) NSArray *items;
+@property (strong, nonatomic) NSString *notes;
 
 @end

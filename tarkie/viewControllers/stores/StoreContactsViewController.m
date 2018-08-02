@@ -24,7 +24,7 @@
     self.app = (AppDelegate *)UIApplication.sharedApplication.delegate;
     self.tvStoreContacts.tableFooterView = UIView.alloc.init;
     self.storeContacts = NSMutableArray.alloc.init;
-    self.btnAdd.hidden = ![Get isSettingEnabled:self.app.db settingID:SETTING_STORE_ADD];
+    self.btnAdd.hidden = !self.app.settingStoreAdd;
     self.viewWillAppear = NO;
 }
 
@@ -64,9 +64,9 @@
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     StoreContactsHeaderTableViewCell *header = [tableView dequeueReusableCellWithIdentifier:@"header"];
-    header.lName.text = [Get isSettingEnabled:self.app.db settingID:SETTING_STORE_DISPLAY_LONG_NAME] ? self.store.name : self.store.shortName;
+    header.lName.text = self.app.settingStoreDisplayLongName ? self.store.name : self.store.shortName;
     header.lAddress.text = self.store.address.length > 0 ? self.store.address : @"No address";
-    header.btnEdit.hidden = ![Get isSettingEnabled:self.app.db settingID:SETTING_STORE_EDIT];
+    header.btnEdit.hidden = !self.app.settingStoreEdit;
     [header.btnEdit addTarget:self action:@selector(editStore:) forControlEvents:UIControlEventTouchUpInside];
     return header;
 }
@@ -79,7 +79,7 @@
     item.lEmail.text = storeContact.email;
     item.lBirthdate.text = storeContact.birthdate;
     item.btnEdit.tag = indexPath.row;
-    item.btnEdit.hidden = ![Get isSettingEnabled:self.app.db settingID:SETTING_STORE_EDIT];
+    item.btnEdit.hidden = !self.app.settingStoreEdit;
     [item.btnEdit addTarget:self action:@selector(editStoreContact:) forControlEvents:UIControlEventTouchUpInside];
     return item;
 }

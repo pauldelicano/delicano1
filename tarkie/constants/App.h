@@ -19,56 +19,16 @@
 #endif
 
 typedef enum {
-    MENU_TIME_IN_OUT = 1,
-    MENU_BREAKS = 2,
-    MENU_STORES = 3,
-    MENU_UPDATE_MASTER_FILE = 4,
-    MENU_SEND_BACKUP_DATA = 5,
-    MENU_BACKUP_DATA = 6,
-    MENU_ABOUT = 7,
-    MENU_LOGOUT = 8
-} Menu;
-
-typedef enum {
-    MODULE_ATTENDANCE = 1,
-    MODULE_VISITS = 2,
-    MODULE_EXPENSE = 3,
-    MODULE_INVENTORY = 4,
-    MODULE_FORMS = 5
-} Module;
-
-typedef enum {
-    CONVENTION_EMPLOYEES = 1,
-    CONVENTION_STORES = 2,
-    CONVENTION_TIME_IN = 3,
-    CONVENTION_TIME_OUT = 4,
-    CONVENTION_VISITS = 5,
-    CONVENTION_TEAMS = 6,
-    CONVENTION_INVOICE = 7,
-    CONVENTION_DELIVERIES = 8,
-    CONVENTION_RETURNS = 9,
-    CONVENTION_SALES = 10
-} Convention;
-
-typedef enum {
     //COMPANY
     //code = setGen-003-01, name = Currency", value = string: php, implemented
-    SETTING_COMPANY_CURRENCY = 1565,
+    SETTING_DISPLAY_CURRENCY = 1565,
     //code = setGen-003-02, name = Date Format", value = number: id,  implemented
-    SETTING_COMPANY_DATE_FORMAT = 1566,
+    SETTING_DISPLAY_DATE_FORMAT = 1566,
     //code = setGen-003-03, name = Time Format", value = string: 12/24, implemented
-    SETTING_COMPANY_TIME_FORMAT = 1567,
+    SETTING_DISPLAY_TIME_FORMAT = 1567,
     //code = setGen-003-04, name = Distance UOM", value = number: id, pending
-    SETTING_COMPANY_DISTANCE_UOM = 1568,
-
-    //STORES
-    //code = setGen-002-01, name = Allow Employee to Add Store/Clients in App?, value = yes/no, implemented
-    SETTING_STORE_ADD = 61,
-    //code = setGen-002-02, name = Allow Employee to Edit Store/Clients in App?, value = yes/no, implemented
-    SETTING_STORE_EDIT = 62,
-    //code = setGen-002-03, name = Use Store/Client Long Name in App?, value = yes/no, implemented
-    SETTING_STORE_DISPLAY_LONG_NAME = 378,
-
+    SETTING_DISPLAY_DISTANCE_UOM = 1568,
+    
     //LOCATION
     //code = setGen-001-01, name = Route Tracking, value = yes/no, pending
     SETTING_LOCATION_TRACKING = 39,
@@ -80,6 +40,14 @@ typedef enum {
     SETTING_LOCATION_GEO_TAGGING = 40,
     //code = setGen-001-04, name = Location-related Alerts, value = yes/no, pending
     SETTING_LOCATION_ALERTS = 42,
+
+    //STORES
+    //code = setGen-002-01, name = Allow Employee to Add Store/Clients in App?, value = yes/no, implemented
+    SETTING_STORE_ADD = 61,
+    //code = setGen-002-02, name = Allow Employee to Edit Store/Clients in App?, value = yes/no, implemented
+    SETTING_STORE_EDIT = 62,
+    //code = setGen-002-03, name = Use Store/Client Long Name in App?, value = yes/no, implemented
+    SETTING_STORE_DISPLAY_LONG_NAME = 378,
 
     //ATTENDANCE
     //code = SetAtt-001-01, name = Allow Employee to Select Store upon Start Day/End Day?, value = yes/no, implemented
@@ -112,33 +80,33 @@ typedef enum {
     SETTING_ATTENDANCE_NOTIFICATION_TIME_OUT = 10,
 
     //VISITS
-    //code = SetIti-001-01, name = Allow Employee to Add Visits in App?, value = yes/no
+    //code = SetIti-001-01, name = Allow Employee to Add Visits in App?, value = yes/no, implemented
     SETTING_VISITS_ADD = 27,
-    //code = SetIti-001-06, name = Do not Allow Changes to Visit After Check-out?, value = yes/no
+    //code = SetIti-001-06, name = Do not Allow Changes to Visit After Check-out?, value = yes/no, implemented
     SETTING_VISITS_EDIT_AFTER_CHECK_OUT = 58,
     //code = SetIti-001-02, name = Allow Employee to Reschedule Visits in App?, value = yes/no
     SETTING_VISITS_RESCHEDULE = 28,
-    //code = SetIti-001-03, name = Allow Employee to Delete Visits in App?, value = yes/no
+    //code = SetIti-001-03, name = Allow Employee to Delete Visits in App?, value = yes/no, implemented
     SETTING_VISITS_DELETE = 55,
-    //code = SetIti-001-10, name = Show Invoice Number in App, value = yes/no
+    //code = SetIti-001-10, name = Show Invoice Number in App, value = yes/no, implemented
     SETTING_VISITS_INVOICE = 1576,
-    //code = SetIti-001-11, name = Show Delivery Fee in App, value = yes/no
+    //code = SetIti-001-11, name = Show Delivery Fee in App, value = yes/no, implemented
     SETTING_VISITS_DELIVERIES = 1577,
-    //code = SetIti-001-05, name = Require 'General' Notes?, value = yes/no
+    //code = SetIti-001-05, name = Require 'General' Notes?, value = yes/no, implemented
     SETTING_VISITS_NOTES = 57,
-    //code = SetIti-001-09, name = Require Remarks for Completed Visits?, value = yes/no
+    //code = SetIti-001-09, name = Require Remarks for Completed Visits?, value = yes/no, implemented
     SETTING_VISITS_NOTES_FOR_COMPLETED = 1575,
-    //code = SetIti-001-07, name = Require Remarks for Not Completed Visits?, value = yes/no
+    //code = SetIti-001-07, name = Require Remarks for Not Completed Visits?, value = yes/no, implemented
     SETTING_VISITS_NOTES_FOR_NOT_COMPLETED = 31,
-    //code = SetIti-001-08, name = Require Remarks for Cancelled Visits?, value = yes/no
+    //code = SetIti-001-08, name = Require Remarks for Cancelled Visits?, value = yes/no, implemented
     SETTING_VISITS_NOTES_FOR_CANCELED = 208,
-    //code = SetIti-001-13, name = Show Notes instead of Address in App, value = yes/no
+    //code = SetIti-001-13, name = Show Notes instead of Address in App, value = yes/no, implemented
     SETTING_VISITS_NOTES_AS_ADDRESS = 1579,
-    //code = SetIti-001-04, name = Allow Employee to Parallel Check-in/Check-out?, value = yes/no
+    //code = SetIti-001-04, name = Allow Employee to Parallel Check-in/Check-out?, value = yes/no, implemented
     SETTING_VISITS_PARALLEL_CHECK_IN_OUT = 56,
-    //code = SetIti-002-01, name = Require Check-in Photo?, value = yes/no
+    //code = SetIti-002-01, name = Require Check-in Photo?, value = yes/no, implemented
     SETTING_VISITS_CHECK_IN_PHOTO = 29,
-    //code = SetIti-002-02, name = Require Check-out Photo?, value = yes/no
+    //code = SetIti-002-02, name = Require Check-out Photo?, value = yes/no, implemented
     SETTING_VISITS_CHECK_OUT_PHOTO = 30,
     //code = SetIti-001-12, name = Use SMS Sending, value = yes/no
     SETTING_VISITS_SMS_SENDING = 1578,
@@ -191,5 +159,37 @@ typedef enum {
     //code = setInv-000-08, name = Stocks On-hand
     SETTING_INVENTORY_STOCKS_ON_HAND = 1586
 } Setting;
+
+typedef enum {
+    CONVENTION_EMPLOYEES = 1,
+    CONVENTION_STORES = 2,
+    CONVENTION_TIME_IN = 3,
+    CONVENTION_TIME_OUT = 4,
+    CONVENTION_VISITS = 5,
+    CONVENTION_TEAMS = 6,
+    CONVENTION_INVOICE = 7,
+    CONVENTION_DELIVERIES = 8,
+    CONVENTION_RETURNS = 9,
+    CONVENTION_SALES = 10
+} Convention;
+
+typedef enum {
+    MENU_TIME_IN_OUT = 1,
+    MENU_BREAKS = 2,
+    MENU_STORES = 3,
+    MENU_UPDATE_MASTER_FILE = 4,
+    MENU_SEND_BACKUP_DATA = 5,
+    MENU_BACKUP_DATA = 6,
+    MENU_ABOUT = 7,
+    MENU_LOGOUT = 8
+} Menu;
+
+typedef enum {
+    MODULE_ATTENDANCE = 1,
+    MODULE_VISITS = 2,
+    MODULE_EXPENSE = 3,
+    MODULE_INVENTORY = 4,
+    MODULE_FORMS = 5
+} Module;
 
 @end

@@ -21,10 +21,8 @@
 @property (strong, nonatomic) NSMutableArray<Forms *> *forms;
 @property (strong, nonatomic) NSMutableArray<Inventories *> *inventories;
 @property (strong, nonatomic) NSTimer *timer;
-@property (nonatomic) UIEdgeInsets vAttendanceLayoutMargins, vVisitsLayoutMargins, vFormsLayoutMargins, vInventoryLayoutMargins;
-@property (strong, nonatomic) NSString *conventionVisits;
-@property (nonatomic) long userID;
-@property (nonatomic) BOOL viewDidAppear, isAttendance, isVisits, isExpense, isForms, isInventory, visitsLoaded, formsLoaded, inventoryLoaded, isTimeIn;
+@property (nonatomic) UIEdgeInsets vAttendanceLayoutMargins, vVisitsLayoutMargins, vFormsLayoutMargins, vInventoryLayoutMargins, btnVisitsLayoutMargins;
+@property (nonatomic) BOOL viewDidAppear,visitsLoaded, formsLoaded, inventoryLoaded;
 
 @end
 
@@ -46,7 +44,6 @@ static MessageDialogViewController *vcMessage;
     self.visitsLoaded = NO;
     self.formsLoaded = NO;
     self.inventoryLoaded = NO;
-    self.userID = [Get userID:self.app.db];
     self.viewDidAppear = NO;
 }
 
@@ -70,34 +67,28 @@ static MessageDialogViewController *vcMessage;
         self.vVisitsLayoutMargins = self.vVisits.layoutMargins;
         self.vFormsLayoutMargins = self.vForms.layoutMargins;
         self.vInventoryLayoutMargins = self.vInventory.layoutMargins;
+        self.btnVisitsLayoutMargins = self.btnVisits.layoutMargins;
     }
     [self onRefresh];
 }
 
 - (void)onRefresh {
     [super onRefresh];
-    self.conventionVisits = [Get conventionName:self.app.db conventionID:CONVENTION_VISITS];
-    [self.btnVisits setTitle:[NSString stringWithFormat:@"New %@", self.conventionVisits] forState:UIControlStateNormal];
-    [self.btnExpense setTitle:[Get currencySymbol:self.app.db] forState:UIControlStateNormal];
+    [self.btnVisits setTitle:[NSString stringWithFormat:@"New %@", self.app.conventionVisits] forState:UIControlStateNormal];
+    [self.btnExpense setTitle:self.app.settingDisplayCurrencySymbol forState:UIControlStateNormal];
     [self.visits removeAllObjects];
     [self.forms removeAllObjects];
     [self.inventories removeAllObjects];
     Company *company = [Get company:self.app.db];
     self.ivCompanyLogo.image = [Image saveFromURL:[Image cachesPath:[NSString stringWithFormat:@"COMPANY_LOGO_%lld%@", company.companyID, @".png"]] url:company.logoURL];
-    self.isTimeIn = [Get isTimeIn:self.app.db];
-    self.isAttendance = [Get isModuleEnabled:self.app.db moduleID:MODULE_ATTENDANCE];
-    self.isVisits = [Get isModuleEnabled:self.app.db moduleID:MODULE_VISITS];
-    self.isExpense = [Get isModuleEnabled:self.app.db moduleID:MODULE_EXPENSE];
-    self.isInventory = [Get isModuleEnabled:self.app.db moduleID:MODULE_INVENTORY];
-    self.isForms = [Get isModuleEnabled:self.app.db moduleID:MODULE_FORMS];
     NSDate *currentDate = NSDate.date;
-    if(self.isVisits) {
+    if(self.app.moduleVisits) {
         [self.visits addObjectsFromArray:[Load visits:self.app.db date:currentDate isNoCheckOutOnly:YES]];
     }
-    if(self.isForms) {
+    if(self.app.moduleForms) {
         [self.forms addObjectsFromArray:[Load forms:self.app.db date:currentDate]];
     }
-    if(self.isInventory) {
+    if(self.app.moduleInventory) {
         [self.inventories addObjectsFromArray:[Load inventories:self.app.db date:currentDate]];
     }
     self.visitsLoaded = self.visits.count == 0;
@@ -110,7 +101,7 @@ static MessageDialogViewController *vcMessage;
 }
 
 - (void)updateHome {
-    if(!self.isTimeIn) {
+    if(!self.main.isTimeIn) {
         [self.btnAttendance setTitle:@"Time In" forState:UIControlStateNormal];
         self.vVisitsHeader.backgroundColor = [UIColor colorNamed:@"Grey600"];
         self.vFormsHeader.backgroundColor = [UIColor colorNamed:@"Grey600"];
@@ -122,7 +113,7 @@ static MessageDialogViewController *vcMessage;
         self.vFormsHeader.backgroundColor = THEME_PRI;
         self.vInventoryHeader.backgroundColor = THEME_PRI;
     }
-    if(self.isAttendance && !(self.isVisits || self.isForms || self.isInventory)) {
+    if(self.app.moduleAttendance && !(self.app.moduleVisits || self.app.moduleForms || self.app.moduleInventory)) {
         self.vAttendance.hidden = NO;
         self.vAttendance.layoutMargins = self.vAttendanceLayoutMargins;
         self.vAttendanceHeight.active = NO;
@@ -144,10 +135,20 @@ static MessageDialogViewController *vcMessage;
             self.timer = nil;
         }
     }
-    if(self.isVisits) {
+    if(self.app.moduleVisits) {
         self.vVisits.hidden = NO;
         self.vVisits.layoutMargins = self.vVisitsLayoutMargins;
         self.vVisitsHeight.active = NO;
+        if(!self.app.settingVisitsAdd) {
+            self.btnVisits.hidden = YES;
+            self.btnVisits.layoutMargins = UIEdgeInsetsZero;
+            self.btnVisitsHeight.active = YES;
+        }
+        else {
+            self.btnVisits.hidden = NO;
+            self.btnVisits.layoutMargins = self.btnVisitsLayoutMargins;
+            self.btnVisitsHeight.active = NO;
+        }
         self.tvVisitsHeight.constant = self.tvVisits.contentSize.height;
     }
     else {
@@ -180,7 +181,7 @@ static MessageDialogViewController *vcMessage;
         self.vInventoryHeight.active = YES;
         self.tvInventoryHeight.constant = 0;
     }
-    if(self.isExpense) {
+    if(self.app.moduleExpense) {
         self.btnExpense.hidden = NO;
     }
     else {
@@ -203,8 +204,8 @@ static MessageDialogViewController *vcMessage;
 
 - (IBAction)addVisit:(id)sender {
     vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
-    vcMessage.subject = [NSString stringWithFormat:@"Add %@", self.conventionVisits];
-    vcMessage.message = [NSString stringWithFormat:@"Are you sure you want to add new %@?", self.conventionVisits];
+    vcMessage.subject = [NSString stringWithFormat:@"Add %@", self.app.conventionVisits];
+    vcMessage.message = [NSString stringWithFormat:@"Are you sure you want to add new %@?", self.app.conventionVisits];
     vcMessage.negativeTitle = @"No";
     vcMessage.negativeTarget = ^{
         [View removeView:vcMessage.view animated:YES];
@@ -217,10 +218,10 @@ static MessageDialogViewController *vcMessage;
         visit.visitID = sequence.visits;
         visit.webVisitID = 0;
         visit.storeID = 0;
-        visit.name = [NSString stringWithFormat:@"New %@ %lld", self.conventionVisits, sequence.visits];
-        visit.employeeID = self.userID;
-        visit.syncBatchID = [Get syncBatchID:self.app.db];
         NSDate *currentDate = NSDate.date;
+        visit.name = [NSString stringWithFormat:@"New %@ %ld", self.app.conventionVisits, [Get visitTodayCount:self.app.db date:[Time getFormattedDate:DATE_FORMAT date:currentDate]] + 1];
+        visit.employeeID = self.app.userID;
+        visit.syncBatchID = [Get syncBatchID:self.app.db];
         visit.createdDate = [Time getFormattedDate:DATE_FORMAT date:currentDate];
         visit.createdTime = [Time getFormattedDate:TIME_FORMAT date:currentDate];
         visit.startDate = [Time getFormattedDate:DATE_FORMAT date:currentDate];
@@ -228,6 +229,7 @@ static MessageDialogViewController *vcMessage;
         visit.notes = @"";
         visit.isCheckOut = NO;
         visit.isCheckIn = NO;
+        visit.isFromWeb = NO;
         visit.isSync = NO;
         visit.isUpdate = NO;
         visit.isWebUpdate = NO;
@@ -240,6 +242,40 @@ static MessageDialogViewController *vcMessage;
         }
     };
     [View addSubview:self.main.view subview:vcMessage.view animated:YES];
+}
+
+- (void)deleteVisit:(UILongPressGestureRecognizer *)longPressGesture {
+    if(self.app.settingVisitsDelete && longPressGesture.state == UIGestureRecognizerStateBegan) {
+        longPressGesture.state = UIGestureRecognizerStateEnded;
+        if(self.visits[longPressGesture.view.tag].isCheckIn || self.visits[longPressGesture.view.tag].isCheckOut) {
+            vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
+            vcMessage.subject = [NSString stringWithFormat:@"Delete %@", self.app.conventionVisits];
+            vcMessage.message = [NSString stringWithFormat:@"This %@ has already been checked-in. You're not allowed to delete it.", self.app.conventionVisits];
+            vcMessage.positiveTitle = @"OK";
+            vcMessage.positiveTarget = ^{
+                [View removeView:vcMessage.view animated:YES];
+            };
+            [View addSubview:self.main.view subview:vcMessage.view animated:YES];
+            return;
+        }
+        vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
+        vcMessage.subject = [NSString stringWithFormat:@"Delete %@", self.app.conventionVisits];
+        vcMessage.message = [NSString stringWithFormat:@"Are you sure you want to delete this %@?", self.app.conventionVisits];
+        vcMessage.negativeTitle = @"No";
+        vcMessage.negativeTarget = ^{
+            [View removeView:vcMessage.view animated:YES];
+        };
+        vcMessage.positiveTitle = @"Yes";
+        vcMessage.positiveTarget = ^{
+            self.visits[longPressGesture.view.tag].isDelete = YES;
+            if([Update save:self.app.db]) {
+                [View removeView:vcMessage.view animated:YES];
+                [self onRefresh];
+                [self.main updateSyncDataCount];
+            }
+        };
+        [View addSubview:self.main.view subview:vcMessage.view animated:YES];
+    }
 }
 
 - (IBAction)addExpense:(id)sender {
@@ -265,11 +301,12 @@ static MessageDialogViewController *vcMessage;
         Visits *visit = self.visits[indexPath.row];
         Stores *store = [Get store:self.app.db storeID:visit.storeID];
         item.lName.text = visit.name;
-        item.lName.textColor = !visit.isCheckIn ? [UIColor colorNamed:@"Grey800"] : THEME_SEC;
-        item.lDetails.text = store.address.length > 0 ? store.address : @"No address";
+        item.lDetails.text = self.app.settingVisitsNotesAsAddress && visit.notes.length > 0 ? visit.notes : store.address.length > 0 ? store.address : @"No address";
         if(indexPath.row == self.visits.count - 1) {
             self.visitsLoaded = YES;
         }
+        item.tag = indexPath.row;
+        [item.longPressGesture addTarget:self action:@selector(deleteVisit:)];
     }
     if(tableView == self.tvForms) {
         Forms *form = self.forms[indexPath.row];
@@ -289,6 +326,10 @@ static MessageDialogViewController *vcMessage;
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
+    if(tableView == self.tvVisits) {
+        HomeTableViewCell *item = (HomeTableViewCell *)cell;
+        item.lName.textColor = !self.visits[indexPath.row].isCheckIn ? [UIColor colorNamed:@"Grey800"] : THEME_SEC;
+    }
     if(self.visitsLoaded && self.formsLoaded && self.inventoryLoaded) {
         self.visitsLoaded = NO;
         self.formsLoaded = NO;

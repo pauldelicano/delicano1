@@ -5,6 +5,7 @@
 
 @property (strong, nonatomic) NSMutableArray<UIImage *> *gallery;
 @property (strong, nonatomic) NSCache *cache;
+@property (strong, nonatomic) UIImage *btnAddPhoto;
 
 @end
 
@@ -31,13 +32,14 @@
     instance.dataSource = self;
     self.gallery = NSMutableArray.alloc.init;
     self.cache = NSCache.alloc.init;
+    self.btnAddPhoto = UIImage.alloc.init;
     return instance;
 }
 
 - (void)setPhotos:(NSArray<UIImage *> *)photos {
     [self.gallery removeAllObjects];
     [self.gallery addObjectsFromArray:photos];
-    [self.gallery addObject:UIImage.alloc.init];
+    [self.gallery addObject:self.btnAddPhoto];
 }
 
 - (void)reloadData {
@@ -52,7 +54,7 @@
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    if(indexPath.row == self.gallery.count - 1) {
+    if(self.gallery[indexPath.row] == self.btnAddPhoto) {
         return [collectionView dequeueReusableCellWithReuseIdentifier:@"button" forIndexPath:indexPath];
     }
     PhotoBarItemCollectionViewCell *item = [collectionView dequeueReusableCellWithReuseIdentifier:@"item" forIndexPath:indexPath];
@@ -83,7 +85,7 @@
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    if(indexPath.row == self.gallery.count - 1) {
+    if(self.gallery[indexPath.row] == self.btnAddPhoto) {
         [self.photoBarDelegate onPhotoBarAdd];
         return;
     }

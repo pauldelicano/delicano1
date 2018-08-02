@@ -9,6 +9,7 @@
 
 @property (strong, nonatomic) NSString *subject;
 @property (strong, nonatomic) NSString *message;
+@property (strong, nonatomic) NSAttributedString *attributedMessage;
 @property (strong, nonatomic) NSString *negativeTitle;
 @property (strong, nonatomic) id negativeTarget;
 @property (strong, nonatomic) NSString *positiveTitle;

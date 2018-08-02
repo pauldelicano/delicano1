@@ -391,11 +391,20 @@
     [params setObject:timeIn.date forKey:@"date_in"];
     [params setObject:timeIn.time forKey:@"time_in"];
     GPS *gps = [Get gps:db gpsID:timeIn.gpsID];
-    [params setObject:gps.date forKey:@"gps_date"];
-    [params setObject:gps.time forKey:@"gps_time"];
-    [params setObject:[NSString stringWithFormat:@"%f", gps.latitude] forKey:@"latitude"];
-    [params setObject:[NSString stringWithFormat:@"%f", gps.longitude] forKey:@"longitude"];
-    [params setObject:[NSString stringWithFormat:@"%d", gps.isValid] forKey:@"is_valid"];
+    if(gps != nil && gps.date != nil && gps.time != nil) {
+        [params setObject:gps.date forKey:@"gps_date"];
+        [params setObject:gps.time forKey:@"gps_time"];
+        [params setObject:[NSString stringWithFormat:@"%f", gps.latitude] forKey:@"latitude"];
+        [params setObject:[NSString stringWithFormat:@"%f", gps.longitude] forKey:@"longitude"];
+        [params setObject:[NSString stringWithFormat:@"%d", gps.isValid] forKey:@"is_valid"];
+    }
+    else {
+        [params setObject:@"0000-00-00" forKey:@"gps_date"];
+        [params setObject:@"00:00:00" forKey:@"gps_time"];
+        [params setObject:@"0" forKey:@"latitude"];
+        [params setObject:@"0" forKey:@"longitude"];
+        [params setObject:@"0" forKey:@"is_valid"];
+    }
     [params setObject:[NSString stringWithFormat:@"%lld", [Get store:db storeID:timeIn.storeID].webStoreID] forKey:@"store_id"];
     [params setObject:[NSString stringWithFormat:@"%lld", [Get schedule:db scheduleID:timeIn.scheduleID].webScheduleID] forKey:@"schedule_id"];
     [params setObject:timeIn.batteryLevel forKey:@"batery_level"];
@@ -460,11 +469,20 @@
     [params setObject:timeOut.date forKey:@"date_out"];
     [params setObject:timeOut.time forKey:@"time_out"];
     GPS *gps = [Get gps:db gpsID:timeOut.gpsID];
-    [params setObject:gps.date forKey:@"gps_date"];
-    [params setObject:gps.time forKey:@"gps_time"];
-    [params setObject:[NSString stringWithFormat:@"%f", gps.latitude] forKey:@"latitude"];
-    [params setObject:[NSString stringWithFormat:@"%f", gps.longitude] forKey:@"longitude"];
-    [params setObject:[NSString stringWithFormat:@"%d", gps.isValid] forKey:@"is_valid"];
+    if(gps != nil && gps.date != nil && gps.time != nil) {
+        [params setObject:gps.date forKey:@"gps_date"];
+        [params setObject:gps.time forKey:@"gps_time"];
+        [params setObject:[NSString stringWithFormat:@"%f", gps.latitude] forKey:@"latitude"];
+        [params setObject:[NSString stringWithFormat:@"%f", gps.longitude] forKey:@"longitude"];
+        [params setObject:[NSString stringWithFormat:@"%d", gps.isValid] forKey:@"is_valid"];
+    }
+    else {
+        [params setObject:@"0000-00-00" forKey:@"gps_date"];
+        [params setObject:@"00:00:00" forKey:@"gps_time"];
+        [params setObject:@"0" forKey:@"latitude"];
+        [params setObject:@"0" forKey:@"longitude"];
+        [params setObject:@"0" forKey:@"is_valid"];
+    }
     [params setObject:[NSString stringWithFormat:@"%lld", [Get store:db storeID:timeOut.storeID].webStoreID] forKey:@"store_id"];
     NSDictionary *response = [Http post:[NSString stringWithFormat:@"%@%@", WEB_API, @"time-out"] params:params timeout:HTTP_TIMEOUT_TX];
     NSDictionary *init = [[response objectForKey:@"init"] lastObject];
@@ -704,17 +722,26 @@
     [params setObject:[Get apiKey:db] forKey:@"api_key"];
     [params setObject:[NSString stringWithFormat:@"%lld", checkIn.checkInID] forKey:@"local_record_id"];
     [params setObject:checkIn.syncBatchID forKey:@"sync_batch_id"];
-    Visits *visit = [Get visit:db visitID:[Get checkIn:db checkInID:checkIn.checkInID].visitID];
+    Visits *visit = [Get visit:db visitID:checkIn.visitID];
     [params setObject:[NSString stringWithFormat:@"%lld", visit.employeeID] forKey:@"employee_id"];
     [params setObject:checkIn.date forKey:@"date_in"];
     [params setObject:checkIn.time forKey:@"time_in"];
     [params setObject:[NSString stringWithFormat:@"%lld", visit.webVisitID] forKey:@"itinerary_id"];
     GPS *gps = [Get gps:db gpsID:checkIn.gpsID];
-    [params setObject:gps.date forKey:@"gps_date"];
-    [params setObject:gps.time forKey:@"gps_time"];
-    [params setObject:[NSString stringWithFormat:@"%f", gps.latitude] forKey:@"latitude"];
-    [params setObject:[NSString stringWithFormat:@"%f", gps.longitude] forKey:@"longitude"];
-    [params setObject:[NSString stringWithFormat:@"%d", gps.isValid] forKey:@"is_valid"];
+    if(gps != nil && gps.date != nil && gps.time != nil) {
+        [params setObject:gps.date forKey:@"gps_date"];
+        [params setObject:gps.time forKey:@"gps_time"];
+        [params setObject:[NSString stringWithFormat:@"%f", gps.latitude] forKey:@"latitude"];
+        [params setObject:[NSString stringWithFormat:@"%f", gps.longitude] forKey:@"longitude"];
+        [params setObject:[NSString stringWithFormat:@"%d", gps.isValid] forKey:@"is_valid"];
+    }
+    else {
+        [params setObject:@"0000-00-00" forKey:@"gps_date"];
+        [params setObject:@"00:00:00" forKey:@"gps_time"];
+        [params setObject:@"0" forKey:@"latitude"];
+        [params setObject:@"0" forKey:@"longitude"];
+        [params setObject:@"0" forKey:@"is_valid"];
+    }
     NSDictionary *response = [Http post:[NSString stringWithFormat:@"%@%@", WEB_API, @"check-in"] params:params timeout:HTTP_TIMEOUT_TX];
     NSDictionary *init = [[response objectForKey:@"init"] lastObject];
     NSString *status = [init objectForKey:@"status"];
@@ -775,11 +802,20 @@
     [params setObject:checkOut.time forKey:@"time_out"];
     [params setObject:[NSString stringWithFormat:@"%lld", visit.webVisitID] forKey:@"itinerary_id"];
     GPS *gps = [Get gps:db gpsID:checkOut.gpsID];
-    [params setObject:gps.date forKey:@"gps_date"];
-    [params setObject:gps.time forKey:@"gps_time"];
-    [params setObject:[NSString stringWithFormat:@"%f", gps.latitude] forKey:@"latitude"];
-    [params setObject:[NSString stringWithFormat:@"%f", gps.longitude] forKey:@"longitude"];
-    [params setObject:[NSString stringWithFormat:@"%d", gps.isValid] forKey:@"is_valid"];
+    if(gps != nil && gps.date != nil && gps.time != nil) {
+        [params setObject:gps.date forKey:@"gps_date"];
+        [params setObject:gps.time forKey:@"gps_time"];
+        [params setObject:[NSString stringWithFormat:@"%f", gps.latitude] forKey:@"latitude"];
+        [params setObject:[NSString stringWithFormat:@"%f", gps.longitude] forKey:@"longitude"];
+        [params setObject:[NSString stringWithFormat:@"%d", gps.isValid] forKey:@"is_valid"];
+    }
+    else {
+        [params setObject:@"0000-00-00" forKey:@"gps_date"];
+        [params setObject:@"00:00:00" forKey:@"gps_time"];
+        [params setObject:@"0" forKey:@"latitude"];
+        [params setObject:@"0" forKey:@"longitude"];
+        [params setObject:@"0" forKey:@"is_valid"];
+    }
     [params setObject:visit.status forKey:@"status"];
     NSDictionary *response = [Http post:[NSString stringWithFormat:@"%@%@", WEB_API, @"check-out"] params:params timeout:HTTP_TIMEOUT_TX];
     NSDictionary *init = [[response objectForKey:@"init"] lastObject];

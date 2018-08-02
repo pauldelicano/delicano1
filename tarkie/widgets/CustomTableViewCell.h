@@ -2,4 +2,6 @@
 
 @interface CustomTableViewCell : UITableViewCell
 
+@property (strong, nonatomic) UILongPressGestureRecognizer *longPressGesture;
+
 @end

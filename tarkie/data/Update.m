@@ -4,11 +4,9 @@
 @implementation Update
 
 + (BOOL)usersLogout:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Users"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isLogout == %@", @NO]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    NSArray<Users *> *result = [self fetch:db request:request];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isLogout == %@", @NO]];
+    NSArray<Users *> *result = [self execute:db entity:@"Users" predicates:predicates];
     for(int x = 0; x < result.count; x++) {
         result[x].isLogout = YES;
     }
@@ -16,38 +14,32 @@
 }
 
 + (void)employeesDeactivate:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Employees"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    NSArray<Employees *> *result = [self fetch:db request:request];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
+    NSArray<Employees *> *result = [self execute:db entity:@"Employees" predicates:predicates];
     for(int x = 0; x < result.count; x++) {
         result[x].isActive = NO;
     }
 }
 
 + (void)announcementsDeactivate:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Announcements"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    NSArray<Announcements *> *result = [self fetch:db request:request];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
+    NSArray<Announcements *> *result = [self execute:db entity:@"Announcements" predicates:predicates];
     for(int x = 0; x < result.count; x++) {
         result[x].isActive = NO;
     }
 }
 
 + (void)storesDeactivate:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Stores"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isFromTask == %@", @NO]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isTag == %@", @YES]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @YES]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    NSArray<Stores *> *result = [self fetch:db request:request];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isFromTask == %@", @NO]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isTag == %@", @YES]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @YES]];
+    NSArray<Stores *> *result = [self execute:db entity:@"Stores" predicates:predicates];
     for(int x = 0; x < result.count; x++) {
         result[x].isTag = NO;
         result[x].isActive = NO;
@@ -55,49 +47,45 @@
 }
 
 + (void)storeContactsDeactivate:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"StoreContacts"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @YES]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    NSArray<StoreContacts *> *result = [self fetch:db request:request];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @YES]];
+    NSArray<StoreContacts *> *result = [self execute:db entity:@"StoreContacts" predicates:predicates];
     for(int x = 0; x < result.count; x++) {
         result[x].isActive = NO;
     }
 }
 
 + (void)scheduleTimesDeactivate:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"ScheduleTimes"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    NSArray<ScheduleTimes *> *result = [self fetch:db request:request];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
+    NSArray<ScheduleTimes *> *result = [self execute:db entity:@"ScheduleTimes" predicates:predicates];
     for(int x = 0; x < result.count; x++) {
         result[x].isActive = NO;
     }
 }
 
 + (void)schedulesDeactivate:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Schedules"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @YES]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    NSArray<Schedules *> *result = [self fetch:db request:request];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @YES]];
+    NSArray<Schedules *> *result = [self execute:db entity:@"Schedules" predicates:predicates];
     for(int x = 0; x < result.count; x++) {
         result[x].isActive = NO;
     }
 }
 
-+ (NSArray *)fetch:(NSManagedObjectContext *)db request:(NSFetchRequest *)request {
++ (NSArray *)execute:(NSManagedObjectContext *)db entity:(NSString *)entity predicates:(NSArray<NSPredicate *> *)predicates  {
+    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:entity];
+    fetchRequest.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:predicates];
     NSError *error = nil;
-    NSArray *result = [db executeFetchRequest:request error:&error];
+    NSArray *data = [db executeFetchRequest:fetchRequest error:&error];
     if(error != nil) {
-        NSLog(@"error: update fetch - %@", error.localizedDescription);
+        NSLog(@"error: update execute - %@", error.localizedDescription);
     }
-    return result;
+    return data;
 }
 
 + (BOOL)save:(NSManagedObjectContext *)db {

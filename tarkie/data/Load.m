@@ -57,9 +57,6 @@
             [menu setObject:[NSString stringWithFormat:@"%d", x] forKey:@"ID"];
             icon = nil;
             [menu setObject:icon == nil ? [UIImage imageNamed:[NSString stringWithFormat:@"%@%@", @"Menu", [name stringByReplacingOccurrencesOfString:@" " withString:@""]]] : icon forKey:@"icon"];
-            if([name isEqualToString:@"Stores"]) {
-                name = [Get conventionName:db conventionID:CONVENTION_STORES];
-            }
             [menu setObject:name forKey:@"name"];
             [menus addObject:menu];
         }
@@ -125,336 +122,322 @@
 }
 
 + (NSArray<Employees *> *)employeeIDs:(NSManagedObjectContext *)db teamID:(long)teamID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Employees"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"teamID == %lld", teamID]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"teamID == %lld", teamID]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
+    return [self execute:db entity:@"Employees" predicates:predicates];
 }
 
 + (NSArray<Announcements *> *)announcements:(NSManagedObjectContext *)db searchFilter:(NSString *)searchFilter isScheduled:(BOOL)isScheduled {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Announcements"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
     if(searchFilter.length > 0) {
-        [subpredicates addObject:[NSPredicate predicateWithFormat:@"subject CONTAINS[cd] %@ OR message CONTAINS[cd] %@", searchFilter.lowercaseString, searchFilter.lowercaseString]];
+        [predicates addObject:[NSPredicate predicateWithFormat:@"subject CONTAINS[cd] %@ OR message CONTAINS[cd] %@", searchFilter.lowercaseString, searchFilter.lowercaseString]];
     }
     NSDate *currentDate = NSDate.date;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:isScheduled? @"scheduledDate < %@ OR (scheduledDate == %@ AND scheduledTime <= %@)" : @"scheduledDate > %@ OR (scheduledDate == %@ AND scheduledTime > %@)", [Time getFormattedDate:DATE_FORMAT date:currentDate], [Time getFormattedDate:DATE_FORMAT date:currentDate], [Time getFormattedDate:TIME_FORMAT date:currentDate]]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
+    [predicates addObject:[NSPredicate predicateWithFormat:isScheduled? @"scheduledDate < %@ OR (scheduledDate == %@ AND scheduledTime <= %@)" : @"scheduledDate > %@ OR (scheduledDate == %@ AND scheduledTime > %@)", [Time getFormattedDate:DATE_FORMAT date:currentDate], [Time getFormattedDate:DATE_FORMAT date:currentDate], [Time getFormattedDate:TIME_FORMAT date:currentDate]]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
     NSMutableArray *sortDescriptors = NSMutableArray.alloc.init;
     [sortDescriptors addObject:[NSSortDescriptor.alloc initWithKey:@"scheduledDate" ascending:NO]];
     [sortDescriptors addObject:[NSSortDescriptor.alloc initWithKey:@"scheduledTime" ascending:NO]];
-    request.sortDescriptors = sortDescriptors;
-    return [self fetch:db request:request];
+    return [self execute:db entity:@"Announcements" predicates:predicates sortDescriptors:sortDescriptors];
 }
 
 + (NSArray<AnnouncementSeen *> *)syncAnnouncementSeen:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"AnnouncementSeen"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
+    return [self execute:db entity:@"AnnouncementSeen" predicates:predicates];
 }
 
 + (NSArray<Stores *> *)stores:(NSManagedObjectContext *)db searchFilter:(NSString *)searchFilter {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Stores"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    BOOL displayLongName = [Get isSettingEnabled:db settingID:SETTING_STORE_DISPLAY_LONG_NAME];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    BOOL settingStoreDisplayLongName = [Get isSettingEnabled:db settingID:SETTING_STORE_DISPLAY_LONG_NAME teamID:[Get teamID:db employeeID:[Get userID:db]]];
     if(searchFilter.length > 0) {
-        [subpredicates addObject:[NSPredicate predicateWithFormat:@"%@ CONTAINS[cd] %@", displayLongName ? @"name" : @"shortName", searchFilter.lowercaseString]];
+        [predicates addObject:[NSPredicate predicateWithFormat:@"%@ CONTAINS[cd] %@", settingStoreDisplayLongName ? @"name" : @"shortName", searchFilter.lowercaseString]];
     }
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"%@.length > 0", displayLongName ? @"name" : @"shortName"]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"%@.length > 0", settingStoreDisplayLongName ? @"name" : @"shortName"]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
     NSMutableArray *sortDescriptors = NSMutableArray.alloc.init;
-    [sortDescriptors addObject:[NSSortDescriptor.alloc initWithKey:@"name" ascending:YES]];
-    request.sortDescriptors = sortDescriptors;
-    return [self fetch:db request:request];
+    [sortDescriptors addObject:[NSSortDescriptor.alloc initWithKey:settingStoreDisplayLongName ? @"name" : @"shortName" ascending:YES]];
+    return [self execute:db entity:@"Stores" predicates:predicates sortDescriptors:sortDescriptors];
 }
 
 + (NSArray<Stores *> *)syncStores:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Stores"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
+    return [self execute:db entity:@"Stores" predicates:predicates];
 }
 
 + (NSArray<Stores *> *)updateStores:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Stores"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @YES]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isUpdate == %@", @YES]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isWebUpdate == %@", @NO]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @YES]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isUpdate == %@", @YES]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isWebUpdate == %@", @NO]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
+    return [self execute:db entity:@"Stores" predicates:predicates];
 }
 
 + (NSArray<StoreContacts *> *)storeContacts:(NSManagedObjectContext *)db storeID:(long)storeID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"StoreContacts"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"storeID == %lld", storeID]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"storeID == %lld", storeID]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
     NSMutableArray *sortDescriptors = NSMutableArray.alloc.init;
     [sortDescriptors addObject:[NSSortDescriptor.alloc initWithKey:@"name" ascending:YES]];
-    request.sortDescriptors = sortDescriptors;
-    return [self fetch:db request:request];
+    return [self execute:db entity:@"StoreContacts" predicates:predicates sortDescriptors:sortDescriptors];
 }
 
 + (NSArray<StoreContacts *> *)syncStoreContacts:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"StoreContacts"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
+    return [self execute:db entity:@"StoreContacts" predicates:predicates];
 }
 
 + (NSArray<StoreContacts *> *)updateStoreContacts:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"StoreContacts"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @YES]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"designation.length > 0"]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"email.length > 0"]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"birthdate.length > 0"]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isUpdate == %@", @YES]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isWebUpdate == %@", @NO]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @YES]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"designation.length > 0"]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"email.length > 0"]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"birthdate.length > 0"]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isUpdate == %@", @YES]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isWebUpdate == %@", @NO]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
+    return [self execute:db entity:@"StoreContacts" predicates:predicates];
 }
 
 + (NSArray<ScheduleTimes *> *)scheduleTimes:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"ScheduleTimes"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
     NSMutableArray *sortDescriptors = NSMutableArray.alloc.init;
     [sortDescriptors addObject:[NSSortDescriptor.alloc initWithKey:@"timeIn" ascending:YES]];
     [sortDescriptors addObject:[NSSortDescriptor.alloc initWithKey:@"timeOut" ascending:YES]];
-    request.sortDescriptors = sortDescriptors;
-    return [self fetch:db request:request];
+    return [self execute:db entity:@"ScheduleTimes" predicates:predicates sortDescriptors:sortDescriptors];
 }
 
 + (NSArray<Schedules *> *)syncSchedules:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Schedules"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %ld", [Get userID:db]]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
+    return [self execute:db entity:@"Schedules" predicates:predicates];
 }
 
 + (NSArray<Schedules *> *)updateSchedules:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Schedules"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %ld", [Get userID:db]]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isFromWeb == %@", @NO]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @YES]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %ld", [Get userID:db]]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isFromWeb == %@", @NO]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @YES]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
+    return [self execute:db entity:@"Schedules" predicates:predicates];
 }
 
 + (NSArray<TimeIn *> *)syncTimeIn:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"TimeIn"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
+    return [self execute:db entity:@"TimeIn" predicates:predicates];
 }
 
 + (NSArray<TimeIn *> *)uploadTimeInPhoto:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"TimeIn"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"photo.length > 0"]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isPhotoUpload == %@", @NO]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"photo.length > 0"]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isPhotoUpload == %@", @NO]];
+    return [self execute:db entity:@"TimeIn" predicates:predicates];
 }
 
 + (NSArray<TimeOut *> *)syncTimeOut:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"TimeOut"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
+    return [self execute:db entity:@"TimeOut" predicates:predicates];
 }
 
 + (NSArray<TimeOut *> *)uploadTimeOutPhoto:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"TimeOut"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"photo.length > 0"]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isPhotoUpload == %@", @NO]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"photo.length > 0"]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isPhotoUpload == %@", @NO]];
+    return [self execute:db entity:@"TimeOut" predicates:predicates];
 }
 
 + (NSArray<TimeOut *> *)uploadTimeOutSignature:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"TimeOut"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"signature.length > 0"]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isSignatureUpload == %@", @NO]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"signature.length > 0"]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSignatureUpload == %@", @NO]];
+    return [self execute:db entity:@"TimeOut" predicates:predicates];
 }
 
 + (NSArray<Photos *> *)visitPhotos:(NSManagedObjectContext *)db visitID:(long)visitID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"VisitPhotos"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"visitID == %ld", visitID]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    NSArray<VisitPhotos *> *visitPhotos = [self fetch:db request:request];
     NSMutableArray<Photos *> *photos = NSMutableArray.alloc.init;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"visitID == %ld", visitID]];
+    NSArray<VisitPhotos *> *visitPhotos = [self execute:db entity:@"VisitPhotos" predicates:predicates];
     for(int x = 0 ; x < visitPhotos.count; x++) {
-        NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Photos"];
-        NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-        [subpredicates addObject:[NSPredicate predicateWithFormat:@"photoID == %ld", visitPhotos[x].photoID]];
-        [subpredicates addObject:[NSPredicate predicateWithFormat:@"isDelete == %@", @NO]];
-        request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-        [photos addObjectsFromArray:[self fetch:db request:request]];
+        NSMutableArray *predicates = NSMutableArray.alloc.init;
+        [predicates addObject:[NSPredicate predicateWithFormat:@"photoID == %ld", visitPhotos[x].photoID]];
+        [predicates addObject:[NSPredicate predicateWithFormat:@"isDelete == %@", @NO]];
+        [photos addObjectsFromArray:[self execute:db entity:@"Photos" predicates:predicates]];
     }
     return photos;
 }
 
 + (NSArray<Photos *> *)uploadVisitPhotos:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"VisitPhotos"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    NSArray<VisitPhotos *> *visitPhotos = [self fetch:db request:request];
-    NSMutableArray<Photos *> *photos = NSMutableArray.alloc.init;
-    for(int x = 0 ; x < visitPhotos.count; x++) {
-        NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Photos"];
-        NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-        [subpredicates addObject:[NSPredicate predicateWithFormat:@"photoID == %ld", visitPhotos[x].photoID]];
-        [subpredicates addObject:[NSPredicate predicateWithFormat:@"isUpload == %@", @NO]];
-        [subpredicates addObject:[NSPredicate predicateWithFormat:@"isDelete == %@", @NO]];
-        request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-        [photos addObjectsFromArray:[self fetch:db request:request]];
-    }
-    return photos;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isUpload == %@", @NO]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isDelete == %@", @NO]];
+    return [self execute:db entity:@"Photos" predicates:predicates];
 }
 
 + (NSArray<Visits *> *)visits:(NSManagedObjectContext *)db date:(NSDate *)date isNoCheckOutOnly:(BOOL)isNoCheckOutOnly {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Visits"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"%@ BETWEEN {startDate, endDate}", [Time getFormattedDate:DATE_FORMAT date:date]]];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"%@ BETWEEN {startDate, endDate}", [Time getFormattedDate:DATE_FORMAT date:date]]];
     if(isNoCheckOutOnly) {
-        [subpredicates addObject:[NSPredicate predicateWithFormat:@"isCheckOut == %@", @NO]];
+        [predicates addObject:[NSPredicate predicateWithFormat:@"isCheckOut == %@", @NO]];
     }
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isDelete == %@", @NO]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isDelete == %@", @NO]];
+    return [self execute:db entity:@"Visits" predicates:predicates];
 }
 
 + (NSArray<Visits *> *)syncVisits:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Visits"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isDelete == %@", @NO]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isDelete == %@", @NO]];
+    return [self execute:db entity:@"Visits" predicates:predicates];
 }
 
 + (NSArray<Visits *> *)updateVisits:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Visits"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"storeID.length > 0"]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @YES]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isUpdate == %@", @YES]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isWebUpdate == %@", @NO]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isDelete == %@", @NO]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"storeID.length > 0"]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @YES]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isUpdate == %@", @YES]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isWebUpdate == %@", @NO]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isDelete == %@", @NO]];
+    return [self execute:db entity:@"Visits" predicates:predicates];
 }
 
 + (NSArray<Visits *> *)deleteVisits:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Visits"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @YES]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isDelete == %@", @YES]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isWebDelete == %@", @NO]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @YES]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isDelete == %@", @YES]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isWebDelete == %@", @NO]];
+    return [self execute:db entity:@"Visits" predicates:predicates];
 }
 
 + (NSArray<VisitInventories *> *)visitInventories:(NSManagedObjectContext *)db visitID:(long)visitID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"VisitInventories"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"visitID == %ld", visitID]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request];
+    return nil;
+    NSMutableArray<VisitInventories *> *visitInventories = [NSMutableArray.alloc initWithArray:[self execute:db entity:@"VisitInventories"]];
+    if(visitInventories.count == 0) {
+        Sequences *sequence = [Get sequence:db];
+        for(int x = 1; x <= 5; x++) {
+            sequence.visitInventories += 1;
+            VisitInventories *visitInventory = [NSEntityDescription insertNewObjectForEntityForName:@"VisitInventories" inManagedObjectContext:db];
+            visitInventory.name = [NSString stringWithFormat:@"Visit Inventory %lld", sequence.visitInventories];
+            visitInventory.visitInventoryID = sequence.visitInventories;
+            visitInventory.visitID = visitID;
+            visitInventory.isActive = YES;
+            [visitInventories addObject:visitInventory];
+        }
+    }
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"visitID == %ld", visitID]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
+    return [self execute:db entity:@"VisitInventories" predicates:predicates];
 }
 
 + (NSArray<VisitForms *> *)visitForms:(NSManagedObjectContext *)db visitID:(long)visitID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"VisitForms"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"visitID == %ld", visitID]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request];
+    return nil;
+    NSMutableArray<VisitForms *> *visitForms = [NSMutableArray.alloc initWithArray:[self execute:db entity:@"VisitForms"]];
+    if(visitForms.count == 0) {
+        Sequences *sequence = [Get sequence:db];
+        for(int x = 1; x <= 5; x++) {
+            sequence.visitForms += 1;
+            VisitForms *visitForm = [NSEntityDescription insertNewObjectForEntityForName:@"VisitForms" inManagedObjectContext:db];
+            visitForm.name = [NSString stringWithFormat:@"Visit Form %lld", sequence.visitForms];
+            visitForm.visitFormID = sequence.visitForms;
+            visitForm.visitID = visitID;
+            visitForm.isActive = YES;
+            [visitForms addObject:visitForm];
+        }
+    }
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"visitID == %ld", visitID]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
+    return [self execute:db entity:@"VisitForms" predicates:predicates];
 }
 
 + (NSArray<CheckIn *> *)syncCheckIn:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"CheckIn"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
+    return [self execute:db entity:@"CheckIn" predicates:predicates];
 }
 
 + (NSArray<CheckIn *> *)uploadCheckInPhoto:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"CheckIn"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"photo.length > 0"]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isPhotoUpload == %@", @NO]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"photo.length > 0"]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isPhotoUpload == %@", @NO]];
+    return [self execute:db entity:@"CheckIn" predicates:predicates];
 }
 
 + (NSArray<CheckOut *> *)syncCheckOut:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"CheckOut"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
+    return [self execute:db entity:@"CheckOut" predicates:predicates];
 }
 
 + (NSArray<CheckOut *> *)uploadCheckOutPhoto:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"CheckOut"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"photo.length > 0"]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isPhotoUpload == %@", @NO]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"photo.length > 0"]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isPhotoUpload == %@", @NO]];
+    return [self execute:db entity:@"CheckOut" predicates:predicates];
 }
 
 + (NSArray<Inventories *> *)inventories:(NSManagedObjectContext *)db date:(NSDate *)date {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Inventories"];
-    return [self fetch:db request:request];
+    return nil;
+    NSMutableArray<Inventories *> *inventories = [NSMutableArray.alloc initWithArray:[self execute:db entity:@"Inventories"]];
+    if(inventories.count == 0) {
+        for(int x = 1; x <= 5; x++) {
+            Inventories *inventory = [NSEntityDescription insertNewObjectForEntityForName:@"Inventories" inManagedObjectContext:db];
+            inventory.inventoryID = x;
+            inventory.name = [NSString stringWithFormat:@"Inventory %d", x];
+            [inventories addObject:inventory];
+        }
+    }
+    NSMutableArray *sortDescriptors = NSMutableArray.alloc.init;
+    [sortDescriptors addObject:[NSSortDescriptor.alloc initWithKey:@"inventoryID" ascending:YES]];
+    return [self execute:db entity:@"Inventories" predicates:nil sortDescriptors:sortDescriptors];
 }
 
 + (NSArray<Forms *> *)forms:(NSManagedObjectContext *)db date:(NSDate *)date {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Forms"];
-    return [self fetch:db request:request];
+    return nil;
+    NSMutableArray<Forms *> *forms = [NSMutableArray.alloc initWithArray:[self execute:db entity:@"Forms"]];
+    if(forms.count == 0) {
+        for(int x = 1; x <= 5; x++) {
+            Forms *form = [NSEntityDescription insertNewObjectForEntityForName:@"Forms" inManagedObjectContext:db];
+            form.formID = x;
+            form.name = [NSString stringWithFormat:@"Form %d", x];
+            [forms addObject:form];
+        }
+    }
+    NSMutableArray *sortDescriptors = NSMutableArray.alloc.init;
+    [sortDescriptors addObject:[NSSortDescriptor.alloc initWithKey:@"formID" ascending:YES]];
+    return [self execute:db entity:@"Forms" predicates:nil sortDescriptors:sortDescriptors];
 }
 
-+ (NSArray *)fetch:(NSManagedObjectContext *)db request:(NSFetchRequest *)request {
++ (NSArray *)execute:(NSManagedObjectContext *)db entity:(NSString *)entity {
+    return [self execute:db entity:entity predicates:nil sortDescriptors:nil];
+}
+
++ (NSArray *)execute:(NSManagedObjectContext *)db entity:(NSString *)entity predicates:(NSArray<NSPredicate *> *)predicates {
+    return [self execute:db entity:entity predicates:predicates sortDescriptors:nil];
+}
+
++ (NSArray *)execute:(NSManagedObjectContext *)db entity:(NSString *)entity predicates:(NSArray<NSPredicate *> *)predicates sortDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors {
+    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:entity];
+    fetchRequest.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:predicates];
+    fetchRequest.sortDescriptors = sortDescriptors;
     NSError *error = nil;
-    NSArray *data = [db executeFetchRequest:request error:&error];
+    NSArray *data = [db executeFetchRequest:fetchRequest error:&error];
     if(error != nil) {
-        NSLog(@"error: load fetch - %@", error.localizedDescription);
+        NSLog(@"error: load execute - %@", error.localizedDescription);
     }
     return data;
 }

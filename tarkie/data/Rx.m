@@ -853,7 +853,7 @@
                 store.geoFenceRadius = [[data[x] objectForKey:@"store_radius"] longLongValue];
 
                 visit.storeID = store.storeID;
-                visit.name = [Get isSettingEnabled:db settingID:SETTING_STORE_DISPLAY_LONG_NAME] ? store.name : store.shortName;
+                visit.name = [Get isSettingEnabled:db settingID:SETTING_STORE_DISPLAY_LONG_NAME teamID:employee.teamID] ? store.name : store.shortName;
                 visit.employeeID = employeeID;
                 visit.startDate = [data[x] objectForKey:@"start_date"];
                 visit.endDate = [data[x] objectForKey:@"end_date"];

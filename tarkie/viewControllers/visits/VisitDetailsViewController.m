@@ -13,17 +13,18 @@
 @interface VisitDetailsViewController()
 
 @property (strong, nonatomic) AppDelegate *app;
+@property (strong, nonatomic) CheckIn *visitCheckIn;
+@property (strong, nonatomic) CheckOut *visitCheckOut;
 @property (strong, nonatomic) NSMutableArray<VisitInventories *> *inventories;
 @property (strong, nonatomic) NSMutableArray<VisitForms *> *forms;
 @property (strong, nonatomic) NSMutableArray<Photos *> *photos;
 @property (strong, nonatomic) NSMutableArray<UIImage *> *images;
-@property (nonatomic) UIEdgeInsets vInventoryLayoutMargins, vFormsLayoutMargins;
+@property (nonatomic) UIEdgeInsets vInventoryLayoutMargins, vFormsLayoutMargins, lInvoiceValueLayoutMargins, lDeliveriesValueLayoutMargins;
 @property (strong, nonatomic) Stores *store;
 @property (strong, nonatomic) UIImage *photo;
-@property (strong, nonatomic) NSString *timeFormat, *photoFilename, *visitStatus, *visitNotes, *conventionStores, *conventionVisits, *conventionInvoice, *conventionDeliveries;
+@property (strong, nonatomic) NSString *photoFilename, *visitStatus, *visitNotes;
 @property (strong, nonatomic) NSDate *currentDate;
-@property (nonatomic) long userID;
-@property (nonatomic) BOOL displayLongName, viewWillAppear, isInventory, isForms, inventoryLoaded, formsLoaded, isCheckingIn, isCheckingOut;
+@property (nonatomic) BOOL viewWillAppear, inventoryLoaded, formsLoaded, isCheckingIn, isCheckingOut;
 
 @end
 
@@ -43,10 +44,6 @@ static MessageDialogViewController *vcMessage;
     self.forms = NSMutableArray.alloc.init;
     self.photos = NSMutableArray.alloc.init;
     self.images = NSMutableArray.alloc.init;
-    self.userID = [Get userID:self.app.db];
-    self.store = nil;
-    self.timeFormat = [Get timeFormat:self.app.db];
-    self.displayLongName = [Get isSettingEnabled:self.app.db settingID:SETTING_STORE_DISPLAY_LONG_NAME];
     self.viewWillAppear = NO;
 }
 
@@ -72,6 +69,8 @@ static MessageDialogViewController *vcMessage;
         [View setCornerRadiusByWidth:self.tfNotes cornerRadius:0.025];
         self.vInventoryLayoutMargins = self.vInventory.layoutMargins;
         self.vFormsLayoutMargins = self.vForms.layoutMargins;
+        self.lInvoiceValueLayoutMargins = self.lInvoiceValue.layoutMargins;
+        self.lDeliveriesValueLayoutMargins = self.lDeliveriesValue.layoutMargins;
         [self onRefresh];
         [self applicationDidBecomeActive];
     }
@@ -90,20 +89,17 @@ static MessageDialogViewController *vcMessage;
 
 - (void)onRefresh {
     [super onRefresh];
-    self.conventionStores = [Get conventionName:self.app.db conventionID:CONVENTION_STORES];
-    self.conventionVisits = [Get conventionName:self.app.db conventionID:CONVENTION_VISITS];
-    self.conventionInvoice = [Get conventionName:self.app.db conventionID:CONVENTION_INVOICE];
-    self.conventionDeliveries = [Get conventionName:self.app.db conventionID:CONVENTION_DELIVERIES];
     [self.inventories removeAllObjects];
     [self.forms removeAllObjects];
     [self.photos removeAllObjects];
     [self.images removeAllObjects];
-    self.isInventory = [Get isModuleEnabled:self.app.db moduleID:MODULE_INVENTORY];
-    self.isForms = [Get isModuleEnabled:self.app.db moduleID:MODULE_FORMS];
-    if(self.isInventory) {
+    self.store = [Get store:self.app.db storeID:self.visit.storeID];
+    self.visitCheckIn = [Get checkIn:self.app.db visitID:self.visit.visitID];
+    self.visitCheckOut = [Get checkOut:self.app.db checkInID:self.visitCheckIn.checkInID];
+    if(self.app.moduleInventory) {
         [self.inventories addObjectsFromArray:[Load visitInventories:self.app.db visitID:self.visit.visitID]];
     }
-    if(self.isForms) {
+    if(self.app.moduleForms) {
         [self.forms addObjectsFromArray:[Load visitForms:self.app.db visitID:self.visit.visitID]];
     }
     [self.photos addObjectsFromArray:[Load visitPhotos:self.app.db visitID:self.visit.visitID]];
@@ -120,18 +116,17 @@ static MessageDialogViewController *vcMessage;
 }
 
 - (void)updateVisitDetails {
-    if(self.visit.storeID != 0) {
-        self.lName.text = self.conventionVisits;
-        Stores *store = [Get store:self.app.db storeID:self.visit.storeID];
-        self.lStoreName.text = self.displayLongName ? store.name : store.shortName;
-        self.lStoreAddress.text = store.address.length > 0 ? store.address : @"No address";
+    if(self.store.storeID != 0) {
+        self.lName.text = self.app.conventionVisits;
+        self.lStoreName.text = self.app.settingStoreDisplayLongName ? self.store.name : self.store.shortName;
+        self.lStoreAddress.text = self.store.address.length > 0 ? self.store.address : @"No address";
     }
     else {
         self.lName.text = self.visit.name;
-        self.lStoreName.text = [NSString stringWithFormat:@"%@ Name", self.conventionStores];
+        self.lStoreName.text = [NSString stringWithFormat:@"%@ Name", self.app.conventionStores];
         self.lStoreAddress.text = @"Address";
     }
-    if(self.isInventory) {
+    if(self.app.moduleInventory) {
         self.vInventory.hidden = NO;
         self.vInventory.layoutMargins = self.vInventoryLayoutMargins;
         self.vInventoryHeight.active = NO;
@@ -143,7 +138,7 @@ static MessageDialogViewController *vcMessage;
         self.vInventoryHeight.active = YES;
         self.tvInventoryHeight.constant = 0;
     }
-    if(self.isForms) {
+    if(self.app.moduleForms) {
         self.vForms.hidden = NO;
         self.vForms.layoutMargins = self.vFormsLayoutMargins;
         self.vFormsHeight.active = NO;
@@ -155,11 +150,38 @@ static MessageDialogViewController *vcMessage;
         self.vFormsHeight.active = YES;
         self.tvFormsHeight.constant = 0;
     }
-    self.lInvoice.text = self.conventionInvoice;
-    self.lDeliveries.text = self.conventionDeliveries;
-    self.lInvoiceValue.text = self.visit.invoice.length > 0 ? self.visit.invoice : @"N/A";
-    self.lDeliveriesValue.text = [NSString stringWithFormat:@"%@%.02f", [Get currencySymbol:self.app.db], [self.visit.deliveries floatValue]];
+    if(self.app.settingVisitsInvoice) {
+        self.lInvoice.text = self.app.conventionInvoice;
+        self.lInvoiceValue.text = self.visit.invoice.length > 0 ? self.visit.invoice : @"N/A";
+        self.lInvoiceValue.layoutMargins = self.lInvoiceValueLayoutMargins;
+    }
+    else {
+        self.lInvoice.text = nil;
+        self.lInvoiceValue.text = nil;
+        self.lInvoiceValue.layoutMargins = UIEdgeInsetsZero;
+    }
+    if(self.app.settingVisitsDeliveries) {
+        self.lDeliveries.text = self.app.conventionDeliveries;
+        self.lDeliveriesValue.text = [NSString stringWithFormat:@"%@%.02f", self.app.settingDisplayCurrencySymbol, [self.visit.deliveries floatValue]];
+        self.lDeliveriesValue.layoutMargins = self.lDeliveriesValueLayoutMargins;
+    }
+    else {
+        self.lDeliveries.text = nil;
+        self.lDeliveriesValue.text = nil;
+        self.lDeliveriesValue.layoutMargins = UIEdgeInsetsZero;
+    }
     self.tfNotes.value = self.visit.notes;
+    if(!self.visit.isCheckOut || (self.visit.isCheckOut && self.app.settingVisitsEditAfterCheckOut)) {
+        self.btnSave.hidden = NO;
+        self.tfNotes.editable = YES;
+    }
+    else {
+        self.btnSave.hidden = YES;
+        if([self.tfNotes.text isEqualToString:self.tfNotes.placeholder]) {
+            self.tfNotes.text  = nil;
+        }
+        self.tfNotes.editable = NO;
+    }
     [self.view layoutIfNeeded];
 }
 
@@ -182,33 +204,85 @@ static MessageDialogViewController *vcMessage;
 }
 
 - (IBAction)back:(id)sender {
+    NSString *notes = self.tfNotes.text;
+    if([notes isEqualToString:self.tfNotes.placeholder]) {
+        notes = @"";
+    }
+    if(self.visit.storeID != self.store.storeID || ![self.visit.notes isEqualToString:notes]) {
+        vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
+        vcMessage.subject = @"Save Changes?";
+        vcMessage.message = @"Do you want to save changes?";
+        vcMessage.negativeTitle = @"Discard";
+        vcMessage.negativeTarget = ^{
+            [View removeView:vcMessage.view animated:YES];
+            [self.navigationController popViewControllerAnimated:YES];
+        };
+        vcMessage.positiveTitle = @"Save";
+        vcMessage.positiveTarget = ^{
+            [View removeView:vcMessage.view animated:YES];
+            [self.btnSave sendActionsForControlEvents:UIControlEventTouchUpInside];
+        };
+        [View addSubview:self.view subview:vcMessage.view animated:YES];
+        return;
+    }
     [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (IBAction)save:(id)sender {
-    if(self.store.storeID != 0) {
-        self.visit.name = self.self.displayLongName ? self.store.name : self.store.shortName;
-        self.visit.storeID = self.store.storeID;
+    if(self.store.storeID == 0) {
+        vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
+        vcMessage.subject = [NSString stringWithFormat:@"%@ is Required", self.app.conventionStores];
+        vcMessage.message = [NSString stringWithFormat:@"Please select %@ first to continue.", self.app.conventionStores.lowercaseString];
+        vcMessage.positiveTitle = @"OK";
+        vcMessage.positiveTarget = ^{
+            [View removeView:vcMessage.view animated:YES];
+        };
+        [View addSubview:self.view subview:vcMessage.view animated:YES];
+        return;
     }
     NSString *notes = self.tfNotes.text;
     if([notes isEqualToString:self.tfNotes.placeholder]) {
         notes = @"";
     }
+    if(notes.length == 0 && self.app.settingVisitsNotes) {
+        vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
+        vcMessage.subject = @"Notes is Required";
+        vcMessage.message = @"Please input notes.";
+        vcMessage.positiveTitle = @"OK";
+        vcMessage.positiveTarget = ^{
+            [View removeView:vcMessage.view animated:YES];
+        };
+        [View addSubview:self.view subview:vcMessage.view animated:YES];
+        return;
+    }
+    self.visit.name = self.app.settingStoreDisplayLongName ? self.store.name : self.store.shortName;
+    self.visit.storeID = self.store.storeID;
     self.visit.notes = notes;
     if(self.visit.isSync) {
         self.visit.isUpdate = YES;
         self.visit.isWebUpdate = NO;
     }
     if([Update save:self.app.db]) {
-        [self back:self];
+        [self.navigationController popViewControllerAnimated:YES];
     }
 }
 
 - (IBAction)editStore:(id)sender {
-    StoresViewController *vcStores = [self.storyboard instantiateViewControllerWithIdentifier:@"vcStores"];
-    vcStores.delegate = self;
-    vcStores.action = STORE_ACTION_SELECT;
-    [self.navigationController pushViewController:vcStores animated:YES];
+    if(!self.visit.isCheckOut || (self.visit.isCheckOut && self.app.settingVisitsEditAfterCheckOut)) {
+        StoresViewController *vcStores = [self.storyboard instantiateViewControllerWithIdentifier:@"vcStores"];
+        vcStores.delegate = self;
+        vcStores.action = STORE_ACTION_SELECT;
+        [self.navigationController pushViewController:vcStores animated:YES];
+        return;
+    }
+    vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
+    vcMessage.subject = [NSString stringWithFormat:@"Cannot Edit %@", self.app.conventionStores];
+    vcMessage.message = [NSString stringWithFormat:@"You have checked-out already. You cannot edit %@ anymore.", self.app.conventionStores.lowercaseString];
+    vcMessage.positiveTitle = @"OK";
+    vcMessage.positiveTarget = ^{
+        [View removeView:vcMessage.view animated:YES];
+    };
+    [View addSubview:self.view subview:vcMessage.view animated:YES];
 }
 
 - (IBAction)checkIn:(id)sender {
@@ -220,11 +294,33 @@ static MessageDialogViewController *vcMessage;
 }
 
 - (IBAction)addInventory:(id)sender {
-    NSLog(@"paul: addInventory");
+    if(!self.visit.isCheckOut || (self.visit.isCheckOut && self.app.settingVisitsEditAfterCheckOut)) {
+        NSLog(@"paul: addInventory");
+        return;
+    }
+    vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
+    vcMessage.subject = @"Cannot Add Inventory";
+    vcMessage.message = @"You have checked-out already. You cannot add inventory anymore.";
+    vcMessage.positiveTitle = @"OK";
+    vcMessage.positiveTarget = ^{
+        [View removeView:vcMessage.view animated:YES];
+    };
+    [View addSubview:self.view subview:vcMessage.view animated:YES];
 }
 
 - (IBAction)addForms:(id)sender {
-    NSLog(@"paul: addForms");
+    if(!self.visit.isCheckOut || (self.visit.isCheckOut && self.app.settingVisitsEditAfterCheckOut)) {
+        NSLog(@"paul: addForms");
+        return;
+    }
+    vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
+    vcMessage.subject = @"Cannot Add Forms";
+    vcMessage.message = @"You have checked-out already. You cannot add forms anymore.";
+    vcMessage.positiveTitle = @"OK";
+    vcMessage.positiveTarget = ^{
+        [View removeView:vcMessage.view animated:YES];
+    };
+    [View addSubview:self.view subview:vcMessage.view animated:YES];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -276,7 +372,7 @@ static MessageDialogViewController *vcMessage;
 - (void)onStoresSelect:(Stores *)stores {
     self.store = stores;
     self.lName.text = @"Visit";
-    self.lStoreName.text = self.displayLongName ? self.store.name : self.store.shortName;
+    self.lStoreName.text = self.app.settingStoreDisplayLongName ? self.store.name : self.store.shortName;
     self.lStoreAddress.text = self.store.address.length > 0 ? self.store.address : @"No address";
 }
 
@@ -289,11 +385,22 @@ static MessageDialogViewController *vcMessage;
 }
 
 - (void)onPhotoBarAdd {
-    CameraViewController *vcCamera = [self.storyboard instantiateViewControllerWithIdentifier:@"vcCamera"];
-    vcCamera.cameraDelegate = self;
-    vcCamera.action = CAMERA_ACTION_VISIT_PHOTOS;
-    vcCamera.isRearCamera = YES;
-    [self.navigationController pushViewController:vcCamera animated:NO];
+    if(!self.visit.isCheckOut || (self.visit.isCheckOut && self.app.settingVisitsEditAfterCheckOut)) {
+        CameraViewController *vcCamera = [self.storyboard instantiateViewControllerWithIdentifier:@"vcCamera"];
+        vcCamera.cameraDelegate = self;
+        vcCamera.action = CAMERA_ACTION_VISIT_PHOTOS;
+        vcCamera.isRearCamera = YES;
+        [self.navigationController pushViewController:vcCamera animated:NO];
+        return;
+    }
+    vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
+    vcMessage.subject = @"Cannot Add Photos";
+    vcMessage.message = @"You have checked-out already. You cannot add photos anymore.";
+    vcMessage.positiveTitle = @"OK";
+    vcMessage.positiveTarget = ^{
+        [View removeView:vcMessage.view animated:YES];
+    };
+    [View addSubview:self.view subview:vcMessage.view animated:YES];
 }
 
 - (void)onCameraCapture:(int)type image:(UIImage *)image {
@@ -310,13 +417,13 @@ static MessageDialogViewController *vcMessage;
         }
         case CAMERA_ACTION_VISIT_PHOTOS: {
             NSDate *currentDate = NSDate.date;
-            NSString *filename = [NSString stringWithFormat:@"%ld-%.0f%@", self.userID, [currentDate timeIntervalSince1970], @".png"];
+            NSString *filename = [NSString stringWithFormat:@"%ld-%.0f%@", self.app.userID, [currentDate timeIntervalSince1970], @".png"];
             if([Image saveFromImage:[Image documentPath:filename] image:image] != nil) {
                 Sequences *sequence = [Get sequence:self.app.db];
                 Photos *photo = [NSEntityDescription insertNewObjectForEntityForName:@"Photos" inManagedObjectContext:self.app.db];
                 sequence.photos += 1;
                 photo.photoID = sequence.photos;
-                photo.employeeID = self.userID;
+                photo.employeeID = self.app.userID;
                 photo.date = [Time getFormattedDate:DATE_FORMAT date:currentDate];
                 photo.time = [Time getFormattedDate:TIME_FORMAT date:currentDate];
                 photo.filename = filename;
@@ -400,10 +507,30 @@ static MessageDialogViewController *vcMessage;
     if(self.visit.isCheckIn) {
         return;
     }
-    if(![Get isTimeIn:self.app.db]) {
+    if(!self.main.isTimeIn) {
         vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
         vcMessage.subject = @"Time In Required";
         vcMessage.message = @"Please time in first before you check-in";
+        vcMessage.positiveTitle = @"OK";
+        vcMessage.positiveTarget = ^{
+            [View removeView:vcMessage.view animated:YES];
+        };
+        [View addSubview:self.view subview:vcMessage.view animated:YES];
+        return;
+    }
+    if(!self.app.settingVisitsParallelCheckInOut && [Get isCheckIn:self.app.db]) {
+        CheckIn *checkIn = [Get checkIn:self.app.db];
+        NSString *visitName = [Get visit:self.app.db visitID:checkIn.visitID].name;
+        NSString *visitDate = [Time formatDate:self.app.settingDisplayDateFormat date:checkIn.date];
+        NSString *message = [NSString stringWithFormat:@"You are currently checked-in at %@ on %@. Please check-out first to continue.", visitName, visitDate];
+        NSMutableAttributedString *attributedText = [NSMutableAttributedString.alloc initWithString:message];
+        vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
+        NSRange range = NSMakeRange(32, visitName.length);
+        [attributedText addAttribute:NSFontAttributeName value:[UIFont fontWithName:@"ProximaNova-Semibold" size:self.lName.font.pointSize] range:range];
+        range = NSMakeRange(36 + visitName.length, visitDate.length);
+        [attributedText addAttribute:NSFontAttributeName value:[UIFont fontWithName:@"ProximaNova-Semibold" size:self.lName.font.pointSize] range:range];
+        vcMessage.subject = @"Currently Checked-in";
+        vcMessage.attributedMessage = attributedText;
         vcMessage.positiveTitle = @"OK";
         vcMessage.positiveTarget = ^{
             [View removeView:vcMessage.view animated:YES];
@@ -415,26 +542,28 @@ static MessageDialogViewController *vcMessage;
         self.isCheckingIn = YES;
         return;
     }
-    if([self.main cameraRequest]) {
-        self.isCheckingIn = YES;
-        return;
-    }
-    if(self.photo == nil) {
-        CameraViewController *vcCamera = [self.storyboard instantiateViewControllerWithIdentifier:@"vcCamera"];
-        vcCamera.cameraDelegate = self;
-        vcCamera.action = CAMERA_ACTION_CHECK_IN;
-        vcCamera.isRearCamera = NO;
-        [self.navigationController pushViewController:vcCamera animated:NO];
-        return;
-    }
-    if(self.photoFilename == nil) {
-        self.photoFilename = [NSString stringWithFormat:@"%ld-%.0f%@", self.userID, [NSDate.date timeIntervalSince1970], @".png"];
-        if([Image saveFromImage:[Image documentPath:self.photoFilename] image:self.photo] == nil) {
-            self.photo = nil;
-            self.photoFilename = nil;
+    if(self.app.settingVisitsCheckInPhoto) {
+        if([self.main cameraRequest]) {
             self.isCheckingIn = YES;
-            [self applicationDidBecomeActive];
             return;
+        }
+        if(self.photo == nil) {
+            CameraViewController *vcCamera = [self.storyboard instantiateViewControllerWithIdentifier:@"vcCamera"];
+            vcCamera.cameraDelegate = self;
+            vcCamera.action = CAMERA_ACTION_CHECK_IN;
+            vcCamera.isRearCamera = NO;
+            [self.navigationController pushViewController:vcCamera animated:NO];
+            return;
+        }
+        if(self.photoFilename == nil) {
+            self.photoFilename = [NSString stringWithFormat:@"%ld-%.0f%@", self.app.userID, [NSDate.date timeIntervalSince1970], @".png"];
+            if([Image saveFromImage:[Image documentPath:self.photoFilename] image:self.photo] == nil) {
+                self.photo = nil;
+                self.photoFilename = nil;
+                self.isCheckingIn = YES;
+                [self applicationDidBecomeActive];
+                return;
+            }
         }
     }
     self.currentDate = NSDate.date;
@@ -442,21 +571,23 @@ static MessageDialogViewController *vcMessage;
     NSString *time = [Time getFormattedDate:TIME_FORMAT date:self.currentDate];
     NSString *syncBatchID = [Get syncBatchID:self.app.db];
     Sequences *sequence = [Get sequence:self.app.db];
-    GPS *gps = [NSEntityDescription insertNewObjectForEntityForName:@"GPS" inManagedObjectContext:self.app.db];
-    sequence.gps += 1;
-    gps.gpsID = sequence.gps;
-    gps.date = [Time getFormattedDate:DATE_FORMAT date:self.app.location.timestamp];
-    gps.time = [Time getFormattedDate:TIME_FORMAT date:self.app.location.timestamp];
-    gps.latitude = self.app.location.coordinate.latitude;
-    gps.longitude = self.app.location.coordinate.longitude;
     CheckIn *checkIn = [NSEntityDescription insertNewObjectForEntityForName:@"CheckIn" inManagedObjectContext:self.app.db];
+    if(self.app.location != nil) {
+        GPS *gps = [NSEntityDescription insertNewObjectForEntityForName:@"GPS" inManagedObjectContext:self.app.db];
+        sequence.gps += 1;
+        gps.gpsID = sequence.gps;
+        gps.date = [Time getFormattedDate:DATE_FORMAT date:self.app.location.timestamp];
+        gps.time = [Time getFormattedDate:TIME_FORMAT date:self.app.location.timestamp];
+        gps.latitude = self.app.location.coordinate.latitude;
+        gps.longitude = self.app.location.coordinate.longitude;
+        checkIn.gpsID = gps.gpsID;
+    }
     sequence.checkIn += 1;
     checkIn.checkInID = sequence.checkIn;
     checkIn.timeInID = [Get timeIn:self.app.db].timeInID;
     checkIn.visitID = self.visit.visitID;
     checkIn.date = date;
     checkIn.time = time;
-    checkIn.gpsID = gps.gpsID;
     checkIn.photo = self.photoFilename;
     checkIn.syncBatchID = syncBatchID;
     checkIn.isSync = NO;
@@ -478,30 +609,70 @@ static MessageDialogViewController *vcMessage;
     if(!self.visit.isCheckIn || self.visit.isCheckOut) {
         return;
     }
+    if(self.store.storeID == 0 && !self.app.settingVisitsEditAfterCheckOut) {
+        vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
+        vcMessage.subject = @"Unfilled Details";
+        vcMessage.message = [NSString stringWithFormat:@"Please complete the details of your %@ first.", self.app.conventionStores.lowercaseString];
+        vcMessage.positiveTitle = @"OK";
+        vcMessage.positiveTarget = ^{
+            [View removeView:vcMessage.view animated:YES];
+        };
+        [View addSubview:self.view subview:vcMessage.view animated:YES];
+        return;
+    }
+    NSString *notes = self.tfNotes.text;
+    if([notes isEqualToString:self.tfNotes.placeholder]) {
+        notes = @"";
+    }
+    if(notes.length == 0 && self.app.settingVisitsNotes && !self.app.settingVisitsEditAfterCheckOut) {
+        vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
+        vcMessage.subject = @"Unfilled Details";
+        vcMessage.message = @"Please complete the details of your notes first.";
+        vcMessage.positiveTitle = @"OK";
+        vcMessage.positiveTarget = ^{
+            [View removeView:vcMessage.view animated:YES];
+        };
+        [View addSubview:self.view subview:vcMessage.view animated:YES];
+        return;
+    }
+    if(self.store.storeID != 0) {
+        self.visit.name = self.app.settingStoreDisplayLongName ? self.store.name : self.store.shortName;
+        self.visit.storeID = self.store.storeID;
+    }
+    if(notes.length != 0) {
+        self.visit.notes = notes;
+    }
+    if(self.visit.storeID != self.store.storeID || ![self.visit.notes isEqualToString:notes]) {
+        if(![Update save:self.app.db]) {
+            return;
+        }
+    }
     if([self.main gpsRequest]) {
         self.isCheckingOut = YES;
         return;
     }
-    if([self.main cameraRequest]) {
-        self.isCheckingOut = YES;
-        return;
-    }
-    if(self.photo == nil) {
-        CameraViewController *vcCamera = [self.storyboard instantiateViewControllerWithIdentifier:@"vcCamera"];
-        vcCamera.cameraDelegate = self;
-        vcCamera.action = CAMERA_ACTION_CHECK_OUT;
-        vcCamera.isRearCamera = NO;
-        [self.navigationController pushViewController:vcCamera animated:NO];
-        return;
-    }
-    if(self.photoFilename == nil) {
-        self.photoFilename = [NSString stringWithFormat:@"%ld-%.0f%@", self.userID, [NSDate.date timeIntervalSince1970], @".png"];
-        if([Image saveFromImage:[Image documentPath:self.photoFilename] image:self.photo] == nil) {
-            self.photo = nil;
-            self.photoFilename = nil;
+    if(self.app.settingVisitsCheckOutPhoto) {
+        if([self.main cameraRequest]) {
             self.isCheckingOut = YES;
-            [self applicationDidBecomeActive];
             return;
+        }
+        if(self.photo == nil) {
+            CameraViewController *vcCamera = [self.storyboard instantiateViewControllerWithIdentifier:@"vcCamera"];
+            vcCamera.cameraDelegate = self;
+            vcCamera.action = CAMERA_ACTION_CHECK_OUT;
+            vcCamera.isRearCamera = NO;
+            [self.navigationController pushViewController:vcCamera animated:NO];
+            return;
+        }
+        if(self.photoFilename == nil) {
+            self.photoFilename = [NSString stringWithFormat:@"%ld-%.0f%@", self.app.userID, [NSDate.date timeIntervalSince1970], @".png"];
+            if([Image saveFromImage:[Image documentPath:self.photoFilename] image:self.photo] == nil) {
+                self.photo = nil;
+                self.photoFilename = nil;
+                self.isCheckingOut = YES;
+                [self applicationDidBecomeActive];
+                return;
+            }
         }
     }
     if(self.visitStatus == nil) {
@@ -525,32 +696,48 @@ static MessageDialogViewController *vcMessage;
     NSString *time = [Time getFormattedDate:TIME_FORMAT date:self.currentDate];
     NSString *syncBatchID = [Get syncBatchID:self.app.db];
     Sequences *sequence = [Get sequence:self.app.db];
-    GPS *gps = [NSEntityDescription insertNewObjectForEntityForName:@"GPS" inManagedObjectContext:self.app.db];
-    sequence.gps += 1;
-    gps.gpsID = sequence.gps;
-    gps.date = [Time getFormattedDate:DATE_FORMAT date:self.app.location.timestamp];
-    gps.time = [Time getFormattedDate:TIME_FORMAT date:self.app.location.timestamp];
-    gps.latitude = self.app.location.coordinate.latitude;
-    gps.longitude = self.app.location.coordinate.longitude;
     CheckOut *checkOut = [NSEntityDescription insertNewObjectForEntityForName:@"CheckOut" inManagedObjectContext:self.app.db];
+    if(self.app.location != nil) {
+        GPS *gps = [NSEntityDescription insertNewObjectForEntityForName:@"GPS" inManagedObjectContext:self.app.db];
+        sequence.gps += 1;
+        gps.gpsID = sequence.gps;
+        gps.date = [Time getFormattedDate:DATE_FORMAT date:self.app.location.timestamp];
+        gps.time = [Time getFormattedDate:TIME_FORMAT date:self.app.location.timestamp];
+        gps.latitude = self.app.location.coordinate.latitude;
+        gps.longitude = self.app.location.coordinate.longitude;
+        checkOut.gpsID = gps.gpsID;
+    }
     sequence.checkOut += 1;
     checkOut.checkOutID = sequence.checkOut;
-    checkOut.checkInID = [Get checkIn:self.app.db timeInID:[Get timeIn:self.app.db].timeInID].checkInID;
+    checkOut.checkInID = self.visitCheckIn.checkInID;
     checkOut.date = date;
     checkOut.time = time;
-    checkOut.gpsID = gps.gpsID;
     checkOut.photo = self.photoFilename;
     checkOut.syncBatchID = syncBatchID;
     checkOut.isSync = NO;
     checkOut.isPhotoUpload = NO;
     checkOut.isPhotoDelete = NO;
+    if(!self.app.settingVisitsEditAfterCheckOut) {
+        self.visit.storeID = self.store.storeID;
+    }
     self.visit.status = self.visitStatus;
     if(self.visitNotes.length > 0) {
         self.visit.notes = self.visitNotes;
     }
     self.visit.isCheckOut = YES;
     if([Update save:self.app.db]) {
-        self.tfNotes.text = self.visit.notes;
+        self.tfNotes.value = self.visit.notes;
+        if(!self.visit.isCheckOut || (self.visit.isCheckOut && self.app.settingVisitsEditAfterCheckOut)) {
+            self.btnSave.hidden = NO;
+            self.tfNotes.editable = YES;
+        }
+        else {
+            self.btnSave.hidden = YES;
+            if([self.tfNotes.text isEqualToString:self.tfNotes.placeholder]) {
+                self.tfNotes.text  = nil;
+            }
+            self.tfNotes.editable = NO;
+        }
         [self cancelCheckOut];
         [self updateCheckOut];
     }
@@ -566,7 +753,8 @@ static MessageDialogViewController *vcMessage;
 
 - (void)updateCheckIn {
     if(self.visit.isCheckIn) {
-        [self.btnCheckIn setTitle:[NSString stringWithFormat:@"IN - %@", [Time formatTime:self.timeFormat time:[Get checkIn:self.app.db visitID:self.visit.visitID].time]] forState:UIControlStateNormal];
+        self.visitCheckIn = [Get checkIn:self.app.db visitID:self.visit.visitID];
+        [self.btnCheckIn setTitle:[NSString stringWithFormat:@"IN - %@", [Time formatTime:self.app.settingDisplayTimeFormat time:self.visitCheckIn.time]] forState:UIControlStateNormal];
         self.btnCheckIn.backgroundColor = [UIColor colorNamed:@"Grey700"];
     }
     else {
@@ -579,7 +767,8 @@ static MessageDialogViewController *vcMessage;
 - (void)updateCheckOut {
     if(self.visit.isCheckIn) {
         if(self.visit.isCheckOut) {
-            [self.btnCheckOut setTitle:[NSString stringWithFormat:@"OUT - %@", [Time formatTime:self.timeFormat time:[Get checkOut:self.app.db checkInID:[Get checkIn:self.app.db visitID:self.visit.visitID].checkInID].time]] forState:UIControlStateNormal];
+            self.visitCheckOut = [Get checkOut:self.app.db checkInID:self.visitCheckIn.checkInID];
+            [self.btnCheckOut setTitle:[NSString stringWithFormat:@"OUT - %@", [Time formatTime:self.app.settingDisplayTimeFormat time:self.visitCheckOut.time]] forState:UIControlStateNormal];
             self.btnCheckOut.backgroundColor = [UIColor colorNamed:@"Grey600"];
         }
         else {

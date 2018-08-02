@@ -9,6 +9,12 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     [self scaleView:self];
+    self.longPressGesture = UILongPressGestureRecognizer.alloc.init;
+}
+
+- (void)drawRect:(CGRect)rect {
+    [super drawRect:rect];
+    [self addGestureRecognizer:self.longPressGesture];
 }
 
 - (void)scaleView:(UIView *)view {

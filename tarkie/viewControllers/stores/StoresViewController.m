@@ -12,8 +12,8 @@
 @property (strong, nonatomic) NSMutableArray<Stores *> *stores;
 @property (strong, nonatomic) NSMutableArray<NSMutableArray<Stores *> *> *storesSectioned;
 @property (strong, nonatomic) NSCharacterSet *validChars;
-@property (strong, nonatomic) NSString *conventionStores, *searchFilter;
-@property (nonatomic) BOOL displayLongName, viewWillAppear;
+@property (strong, nonatomic) NSString *searchFilter;
+@property (nonatomic) BOOL viewWillAppear;
 
 @end
 
@@ -27,8 +27,7 @@
     self.stores = NSMutableArray.alloc.init;
     self.storesSectioned = NSMutableArray.alloc.init;
     self.validChars = [NSCharacterSet characterSetWithCharactersInString:@"abcdefghijklmnopqrstuvwxyz"];
-    self.btnAdd.hidden = ![Get isSettingEnabled:self.app.db settingID:SETTING_STORE_ADD];
-    self.displayLongName = [Get isSettingEnabled:self.app.db settingID:SETTING_STORE_DISPLAY_LONG_NAME];
+    self.btnAdd.hidden = !self.app.settingStoreAdd;
     self.viewWillAppear = NO;
 }
 
@@ -48,16 +47,15 @@
 
 - (void)onRefresh {
     [super onRefresh];
-    self.conventionStores = [Get conventionName:self.app.db conventionID:CONVENTION_STORES];
-    self.lName.text = self.conventionStores;
+    self.lName.text = self.app.conventionStores;
     [self.stores removeAllObjects];
     [self.storesSectioned removeAllObjects];
     [self.stores addObjectsFromArray:[Load stores:self.app.db searchFilter:self.searchFilter]];
     NSString *alphabet = @"#";
     NSMutableArray<Stores *> *rows = NSMutableArray.alloc.init;
     for(int x = 0; x < self.stores.count; x++) {
-        if((self.displayLongName ? self.stores[x].name : self.stores[x].shortName).length > 0) {
-            NSString *letter = [self.displayLongName ? self.stores[x].name : self.stores[x].shortName substringToIndex:1].lowercaseString;
+        if((self.app.settingStoreDisplayLongName ? self.stores[x].name : self.stores[x].shortName).length > 0) {
+            NSString *letter = [self.app.settingStoreDisplayLongName ? self.stores[x].name : self.stores[x].shortName substringToIndex:1].lowercaseString;
             if([letter rangeOfCharacterFromSet:self.validChars].location == NSNotFound) {
                 letter = @"#";
             }
@@ -96,7 +94,7 @@
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     HomeTableViewCell *header = [tableView dequeueReusableCellWithIdentifier:@"header"];
     Stores *store = self.storesSectioned[section].firstObject;
-    NSString *letter = [self.displayLongName ? store.name : store.shortName substringToIndex:1].lowercaseString;
+    NSString *letter = [self.app.settingStoreDisplayLongName ? store.name : store.shortName substringToIndex:1].lowercaseString;
     if([letter rangeOfCharacterFromSet:self.validChars].location == NSNotFound) {
         letter = @"#";
     }
@@ -109,7 +107,7 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     HomeTableViewCell *item = [tableView dequeueReusableCellWithIdentifier:@"item" forIndexPath:indexPath];
     Stores *store = self.storesSectioned[indexPath.section][indexPath.row];
-    item.lName.text = self.displayLongName ? store.name : store.shortName;
+    item.lName.text = self.app.settingStoreDisplayLongName ? store.name : store.shortName;
     return item;
 }
 

@@ -12,6 +12,7 @@
 @implementation AuthorizationViewController
 
 static MessageDialogViewController *vcMessage;
+static LoadingDialogViewController *vcLoading;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -34,8 +35,8 @@ static MessageDialogViewController *vcMessage;
 - (IBAction)authorize:(id)sender {
     NSString *deviceID = UIDevice.currentDevice.identifierForVendor.UUIDString;
     NSString *authorizationCode = self.tfAuthorizationCode.text;
-    deviceID = authorizationCode.length == 0 ? @"91F9F8A0-DE47-4553-A68F-951244B11320" : deviceID;
-    authorizationCode = authorizationCode.length == 0 ? @"79HAWRPE" : authorizationCode;
+    deviceID = authorizationCode.length == 0 ? @"91F9F8A0-DE47-4553-A68F-951244B11320" : deviceID;//paul
+    authorizationCode = authorizationCode.length == 0 ? @"79HAWRPE" : authorizationCode;//paul
     if(deviceID.length == 0) {
         vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
         vcMessage.subject = @"Authorization";
@@ -63,7 +64,7 @@ static MessageDialogViewController *vcMessage;
     [params setObject:authorizationCode forKey:@"authorization_code"];
     [params setObject:API_KEY forKey:@"api_key"];
     [params setObject:@"IOS" forKey:@"device_type"];
-    LoadingDialogViewController *vcLoading = [self.storyboard instantiateViewControllerWithIdentifier:@"vcLoading"];
+    vcLoading = [self.storyboard instantiateViewControllerWithIdentifier:@"vcLoading"];
     vcLoading.delegate = self;
     vcLoading.action = LOADING_ACTION_AUTHORIZE;
     vcLoading.params = params;
@@ -74,7 +75,7 @@ static MessageDialogViewController *vcMessage;
     
 }
 
-- (void)onLoadingFinish:(int)action params:(NSDictionary *)params result:(NSString *)result {
+- (void)onLoadingFinish:(int)action result:(NSString *)result {
     switch(action) {
         case LOADING_ACTION_AUTHORIZE: {
             if(![result isEqualToString:@"ok"]) {

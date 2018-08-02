@@ -11,10 +11,9 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     self.psc = [self persistentStoreCoordinatorInit:@"tarkie.db"];
-//    self.db = [self managedObjectContextInit:self.psc councurrencyType:NSMainQueueConcurrencyType];
     self.db = [self managedObjectContextInit:self.psc councurrencyType:NSPrivateQueueConcurrencyType];
     self.dbSync = [self managedObjectContextInit:self.psc councurrencyType:NSPrivateQueueConcurrencyType];
-    self.dbTracking = [self managedObjectContextInit:self.psc councurrencyType:NSMainQueueConcurrencyType];
+    self.dbTracking = [self managedObjectContextInit:self.psc councurrencyType:NSPrivateQueueConcurrencyType];
     self.locationManager = [self locationManagerInit:self];
     self.userNotificationCenter = [self userNotificationCenterInit:self];
     return YES;
@@ -75,7 +74,7 @@
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
     self.authorizationStatus = status;
     if(self.isUpdatingLocation) {
-        [self startUpdatingLocation];
+        [self.locationManager startUpdatingLocation];
     }
     if(self.applicationDidEnterBackground && self.isUpdatingLocation && self.authorizationStatus != kCLAuthorizationStatusAuthorizedAlways) {
         [self.locationManager stopUpdatingLocation];

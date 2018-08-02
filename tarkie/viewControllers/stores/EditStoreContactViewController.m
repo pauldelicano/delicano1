@@ -60,7 +60,7 @@
     self.tfEmail.text = self.storeContact.email;
     self.tfMobileNumber.text = self.storeContact.mobileNumber;
     self.tfLandlineNumber.text = self.storeContact.landlineNumber;
-    self.tfBirthdate.text = [Time formatDate:[Get dateFormat:self.app.db] date:self.storeContact.birthdate];
+    self.tfBirthdate.text = [Time formatDate:self.app.settingDisplayDateFormat date:self.storeContact.birthdate];
     self.tfRemarks.text = self.storeContact.remarks;
 }
 

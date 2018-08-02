@@ -31,7 +31,12 @@
 - (void)onRefresh {
     [super onRefresh];
     self.lSubject.text = self.subject;
-    self.lMessage.text = self.message;
+    if(self.message != nil) {
+        self.lMessage.text = self.message;
+    }
+    if(self.attributedMessage != nil) {
+        self.lMessage.attributedText = self.attributedMessage;
+    }
     if(self.negativeTitle != nil) {
         [self.btnNegative setTitle:self.negativeTitle forState:UIControlStateNormal];
         if(self.negativeTarget != nil) {

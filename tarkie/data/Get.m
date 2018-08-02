@@ -1,13 +1,11 @@
 #import "Get.h"
 #import "App.h"
-#import "Update.h"
 #import "Time.h"
 
 @implementation Get
 
 + (Sequences *)sequence:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Sequences"];
-    Sequences *sequence = [self fetch:db request:request].lastObject;
+    Sequences *sequence = [self execute:db entity:@"Sequences"];
     if(sequence == nil) {
         sequence = [NSEntityDescription insertNewObjectForEntityForName:@"Sequences" inManagedObjectContext:db];
         sequence.stores = 0;
@@ -24,34 +22,26 @@
         sequence.checkIn = 0;
         sequence.checkOut = 0;
         sequence.photos = 0;
-        if(![Update save:db]) {
-            return nil;
-        }
     }
     return sequence;
 }
 
 + (Device *)device:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Device"];
-    return [self fetch:db request:request].lastObject;
+    return [self execute:db entity:@"Device"];
 }
 
 + (NSString *)apiKey:(NSManagedObjectContext *)db {
-    Device *device = [self device:db];
-    return device != nil ? device.apiKey : nil;
+    return [self device:db].apiKey;
 }
 
 + (Company *)company:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Company"];
-    return [self fetch:db request:request].lastObject;
+    return [self execute:db entity:@"Company"];
 }
 
 + (Modules *)module:(NSManagedObjectContext *)db moduleID:(long)moduleID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Modules"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"moduleID == %ld", moduleID]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].lastObject;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"moduleID == %ld", moduleID]];
+    return [self execute:db entity:@"Modules" predicates:predicates];
 }
 
 + (BOOL)isModuleEnabled:(NSManagedObjectContext *)db moduleID:(long)moduleID {
@@ -62,54 +52,75 @@
 }
 
 + (Users *)user:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Users"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isLogout == %@", @NO]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].lastObject;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isLogout == %@", @NO]];
+    return [self execute:db entity:@"Users" predicates:predicates];
 }
 
 + (long)userID:(NSManagedObjectContext *)db {
-    Users *user = [self user:db];
-    return user != nil ? user.userID : 0;
+    return [self user:db].userID;
 }
 
 + (Employees *)employee:(NSManagedObjectContext *)db employeeID:(long)employeeID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Employees"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %ld", employeeID]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].lastObject;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %ld", employeeID]];
+    return [self execute:db entity:@"Employees" predicates:predicates];
+}
+
++ (long)teamID:(NSManagedObjectContext *)db employeeID:(long)employeeID {
+    return [self employee:db employeeID:employeeID].teamID;
 }
 
 + (Settings *)setting:(NSManagedObjectContext *)db settingID:(long)settingID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Settings"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"settingID == %ld", settingID]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].lastObject;
-}
-
-+ (SettingsTeams *)settingTeam:(NSManagedObjectContext *)db settingID:(long)settingID {
-    return [self settingTeam:db settingID:settingID teamID:[Get employee:db employeeID:[Get userID:db]].teamID];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"settingID == %ld", settingID]];
+    return [self execute:db entity:@"Settings" predicates:predicates];
 }
 
 + (SettingsTeams *)settingTeam:(NSManagedObjectContext *)db settingID:(long)settingID teamID:(long)teamID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"SettingsTeams"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"settingID == %ld", settingID]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"teamID == %ld", teamID]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].lastObject;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"settingID == %ld", settingID]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"teamID == %ld", teamID]];
+    return [self execute:db entity:@"SettingsTeams" predicates:predicates];
 }
 
-+ (BOOL)isSettingEnabled:(NSManagedObjectContext *)db settingID:(long)settingID {
-    return [[self settingTeam:db settingID:settingID].value isEqualToString:@"yes"];
++ (BOOL)isSettingEnabled:(NSManagedObjectContext *)db settingID:(long)settingID  teamID:(long)teamID {
+    return [[self settingTeam:db settingID:settingID teamID:teamID].value isEqualToString:@"yes"];
 }
 
-+ (NSString *)dateFormat:(NSManagedObjectContext *)db {
++ (NSString *)settingCurrencySymbol:(NSManagedObjectContext *)db teamID:(long)teamID {
+    NSString *currencySymbol;
+    NSString *currencyCode = [self settingTeam:db settingID:SETTING_DISPLAY_CURRENCY teamID:teamID].value;
+    if([currencyCode isEqualToString:@"AUD"] || [currencyCode isEqualToString:@"CAD"] || [currencyCode isEqualToString:@"HKD"] || [currencyCode isEqualToString:@"SGD"] || [currencyCode isEqualToString:@"USD"]) {
+        currencySymbol = @"$";
+    }
+    if([currencyCode isEqualToString:@"EUR"]) {
+        currencySymbol = @"€";
+    }
+    if([currencyCode isEqualToString:@"JPY"]) {
+        currencySymbol = @"¥";
+    }
+    if([currencyCode isEqualToString:@"PHP"]) {
+        currencySymbol = @"₱";
+    }
+    if([currencyCode isEqualToString:@"GBP"]) {
+        currencySymbol = @"£";
+    }
+    if([currencyCode isEqualToString:@"TWD"]) {
+        currencySymbol = @"NT$";
+    }
+    if([currencyCode isEqualToString:@"THB"]) {
+        currencySymbol = @"฿";
+    }
+    if([currencyCode isEqualToString:@"TRY"]) {
+        currencySymbol = @"₺";
+    }
+    return currencySymbol;
+}
+
++ (NSString *)settingDateFormat:(NSManagedObjectContext *)db teamID:(long)teamID {
     NSString *format = DATE_FORMAT;
-    NSString *setting = [self settingTeam:db settingID:SETTING_COMPANY_DATE_FORMAT].value;
+    NSString *setting = [self settingTeam:db settingID:SETTING_DISPLAY_DATE_FORMAT teamID:teamID].value;
     if([setting isEqualToString:@"1"]) {
         format = @"MMMM d, yyyy";
     }
@@ -128,9 +139,9 @@
     return format;
 }
 
-+ (NSString *)timeFormat:(NSManagedObjectContext *)db {
++ (NSString *)settingTimeFormat:(NSManagedObjectContext *)db teamID:(long)teamID {
     NSString *format = TIME_FORMAT;
-    NSString *setting = [self settingTeam:db settingID:SETTING_COMPANY_TIME_FORMAT].value;
+    NSString *setting = [self settingTeam:db settingID:SETTING_DISPLAY_TIME_FORMAT teamID:teamID].value;
     if([setting isEqualToString:@"12"]) {
         format = @"hh:mm a";
     }
@@ -140,54 +151,10 @@
     return format;
 }
 
-+ (NSString *)currencySymbol:(NSManagedObjectContext *)db {
-    NSString *currencySymbol = @"$";
-    NSString *currencyCode = [self settingTeam:db settingID:SETTING_COMPANY_CURRENCY].value;
-    if([currencyCode isEqualToString:@"AUD"]) {
-        currencySymbol = @"$";
-    }
-    if([currencyCode isEqualToString:@"CAD"]) {
-        currencySymbol = @"$";
-    }
-    if([currencyCode isEqualToString:@"EUR"]) {
-        currencySymbol = @"€";
-    }
-    if([currencyCode isEqualToString:@"HKD"]) {
-        currencySymbol = @"$";
-    }
-    if([currencyCode isEqualToString:@"JPY"]) {
-        currencySymbol = @"¥";
-    }
-    if([currencyCode isEqualToString:@"PHP"]) {
-        currencySymbol = @"₱";
-    }
-    if([currencyCode isEqualToString:@"GBP"]) {
-        currencySymbol = @"£";
-    }
-    if([currencyCode isEqualToString:@"SGD"]) {
-        currencySymbol = @"$";
-    }
-    if([currencyCode isEqualToString:@"TWD"]) {
-        currencySymbol = @"NT$";
-    }
-    if([currencyCode isEqualToString:@"THB"]) {
-        currencySymbol = @"฿";
-    }
-    if([currencyCode isEqualToString:@"TRY"]) {
-        currencySymbol = @"₺";
-    }
-    if([currencyCode isEqualToString:@"USD"]) {
-        currencySymbol = @"$";
-    }
-    return currencySymbol;
-}
-
 + (Conventions *)convention:(NSManagedObjectContext *)db conventionID:(long)conventionID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Conventions"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"conventionID == %ld", conventionID]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].lastObject;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"conventionID == %ld", conventionID]];
+    return [self execute:db entity:@"Conventions" predicates:predicates];
 }
 
 + (NSString *)conventionName:(NSManagedObjectContext *)db conventionID:(long)conventionID {
@@ -195,175 +162,127 @@
 }
 
 + (AlertTypes *)alertType:(NSManagedObjectContext *)db alertTypeID:(long)alertTypeID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"AlertTypes"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"alertTypeID == %ld", alertTypeID]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].lastObject;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"alertTypeID == %ld", alertTypeID]];
+    return [self execute:db entity:@"AlertTypes" predicates:predicates];
 }
 
 + (TimeSecurity *)timeSecurity:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"TimeSecurity"];
-    return [self fetch:db request:request].lastObject;
+    return [self execute:db entity:@"TimeSecurity"];
 }
 
 + (SyncBatch *)syncBatch:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"SyncBatch"];
-    return [self fetch:db request:request].lastObject;
+    return [self execute:db entity:@"SyncBatch"];
 }
 
 + (NSString *)syncBatchID:(NSManagedObjectContext *)db {
-    SyncBatch *syncBatch = [self syncBatch:db];
-    return syncBatch != nil ? syncBatch.syncBatchID : nil;
+    return [self syncBatch:db].syncBatchID;
 }
 
 + (Announcements *)announcement:(NSManagedObjectContext *)db announcementID:(long)announcementID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Announcements"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"announcementID == %ld", announcementID]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].lastObject;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"announcementID == %ld", announcementID]];
+    return [self execute:db entity:@"Announcements" predicates:predicates];
 }
 
 + (AnnouncementSeen *)announcementSeen:(NSManagedObjectContext *)db announcementID:(long)announcementID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"AnnouncementSeen"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"announcementID == %ld", announcementID]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].lastObject;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"announcementID == %ld", announcementID]];
+    return [self execute:db entity:@"AnnouncementSeen" predicates:predicates];
 }
 
 + (long)unSeenAnnouncementsCount:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Announcements"];
-    request.includesSubentities = NO;
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
     NSDate *currentDate = NSDate.date;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"scheduledDate < %@ OR (scheduledDate == %@ AND scheduledTime <= %@)", [Time getFormattedDate:DATE_FORMAT date:currentDate], [Time getFormattedDate:DATE_FORMAT date:currentDate], [Time getFormattedDate:TIME_FORMAT date:currentDate]]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isSeen == %@", @NO]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].count;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"scheduledDate < %@ OR (scheduledDate == %@ AND scheduledTime <= %@)", [Time getFormattedDate:DATE_FORMAT date:currentDate], [Time getFormattedDate:DATE_FORMAT date:currentDate], [Time getFormattedDate:TIME_FORMAT date:currentDate]]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [self userID:db]]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSeen == %@", @NO]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
+    return [self count:db entity:@"Announcements" predicates:predicates];
 }
 
 + (long)syncAnnouncementSeenCount:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"AnnouncementSeen"];
-    request.includesSubentities = NO;
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].count;
-}
-
-+ (Stores *)store:(NSManagedObjectContext *)db storeID:(long)storeID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Stores"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"storeID == %ld", storeID]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %ld", [Get userID:db]]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].lastObject;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
+    return [self count:db entity:@"AnnouncementSeen" predicates:predicates];
 }
 
 + (Stores *)store:(NSManagedObjectContext *)db webStoreID:(long)webStoreID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Stores"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"webStoreID == %ld", webStoreID]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %ld", [Get userID:db]]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].lastObject;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"webStoreID == %ld", webStoreID]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %ld", [self userID:db]]];
+    return [self execute:db entity:@"Stores" predicates:predicates];
+}
+
++ (Stores *)store:(NSManagedObjectContext *)db storeID:(long)storeID {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"storeID == %ld", storeID]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %ld", [self userID:db]]];
+    return [self execute:db entity:@"Stores" predicates:predicates];
 }
 
 + (long)syncStoresCount:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Stores"];
-    request.includesSubentities = NO;
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@ OR (isSync == %@ AND isUpdate == %@ AND isWebUpdate == %@)", @NO, @YES, @YES, @NO]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].count;
-}
-
-+ (StoreContacts *)storeContact:(NSManagedObjectContext *)db storeContactID:(long)storeContactID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"StoreContacts"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"storeContactID == %ld", storeContactID]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].lastObject;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@ OR (isSync == %@ AND isUpdate == %@ AND isWebUpdate == %@)", @NO, @YES, @YES, @NO]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
+    return [self count:db entity:@"Stores" predicates:predicates];
 }
 
 + (StoreContacts *)storeContact:(NSManagedObjectContext *)db webStoreContactID:(long)webStoreContactID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"StoreContacts"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"webStoreContactID == %ld", webStoreContactID]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].lastObject;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"webStoreContactID == %ld", webStoreContactID]];
+    return [self execute:db entity:@"StoreContacts" predicates:predicates];
+}
+
++ (StoreContacts *)storeContact:(NSManagedObjectContext *)db storeContactID:(long)storeContactID {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"storeContactID == %ld", storeContactID]];
+    return [self execute:db entity:@"StoreContacts" predicates:predicates];
 }
 
 + (long)syncStoreContactsCount:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"StoreContacts"];
-    request.includesSubentities = NO;
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@ OR (designation.length > 0 AND email.length > 0 AND birthdate.length > 0 AND isSync == %@ AND isUpdate == %@ AND isWebUpdate == %@)", @NO, @YES, @YES, @NO]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].count;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@ OR (designation.length > 0 AND email.length > 0 AND birthdate.length > 0 AND isSync == %@ AND isUpdate == %@ AND isWebUpdate == %@)", @NO, @YES, @YES, @NO]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
+    return [self count:db entity:@"StoreContacts" predicates:predicates];
 }
 
 + (ScheduleTimes *)scheduleTime:(NSManagedObjectContext *)db scheduleTimeID:(long)scheduleTimeID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"ScheduleTimes"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"scheduleTimeID == %ld", scheduleTimeID]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].lastObject;
-}
-
-+ (Schedules *)schedule:(NSManagedObjectContext *)db scheduleID:(long)scheduleID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Schedules"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"scheduleID == %ld", scheduleID]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].lastObject;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"scheduleTimeID == %ld", scheduleTimeID]];
+    return [self execute:db entity:@"ScheduleTimes" predicates:predicates];
 }
 
 + (Schedules *)schedule:(NSManagedObjectContext *)db webScheduleID:(long)webScheduleID scheduleDate:(NSString *)scheduleDate {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Schedules"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"webScheduleID == %ld OR scheduleDate == %@", webScheduleID, scheduleDate]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].lastObject;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"webScheduleID == %ld OR scheduleDate == %@", webScheduleID, scheduleDate]];
+    return [self execute:db entity:@"Schedules" predicates:predicates];
+}
+
++ (Schedules *)schedule:(NSManagedObjectContext *)db scheduleID:(long)scheduleID {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"scheduleID == %ld", scheduleID]];
+    return [self execute:db entity:@"Schedules" predicates:predicates];
 }
 
 + (long)syncSchedulesCount:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Schedules"];
-    request.includesSubentities = NO;
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %ld", [Get userID:db]]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@ OR (isFromWeb == %@ AND isSync == %@)", @NO, @NO, @YES]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].count;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %ld", [self userID:db]]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@ OR (isFromWeb == %@ AND isSync == %@)", @NO, @NO, @YES]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
+    return [self count:db entity:@"Schedules" predicates:predicates];
 }
 
 + (TimeIn *)timeIn:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"TimeIn"];
-    return [self fetch:db request:request].lastObject;
-}
-
-+ (long)timeInCount:(NSManagedObjectContext *)db date:(NSString *)date {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"TimeIn"];
-    request.includesSubentities = NO;
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"date == %@", date]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].count;
+    NSMutableArray *sortDescriptors = NSMutableArray.alloc.init;
+    [sortDescriptors addObject:[NSSortDescriptor.alloc initWithKey:@"timeInID" ascending:NO]];
+    return [self execute:db entity:@"TimeIn" predicates:nil sortDescriptors:sortDescriptors];
 }
 
 + (TimeIn *)timeIn:(NSManagedObjectContext *)db timeInID:(long)timeInID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"TimeIn"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"timeInID == %ld", timeInID]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].lastObject;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"timeInID == %ld", timeInID]];
+    return [self execute:db entity:@"TimeIn" predicates:predicates];
 }
 
 + (BOOL)isTimeIn:(NSManagedObjectContext *)db {
@@ -374,39 +293,35 @@
     return ![self isTimeOut:db timeInID:timeIn.timeInID];
 }
 
++ (long)timeInCount:(NSManagedObjectContext *)db date:(NSString *)date {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"date == %@", date]];
+    return [self count:db entity:@"TimeIn" predicates:predicates];
+}
+
 + (long)syncTimeInCount:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"TimeIn"];
-    request.includesSubentities = NO;
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].count;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
+    return [self count:db entity:@"TimeIn" predicates:predicates];
 }
 
 + (long)uploadTimeInPhotoCount:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"TimeIn"];
-    request.includesSubentities = NO;
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"photo.length > 0"]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isPhotoUpload == %@", @NO]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].count;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"photo.length > 0"]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isPhotoUpload == %@", @NO]];
+    return [self count:db entity:@"TimeIn" predicates:predicates];
 }
 
 + (TimeOut *)timeOut:(NSManagedObjectContext *)db timeInID:(long)timeInID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"TimeOut"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"timeInID == %ld", timeInID]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].lastObject;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"timeInID == %ld", timeInID]];
+    return [self execute:db entity:@"TimeOut" predicates:predicates];
 }
 
 + (TimeOut *)timeOut:(NSManagedObjectContext *)db timeOutID:(long)timeOutID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"TimeOut"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"timeOutID == %ld", timeOutID]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].lastObject;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"timeOutID == %ld", timeOutID]];
+    return [self execute:db entity:@"TimeOut" predicates:predicates];
 }
 
 + (BOOL)isTimeOut:(NSManagedObjectContext *)db timeInID:(long)timeInID {
@@ -414,206 +329,149 @@
 }
 
 + (long)syncTimeOutCount:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"TimeOut"];
-    request.includesSubentities = NO;
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].count;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
+    return [self count:db entity:@"TimeOut" predicates:predicates];
 }
 
 + (long)uploadTimeOutPhotoCount:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"TimeOut"];
-    request.includesSubentities = NO;
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"photo.length > 0"]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isPhotoUpload == %@", @NO]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].count;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"photo.length > 0"]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isPhotoUpload == %@", @NO]];
+    return [self count:db entity:@"TimeOut" predicates:predicates];
 }
 
 + (long)uploadTimeOutSignatureCount:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"TimeOut"];
-    request.includesSubentities = NO;
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"signature.length > 0"]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isSignatureUpload == %@", @NO]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].count;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"signature.length > 0"]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSignatureUpload == %@", @NO]];
+    return [self count:db entity:@"TimeOut" predicates:predicates];
 }
 
 + (BreakTypes *)breakType:(NSManagedObjectContext *)db breakTypeID:(long)breakTypeID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"BreakTypes"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"breakTypeID == %ld", breakTypeID]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].lastObject;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"breakTypeID == %ld", breakTypeID]];
+    return [self execute:db entity:@"BreakTypes" predicates:predicates];
 }
 
 + (OvertimeReasons *)overtimeReason:(NSManagedObjectContext *)db overtimeReasonID:(long)overtimeReasonID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"OvertimeReasons"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"overtimeReasonID == %ld", overtimeReasonID]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].lastObject;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"overtimeReasonID == %ld", overtimeReasonID]];
+    return [self execute:db entity:@"OvertimeReasons" predicates:predicates];
 }
 
 + (Photos *)photo:(NSManagedObjectContext *)db photoID:(long)photoID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Photos"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"photoID == %ld", photoID]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].lastObject;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"photoID == %ld", photoID]];
+    return [self execute:db entity:@"Photos" predicates:predicates];
 }
 
 + (long)uploadVisitPhotosCount:(NSManagedObjectContext *)db {
-    long count = 0;
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"VisitPhotos"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    NSArray<VisitPhotos *> *visitPhotos = [self fetch:db request:request];
-    for(int x = 0 ; x < visitPhotos.count; x++) {
-        NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Photos"];
-        request.includesSubentities = NO;
-        NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-        [subpredicates addObject:[NSPredicate predicateWithFormat:@"photoID == %ld", visitPhotos[x].photoID]];
-        [subpredicates addObject:[NSPredicate predicateWithFormat:@"isUpload == %@", @NO]];
-        [subpredicates addObject:[NSPredicate predicateWithFormat:@"isDelete == %@", @NO]];
-        request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-        count += [self fetch:db request:request].count;
-    }
-    return count;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isUpload == %@", @NO]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isDelete == %@", @NO]];
+    return [self count:db entity:@"Photos" predicates:predicates];
 }
 
 + (Visits *)visit:(NSManagedObjectContext *)db visitID:(long)visitID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Visits"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"visitID == %ld", visitID]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].lastObject;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"visitID == %ld", visitID]];
+    return [self execute:db entity:@"Visits" predicates:predicates];
 }
 
 + (Visits *)visit:(NSManagedObjectContext *)db webVisitID:(long)webVisitID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Visits"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"webVisitID == %ld", webVisitID]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].lastObject;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"webVisitID == %ld", webVisitID]];
+    return [self execute:db entity:@"Visits" predicates:predicates];
+}
+
++ (long)visitTodayCount:(NSManagedObjectContext *)db date:(NSString *)date {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"%@ BETWEEN {startDate, endDate}", date]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isFromWeb == %@", @NO]];
+    return [self count:db entity:@"Visits" predicates:predicates];
 }
 
 + (long)syncVisitsCount:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Visits"];
-    request.includesSubentities = NO;
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"(isSync == %@ AND isDelete == %@) OR (storeID.length > 0 AND isSync == %@ AND isUpdate == %@ AND isWebUpdate == %@ AND isDelete == %@) OR (isSync == %@ AND isDelete == %@ AND isWebDelete = %@)", @NO, @NO, @YES, @YES, @NO, @NO, @YES, @YES, @NO]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].count;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"(isSync == %@ AND isDelete == %@) OR (storeID.length > 0 AND isSync == %@ AND isUpdate == %@ AND isWebUpdate == %@ AND isDelete == %@) OR (isSync == %@ AND isDelete == %@ AND isWebDelete = %@)", @NO, @NO, @YES, @YES, @NO, @NO, @YES, @YES, @NO]];
+    return [self count:db entity:@"Visits" predicates:predicates];
 }
 
 + (VisitInventories *)visitInventory:(NSManagedObjectContext *)db visitID:(long)visitID inventoryID:(long)inventoryID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"VisitInventories"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"visitID == %ld", visitID]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"inventoryID == %ld", inventoryID]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].lastObject;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"visitID == %ld", visitID]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"inventoryID == %ld", inventoryID]];
+    return [self execute:db entity:@"VisitInventories" predicates:predicates];
 }
 
 + (VisitForms *)visitForm:(NSManagedObjectContext *)db visitID:(long)visitID formID:(long)formID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"VisitForms"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"visitID == %ld", visitID]];
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"formID == %ld", formID]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].lastObject;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"visitID == %ld", visitID]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"formID == %ld", formID]];
+    return [self execute:db entity:@"VisitForms" predicates:predicates];
 }
 
-+ (CheckIn *)checkIn:(NSManagedObjectContext *)db timeInID:(long)timeInID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"CheckIn"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"timeInID == %ld", timeInID]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].lastObject;
++ (CheckIn *)checkIn:(NSManagedObjectContext *)db {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isCheckIn == %@", @YES]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isCheckOut == %@", @NO]];
+    NSMutableArray *sortDescriptors = NSMutableArray.alloc.init;
+    [sortDescriptors addObject:[NSSortDescriptor.alloc initWithKey:@"visitID" ascending:YES]];
+    Visits *visit = [self execute:db entity:@"Visits" predicates:predicates sortDescriptors:sortDescriptors];
+    return [self checkIn:db visitID:visit.visitID];
 }
 
 + (CheckIn *)checkIn:(NSManagedObjectContext *)db visitID:(long)visitID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"CheckIn"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"visitID == %ld", visitID]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].lastObject;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"visitID == %ld", visitID]];
+    return [self execute:db entity:@"CheckIn" predicates:predicates];
 }
 
 + (CheckIn *)checkIn:(NSManagedObjectContext *)db checkInID:(long)checkInID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"CheckIn"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"checkInID == %ld", checkInID]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].lastObject;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"checkInID == %ld", checkInID]];
+    return [self execute:db entity:@"CheckIn" predicates:predicates];
 }
 
-+ (BOOL)isCheckIn:(NSManagedObjectContext *)db timeInID:(long)timeInID {
-    CheckIn *checkIn = [self checkIn:db timeInID:timeInID];
-    if(checkIn == nil) {
-        return NO;
-    }
-    return ![self isCheckOut:db checkInID:checkIn.checkInID];
++ (BOOL)isCheckIn:(NSManagedObjectContext *)db  {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isCheckIn == %@", @YES]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isCheckOut == %@", @NO]];
+    return [self count:db entity:@"Visits" predicates:predicates] > 0;
 }
 
 + (long)syncCheckInCount:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"CheckIn"];
-    request.includesSubentities = NO;
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].count;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
+    return [self count:db entity:@"CheckIn" predicates:predicates];
 }
 
 + (long)uploadCheckInPhotoCount:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"CheckIn"];
-    request.includesSubentities = NO;
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"photo.length > 0 AND isPhotoUpload == %@", @NO]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].count;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"photo.length > 0"]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isPhotoUpload == %@", @NO]];
+    return [self count:db entity:@"CheckIn" predicates:predicates];
 }
 
 + (CheckOut *)checkOut:(NSManagedObjectContext *)db checkInID:(long)checkInID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"CheckOut"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"checkInID == %ld", checkInID]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].lastObject;
-}
-
-+ (CheckOut *)checkOut:(NSManagedObjectContext *)db checkOutID:(long)checkOutID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"CheckOut"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"checkOutID == %ld", checkOutID]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].lastObject;
-}
-
-+ (BOOL)isCheckOut:(NSManagedObjectContext *)db checkInID:(long)checkInID {
-    return [self checkOut:db checkInID:checkInID] != nil ? YES : NO;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"checkInID == %ld", checkInID]];
+    return [self execute:db entity:@"CheckOut" predicates:predicates];
 }
 
 + (long)syncCheckOutCount:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"CheckOut"];
-    request.includesSubentities = NO;
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].count;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
+    return [self count:db entity:@"CheckOut" predicates:predicates];
 }
 
 + (long)uploadCheckOutPhotoCount:(NSManagedObjectContext *)db {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"CheckOut"];
-    request.includesSubentities = NO;
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"photo.length > 0 AND isPhotoUpload == %@", @NO]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].count;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"photo.length > 0"]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isPhotoUpload == %@", @NO]];
+    return [self count:db entity:@"CheckOut" predicates:predicates];
 }
 
 + (long)syncTotalCount:(NSManagedObjectContext *)db {
@@ -621,20 +479,42 @@
 }
 
 + (GPS *)gps:(NSManagedObjectContext *)db gpsID:(long)gpsID {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"GPS"];
-    NSMutableArray *subpredicates = NSMutableArray.alloc.init;
-    [subpredicates addObject:[NSPredicate predicateWithFormat:@"gpsID == %ld", gpsID]];
-    request.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:subpredicates];
-    return [self fetch:db request:request].lastObject;
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"gpsID == %ld", gpsID]];
+    return [self execute:db entity:@"GPS" predicates:predicates];
 }
 
-+ (NSArray *)fetch:(NSManagedObjectContext *)db request:(NSFetchRequest *)request {
++ (id)execute:(NSManagedObjectContext *)db entity:(NSString *)entity {
+    return [self execute:db entity:entity predicates:nil sortDescriptors:nil];
+}
+
++ (id)execute:(NSManagedObjectContext *)db entity:(NSString *)entity predicates:(NSArray<NSPredicate *> *)predicates {
+    return [self execute:db entity:entity predicates:predicates sortDescriptors:nil];
+}
+
++ (id)execute:(NSManagedObjectContext *)db entity:(NSString *)entity predicates:(NSArray<NSPredicate *> *)predicates sortDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors {
+    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:entity];
+    fetchRequest.fetchLimit = 1;
+    fetchRequest.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:predicates];
+    fetchRequest.sortDescriptors = sortDescriptors;
     NSError *error = nil;
-    NSArray *data = [db executeFetchRequest:request error:&error];
+    NSArray *data = [db executeFetchRequest:fetchRequest error:&error];
     if(error != nil) {
-        NSLog(@"error: get fetch - %@", error.localizedDescription);
+        NSLog(@"error: get execute - %@", error.localizedDescription);
     }
-    return data;
+    return data.lastObject;
+}
+
++ (NSUInteger)count:(NSManagedObjectContext *)db entity:(NSString *)entity predicates:(NSArray<NSPredicate *> *)predicates {
+    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:entity];
+    fetchRequest.includesSubentities = NO;
+    fetchRequest.predicate = [NSCompoundPredicate.alloc initWithType:NSAndPredicateType subpredicates:predicates];
+    NSError *error = nil;
+    NSUInteger count = [db countForFetchRequest:fetchRequest error:&error];
+    if(error != nil) {
+        NSLog(@"error: get count - %@", error.localizedDescription);
+    }
+    return count;
 }
 
 @end

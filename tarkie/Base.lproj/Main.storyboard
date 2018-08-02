@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="uIr-YX-yFR">
-    <device id="retina3_5" orientation="portrait">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14295.6" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="uIr-YX-yFR">
+    <device id="retina4_0" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
-        <capability name="Alignment constraints with different attributes" minToolsVersion="5.1"/>
-        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
-        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
-        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14270.1"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -50,16 +47,16 @@
             <objects>
                 <viewController storyboardIdentifier="vcSplash" id="BYZ-38-t0r" customClass="SplashViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ApC-5U-e4T">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                                 <color key="backgroundColor" name="ThemePri.sevie"/>
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                             </view>
                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" restorationIdentifier="ivLogo" insetsLayoutMarginsFromSafeArea="NO" image="AppLogo.sevie" translatesAutoresizingMaskIntoConstraints="NO" id="3BC-Gx-Xaa">
-                                <rect key="frame" x="83" y="173" width="154" height="154"/>
+                                <rect key="frame" x="83" y="217" width="154" height="154"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="3BC-Gx-Xaa" secondAttribute="height" id="Fza-g5-x0g"/>
                                 </constraints>
@@ -93,22 +90,22 @@
             <objects>
                 <viewController storyboardIdentifier="vcAuthorization" id="Zak-5f-jU3" customClass="AuthorizationViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="n4Z-Qb-Cg0">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" image="Secondary" translatesAutoresizingMaskIntoConstraints="NO" id="wtD-kF-87g">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                             </imageView>
                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" image="AppLogo.sevie" translatesAutoresizingMaskIntoConstraints="NO" id="6ln-3z-xJo">
-                                <rect key="frame" x="80" y="103" width="160" height="64"/>
+                                <rect key="frame" x="80" y="147" width="160" height="64"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="6ln-3z-xJo" secondAttribute="height" multiplier="2.5" id="glW-8w-cvX"/>
                                 </constraints>
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="-12" trailing="0.0"/>
                             </imageView>
                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HQG-Uo-Tqi">
-                                <rect key="frame" x="40" y="191" width="240" height="118"/>
+                                <rect key="frame" x="40" y="235" width="240" height="118"/>
                                 <subviews>
                                     <textField opaque="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Authorization Code" textAlignment="center" adjustsFontSizeToFit="NO" minimumFontSize="16" translatesAutoresizingMaskIntoConstraints="NO" id="A75-ao-F3R" customClass="TextField">
                                         <rect key="frame" x="16" y="16" width="208" height="30"/>
@@ -174,11 +171,11 @@
             <objects>
                 <viewController storyboardIdentifier="vcMessage" useStoryboardIdentifierAsRestorationIdentifier="YES" id="V8z-X6-tCU" customClass="MessageDialogViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="VhW-nU-h1d">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="P8I-3p-18o">
-                                <rect key="frame" x="33" y="176" width="254" height="148"/>
+                                <rect key="frame" x="33" y="220" width="254" height="148"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0E3-v3-fLm">
                                         <rect key="frame" x="16" y="16" width="222" height="16"/>
@@ -277,14 +274,14 @@
             <objects>
                 <viewController storyboardIdentifier="vcLoading" id="dFU-On-hfu" customClass="LoadingDialogViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="hLy-TV-PAK">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Evy-2Y-NbD">
-                                <rect key="frame" x="33" y="199" width="254" height="102"/>
+                                <rect key="frame" x="33" y="243" width="254" height="102"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="Message" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ACW-OA-cOT">
-                                        <rect key="frame" x="16.5" y="16" width="221.5" height="44"/>
+                                        <rect key="frame" x="16" y="16" width="222" height="44"/>
                                         <constraints>
                                             <constraint firstAttribute="width" relation="lessThanOrEqual" secondItem="ACW-OA-cOT" secondAttribute="height" multiplier="5" id="XV5-dc-DXG"/>
                                         </constraints>
@@ -335,22 +332,22 @@
             <objects>
                 <viewController storyboardIdentifier="vcLogin" id="UYH-5K-2rZ" customClass="LoginViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="zuc-Kf-tUc">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" image="Secondary" translatesAutoresizingMaskIntoConstraints="NO" id="ZHW-oC-XqF">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                             </imageView>
                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" image="AppLogo.sevie" translatesAutoresizingMaskIntoConstraints="NO" id="r5L-ai-2Jv">
-                                <rect key="frame" x="80" y="80" width="160" height="64"/>
+                                <rect key="frame" x="80" y="124" width="160" height="64"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="r5L-ai-2Jv" secondAttribute="height" multiplier="2.5" id="OnW-Mq-kRh"/>
                                 </constraints>
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="-12" trailing="0.0"/>
                             </imageView>
                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hJu-vu-DjJ">
-                                <rect key="frame" x="40" y="168" width="240" height="164"/>
+                                <rect key="frame" x="40" y="212" width="240" height="164"/>
                                 <subviews>
                                     <textField opaque="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Employee Number" textAlignment="center" adjustsFontSizeToFit="NO" minimumFontSize="16" translatesAutoresizingMaskIntoConstraints="NO" id="kWd-1b-dxr" customClass="TextField">
                                         <rect key="frame" x="16" y="16" width="208" height="30"/>
@@ -361,7 +358,7 @@
                                         <textInputTraits key="textInputTraits"/>
                                     </textField>
                                     <textField opaque="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Password" textAlignment="center" adjustsFontSizeToFit="NO" minimumFontSize="16" translatesAutoresizingMaskIntoConstraints="NO" id="26B-VH-i6L" customClass="TextField">
-                                        <rect key="frame" x="16.5" y="62" width="208" height="30"/>
+                                        <rect key="frame" x="16" y="62" width="208" height="30"/>
                                         <color key="backgroundColor" name="Grey200"/>
                                         <directionalEdgeInsets key="directionalLayoutMargins" top="-8" leading="-16" bottom="-8" trailing="-16"/>
                                         <color key="textColor" name="Grey800"/>
@@ -428,7 +425,7 @@
             <objects>
                 <viewController storyboardIdentifier="vcMain" id="iPn-OW-2Pb" customClass="MainViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="lCe-kd-Z9H">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XeV-kA-aiv">
@@ -437,10 +434,10 @@
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                             </view>
                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YOc-Ag-FVD">
-                                <rect key="frame" x="0.0" y="20" width="320" height="50"/>
+                                <rect key="frame" x="0.0" y="20" width="320" height="71"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Hpb-bV-jJm">
-                                        <rect key="frame" x="0.0" y="0.0" width="40.5" height="50"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="57" height="71"/>
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="Hpb-bV-jJm" secondAttribute="height" multiplier="0.8" id="o0N-Eg-QOy"/>
                                         </constraints>
@@ -454,20 +451,20 @@
                                         </connections>
                                     </button>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="751" insetsLayoutMarginsFromSafeArea="NO" text="Menu" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Yh4-D2-BYk">
-                                        <rect key="frame" x="44.5" y="16" width="45" height="18"/>
+                                        <rect key="frame" x="61" y="16" width="45" height="39"/>
                                         <directionalEdgeInsets key="directionalLayoutMargins" top="-16" leading="-2" bottom="-16" trailing="-2"/>
                                         <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="18"/>
                                         <color key="textColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="he2-sY-S6p">
-                                        <rect key="frame" x="93.5" y="0.0" width="214.5" height="50"/>
+                                        <rect key="frame" x="110" y="0.0" width="198" height="71"/>
                                         <subviews>
                                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="heb-M4-v0f">
-                                                <rect key="frame" x="0.0" y="0.0" width="214.5" height="50"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="198" height="71"/>
                                                 <subviews>
                                                     <button opaque="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" adjustsImageWhenHighlighted="NO" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="525-LC-mOx">
-                                                        <rect key="frame" x="110.5" y="0.0" width="50" height="50"/>
+                                                        <rect key="frame" x="52" y="0.0" width="71" height="71"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" secondItem="525-LC-mOx" secondAttribute="height" id="9Bp-Fs-gBm"/>
                                                         </constraints>
@@ -484,7 +481,7 @@
                                                         </connections>
                                                     </button>
                                                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="x0E-PJ-fDp">
-                                                        <rect key="frame" x="138" y="18" width="14.5" height="15"/>
+                                                        <rect key="frame" x="93.5" y="25" width="21.5" height="21"/>
                                                         <color key="backgroundColor" name="Red700"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" secondItem="x0E-PJ-fDp" secondAttribute="height" id="Uvu-I4-vV2"/>
@@ -495,7 +492,7 @@
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                     <button opaque="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" adjustsImageWhenHighlighted="NO" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vcf-an-0OR">
-                                                        <rect key="frame" x="164.5" y="0.0" width="50" height="50"/>
+                                                        <rect key="frame" x="127" y="0.0" width="71" height="71"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" secondItem="vcf-an-0OR" secondAttribute="height" id="TqW-sD-pdy"/>
                                                         </constraints>
@@ -512,7 +509,7 @@
                                                         </connections>
                                                     </button>
                                                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3LP-QR-D7A">
-                                                        <rect key="frame" x="194.5" y="17.5" width="15" height="15"/>
+                                                        <rect key="frame" x="171.5" y="25" width="21.5" height="21"/>
                                                         <color key="backgroundColor" name="Red700"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" secondItem="3LP-QR-D7A" secondAttribute="height" id="uo6-eP-zqW"/>
@@ -542,10 +539,10 @@
                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                             </view>
                                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TOn-Et-Rnm">
-                                                <rect key="frame" x="0.0" y="0.0" width="214.5" height="50"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="198" height="71"/>
                                                 <subviews>
                                                     <button opaque="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" adjustsImageWhenHighlighted="NO" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xTR-my-Nau">
-                                                        <rect key="frame" x="88.5" y="0.0" width="50" height="50"/>
+                                                        <rect key="frame" x="51" y="0.0" width="71" height="71"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" secondItem="xTR-my-Nau" secondAttribute="height" id="JsR-b1-5qx"/>
                                                         </constraints>
@@ -562,7 +559,7 @@
                                                         </connections>
                                                     </button>
                                                     <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ecm-4B-wrj">
-                                                        <rect key="frame" x="142.5" y="12" width="72" height="26"/>
+                                                        <rect key="frame" x="126" y="12" width="72" height="47"/>
                                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <directionalEdgeInsets key="directionalLayoutMargins" top="-12" leading="-2" bottom="-12" trailing="0.0"/>
                                                         <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="12"/>
@@ -588,10 +585,10 @@
                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                             </view>
                                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LMl-jC-ObC">
-                                                <rect key="frame" x="0.0" y="0.0" width="214.5" height="50"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="198" height="71"/>
                                                 <subviews>
                                                     <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="EeN-0l-7Hx">
-                                                        <rect key="frame" x="124.5" y="12" width="90" height="26"/>
+                                                        <rect key="frame" x="108" y="12" width="90" height="47"/>
                                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <directionalEdgeInsets key="directionalLayoutMargins" top="-12" leading="-2" bottom="-12" trailing="0.0"/>
                                                         <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="12"/>
@@ -615,14 +612,14 @@
                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                             </view>
                                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0xf-gx-bmp">
-                                                <rect key="frame" x="0.0" y="0.0" width="214.5" height="50"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="198" height="71"/>
                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                             </view>
                                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Rc0-am-GBD">
-                                                <rect key="frame" x="0.0" y="0.0" width="214.5" height="50"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="198" height="71"/>
                                                 <subviews>
                                                     <button opaque="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6PT-vh-iGb">
-                                                        <rect key="frame" x="102.5" y="0.0" width="50" height="50"/>
+                                                        <rect key="frame" x="65" y="0.0" width="71" height="71"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" secondItem="6PT-vh-iGb" secondAttribute="height" id="gx3-zc-pFs"/>
                                                         </constraints>
@@ -638,7 +635,7 @@
                                                         </connections>
                                                     </button>
                                                     <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eAy-jX-NIn">
-                                                        <rect key="frame" x="156.5" y="12" width="58" height="26"/>
+                                                        <rect key="frame" x="140" y="12" width="58" height="47"/>
                                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <directionalEdgeInsets key="directionalLayoutMargins" top="-12" leading="-2" bottom="-12" trailing="0.0"/>
                                                         <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="12"/>
@@ -664,17 +661,17 @@
                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                             </view>
                                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YzQ-di-NF5">
-                                                <rect key="frame" x="0.0" y="0.0" width="214.5" height="50"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="198" height="71"/>
                                                 <subviews>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="Jan 1, 2018" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BMF-Hj-owk">
-                                                        <rect key="frame" x="74.5" y="0.0" width="86" height="50"/>
+                                                        <rect key="frame" x="37" y="0.0" width="86" height="71"/>
                                                         <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="-2"/>
                                                         <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="18"/>
                                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                     <button opaque="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" adjustsImageWhenHighlighted="NO" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Csb-lD-GvP">
-                                                        <rect key="frame" x="164.5" y="0.0" width="50" height="50"/>
+                                                        <rect key="frame" x="127" y="0.0" width="71" height="71"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" secondItem="Csb-lD-GvP" secondAttribute="height" id="5mL-N2-2Xa"/>
                                                         </constraints>
@@ -749,12 +746,12 @@
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                             </view>
                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="i5E-hL-cbu">
-                                <rect key="frame" x="0.0" y="70" width="320" height="360.5"/>
+                                <rect key="frame" x="0.0" y="91" width="320" height="406"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                             </view>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" bounces="NO" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="diM-jJ-Elb" customClass="PageBarCollectionView">
-                                <rect key="frame" x="0.0" y="430.5" width="320" height="49.5"/>
+                                <rect key="frame" x="0.0" y="497" width="320" height="71"/>
                                 <color key="backgroundColor" name="ThemePri.sevie"/>
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="0.0" minimumInteritemSpacing="0.0" id="DdF-hZ-X3z">
@@ -765,18 +762,18 @@
                                 </collectionViewFlowLayout>
                                 <cells>
                                     <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" reuseIdentifier="item" id="OYB-Le-orc" customClass="PageBarItemCollectionViewCell">
-                                        <rect key="frame" x="0.0" y="-0.5" width="320" height="50"/>
+                                        <rect key="frame" x="0.0" y="10.5" width="320" height="50"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YzR-NK-gtM">
-                                                    <rect key="frame" x="0.5" y="8" width="319.5" height="20"/>
+                                                    <rect key="frame" x="0.0" y="8" width="320" height="20"/>
                                                     <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                                 </imageView>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bmM-pZ-IE8">
-                                                    <rect key="frame" x="0.5" y="8" width="319.5" height="20"/>
+                                                    <rect key="frame" x="0.0" y="8" width="320" height="20"/>
                                                     <directionalEdgeInsets key="directionalLayoutMargins" top="-8" leading="0.0" bottom="-2" trailing="0.0"/>
                                                     <fontDescription key="fontDescription" name="FontAwesome5FreeSolid" family="Font Awesome 5 Free" pointSize="20"/>
                                                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -814,7 +811,7 @@
                                 </cells>
                             </collectionView>
                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dh5-hF-eqJ">
-                                <rect key="frame" x="0.0" y="480" width="320" height="0.0"/>
+                                <rect key="frame" x="0.0" y="568" width="320" height="0.0"/>
                                 <color key="backgroundColor" name="ThemePri.sevie"/>
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                             </view>
@@ -878,11 +875,11 @@
             <objects>
                 <viewController storyboardIdentifier="vcDrawer" id="WCv-vO-WsT" customClass="DrawerViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="emt-aO-FLn">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" bounces="NO" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="ygj-Lr-9gn">
-                                <rect key="frame" x="0.0" y="20" width="320" height="460"/>
+                                <rect key="frame" x="0.0" y="20" width="320" height="548"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                 <color key="separatorColor" name="Grey500"/>
@@ -896,7 +893,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3C8-vE-P6z">
-                                                    <rect key="frame" x="0.0" y="-0.5" width="320" height="140"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="320" height="139.5"/>
                                                     <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                                 </view>
                                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gvD-xn-Bil">
@@ -969,7 +966,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xZQ-jx-GuA">
-                                                    <rect key="frame" x="16" y="12" width="23.5" height="23"/>
+                                                    <rect key="frame" x="16" y="12" width="23.5" height="23.5"/>
                                                     <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                                 </imageView>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZgP-fj-X1Z">
@@ -1049,18 +1046,18 @@
             <objects>
                 <viewController storyboardIdentifier="vcHome" id="Rqu-FB-WQx" customClass="HomeViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="vyr-Yj-3a1">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" image="Primary" translatesAutoresizingMaskIntoConstraints="NO" id="9Pm-Cb-iiN">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                             </imageView>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" bounces="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Bk-b4-8K3">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WoU-A5-5dM">
-                                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                                         <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                     </view>
                                     <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6kx-19-0Ry">
@@ -1077,17 +1074,17 @@
                                                 <rect key="frame" x="12" y="100" width="296" height="172"/>
                                                 <subviews>
                                                     <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3hb-LA-vws">
-                                                        <rect key="frame" x="0.0" y="0.0" width="296.5" height="112"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="296" height="112"/>
                                                         <subviews>
                                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="9:00" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="67k-2H-w6h">
-                                                                <rect key="frame" x="0.0" y="6" width="296.5" height="80"/>
+                                                                <rect key="frame" x="0.0" y="6" width="296" height="80"/>
                                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="-6" leading="0.0" bottom="-2" trailing="0.0"/>
                                                                 <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="80"/>
                                                                 <color key="textColor" name="Grey800"/>
                                                                 <nil key="highlightedColor"/>
                                                             </label>
                                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="Tuesday, Jan 2, 2018" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ULu-u0-iuu">
-                                                                <rect key="frame" x="0.0" y="88" width="296.5" height="18"/>
+                                                                <rect key="frame" x="0.0" y="88" width="296" height="18"/>
                                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="-2" leading="0.0" bottom="-6" trailing="0.0"/>
                                                                 <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="18"/>
                                                                 <color key="textColor" name="Grey800"/>
@@ -1107,7 +1104,7 @@
                                                         <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="-6" trailing="0.0"/>
                                                     </view>
                                                     <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="t5O-JV-cSW">
-                                                        <rect key="frame" x="90.5" y="124" width="116" height="48"/>
+                                                        <rect key="frame" x="90" y="124" width="116" height="48"/>
                                                         <color key="backgroundColor" name="ThemePri.sevie"/>
                                                         <directionalEdgeInsets key="directionalLayoutMargins" top="-6" leading="0.0" bottom="0.0" trailing="0.0"/>
                                                         <fontDescription key="fontDescription" name="ProximaNova-Semibold" family="Proxima Nova" pointSize="24"/>
@@ -1160,38 +1157,38 @@
                                                         <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                                     </view>
                                                     <tableView clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" bounces="NO" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="c0r-Nt-y01">
-                                                        <rect key="frame" x="0.5" y="40" width="295.5" height="70"/>
+                                                        <rect key="frame" x="0.0" y="40" width="296" height="70"/>
                                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="70" id="rjf-j6-09P"/>
                                                         </constraints>
-                                                        <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="-3" trailing="0.0"/>
+                                                        <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                                         <color key="separatorColor" name="Grey500"/>
                                                         <inset key="separatorInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                                         <prototypes>
                                                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="item" rowHeight="54" id="sKr-Za-EZu" customClass="HomeTableViewCell">
-                                                                <rect key="frame" x="0.0" y="28" width="295.5" height="54"/>
+                                                                <rect key="frame" x="0.0" y="28" width="296" height="54"/>
                                                                 <autoresizingMask key="autoresizingMask"/>
                                                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="sKr-Za-EZu" id="8h0-Vb-mpZ">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="295.5" height="53.5"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="296" height="53.5"/>
                                                                     <autoresizingMask key="autoresizingMask"/>
                                                                     <subviews>
                                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="751" insetsLayoutMarginsFromSafeArea="NO" text="Name" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yJu-s3-Ec2">
-                                                                            <rect key="frame" x="24" y="12" width="223.5" height="16"/>
+                                                                            <rect key="frame" x="24" y="12" width="224" height="16"/>
                                                                             <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="-4"/>
                                                                             <fontDescription key="fontDescription" name="ProximaNova-Semibold" family="Proxima Nova" pointSize="16"/>
                                                                             <color key="textColor" name="Grey800"/>
                                                                             <nil key="highlightedColor"/>
                                                                         </label>
                                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="Details" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="G9X-E5-tnc">
-                                                                            <rect key="frame" x="24" y="28" width="223" height="13.5"/>
+                                                                            <rect key="frame" x="24" y="28" width="224" height="13.5"/>
                                                                             <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                                                             <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="14"/>
                                                                             <color key="textColor" name="Grey600"/>
                                                                             <nil key="highlightedColor"/>
                                                                         </label>
                                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="43C-3b-vIZ">
-                                                                            <rect key="frame" x="255.5" y="19" width="16" height="16"/>
+                                                                            <rect key="frame" x="256" y="19" width="16" height="16"/>
                                                                             <constraints>
                                                                                 <constraint firstAttribute="width" secondItem="43C-3b-vIZ" secondAttribute="height" id="23X-Pm-CKg"/>
                                                                             </constraints>
@@ -1230,12 +1227,20 @@
                                                     <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="o2b-Uf-VRN">
                                                         <rect key="frame" x="91" y="116" width="114" height="40"/>
                                                         <color key="backgroundColor" name="ThemeSec.sevie"/>
-                                                        <directionalEdgeInsets key="directionalLayoutMargins" top="-3" leading="0.0" bottom="-6" trailing="0.0"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" id="0dr-eJ-h0L"/>
+                                                        </constraints>
+                                                        <directionalEdgeInsets key="directionalLayoutMargins" top="-6" leading="0.0" bottom="-6" trailing="0.0"/>
                                                         <fontDescription key="fontDescription" name="ProximaNova-Semibold" family="Proxima Nova" pointSize="16"/>
                                                         <inset key="contentEdgeInsets" minX="18" minY="12" maxX="18" maxY="12"/>
                                                         <state key="normal" title="NEW VISIT">
                                                             <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         </state>
+                                                        <variation key="default">
+                                                            <mask key="constraints">
+                                                                <exclude reference="0dr-eJ-h0L"/>
+                                                            </mask>
+                                                        </variation>
                                                         <connections>
                                                             <action selector="addVisit:" destination="Rqu-FB-WQx" eventType="touchUpInside" id="keJ-jz-CNo"/>
                                                         </connections>
@@ -1265,10 +1270,10 @@
                                                 <rect key="frame" x="12" y="458" width="296" height="96"/>
                                                 <subviews>
                                                     <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="K5J-3A-X8d">
-                                                        <rect key="frame" x="0.5" y="0.0" width="295.5" height="40"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="296" height="40"/>
                                                         <subviews>
                                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="APP FORMS" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZwF-uq-xyb">
-                                                                <rect key="frame" x="0.0" y="12" width="295.5" height="16"/>
+                                                                <rect key="frame" x="0.0" y="12" width="296" height="16"/>
                                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="-12" leading="0.0" bottom="-12" trailing="0.0"/>
                                                                 <fontDescription key="fontDescription" name="ProximaNova-Semibold" family="Proxima Nova" pointSize="16"/>
                                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -1285,7 +1290,7 @@
                                                         <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                                     </view>
                                                     <tableView clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" bounces="NO" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="BWy-46-3Js">
-                                                        <rect key="frame" x="0.5" y="40" width="295.5" height="56"/>
+                                                        <rect key="frame" x="0.0" y="40" width="296" height="56"/>
                                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="56" id="fBg-Bs-1Hu"/>
@@ -1295,21 +1300,21 @@
                                                         <inset key="separatorInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                                         <prototypes>
                                                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="item" rowHeight="40" id="d8u-Gc-Mrn" customClass="HomeTableViewCell">
-                                                                <rect key="frame" x="0.0" y="28" width="295.5" height="40"/>
+                                                                <rect key="frame" x="0.0" y="28" width="296" height="40"/>
                                                                 <autoresizingMask key="autoresizingMask"/>
                                                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="d8u-Gc-Mrn" id="C0w-Rw-6cd">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="295.5" height="39.5"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="296" height="39.5"/>
                                                                     <autoresizingMask key="autoresizingMask"/>
                                                                     <subviews>
                                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="Name" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lw1-hM-Fnp">
-                                                                            <rect key="frame" x="24" y="12" width="223.5" height="15.5"/>
+                                                                            <rect key="frame" x="24" y="12" width="224" height="15.5"/>
                                                                             <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="-4"/>
                                                                             <fontDescription key="fontDescription" name="ProximaNova-Semibold" family="Proxima Nova" pointSize="16"/>
                                                                             <color key="textColor" name="Grey800"/>
                                                                             <nil key="highlightedColor"/>
                                                                         </label>
                                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bsp-9F-7r7">
-                                                                            <rect key="frame" x="255.5" y="12" width="16" height="16"/>
+                                                                            <rect key="frame" x="256" y="12" width="16" height="16"/>
                                                                             <constraints>
                                                                                 <constraint firstAttribute="width" secondItem="bsp-9F-7r7" secondAttribute="height" id="MAX-0O-88K"/>
                                                                             </constraints>
@@ -1364,10 +1369,10 @@
                                                 <rect key="frame" x="12" y="566" width="296" height="96"/>
                                                 <subviews>
                                                     <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oKf-l9-aoE">
-                                                        <rect key="frame" x="0.5" y="0.0" width="295.5" height="40"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="296" height="40"/>
                                                         <subviews>
                                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="INVENTORY" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Rge-6C-m3X">
-                                                                <rect key="frame" x="0.0" y="12" width="295.5" height="16"/>
+                                                                <rect key="frame" x="0.0" y="12" width="296" height="16"/>
                                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="-12" leading="0.0" bottom="-12" trailing="0.0"/>
                                                                 <fontDescription key="fontDescription" name="ProximaNova-Semibold" family="Proxima Nova" pointSize="16"/>
                                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -1384,7 +1389,7 @@
                                                         <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                                     </view>
                                                     <tableView clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" bounces="NO" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="BIL-bD-pje">
-                                                        <rect key="frame" x="0.5" y="40" width="295.5" height="56"/>
+                                                        <rect key="frame" x="0.0" y="40" width="296" height="56"/>
                                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="56" id="mYw-gs-vY1"/>
@@ -1394,21 +1399,21 @@
                                                         <inset key="separatorInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                                         <prototypes>
                                                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="item" rowHeight="40" id="MON-Zc-X69" customClass="HomeTableViewCell">
-                                                                <rect key="frame" x="0.0" y="28" width="295.5" height="40"/>
+                                                                <rect key="frame" x="0.0" y="28" width="296" height="40"/>
                                                                 <autoresizingMask key="autoresizingMask"/>
                                                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="MON-Zc-X69" id="55l-Aj-hV5">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="295.5" height="39.5"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="296" height="39.5"/>
                                                                     <autoresizingMask key="autoresizingMask"/>
                                                                     <subviews>
                                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="Name" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cgY-OM-JnA">
-                                                                            <rect key="frame" x="24" y="12" width="223.5" height="15.5"/>
+                                                                            <rect key="frame" x="24" y="12" width="224" height="15.5"/>
                                                                             <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="-4"/>
                                                                             <fontDescription key="fontDescription" name="ProximaNova-Semibold" family="Proxima Nova" pointSize="16"/>
                                                                             <color key="textColor" name="Grey800"/>
                                                                             <nil key="highlightedColor"/>
                                                                         </label>
                                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gl3-0T-NSK">
-                                                                            <rect key="frame" x="255.5" y="12" width="16" height="16"/>
+                                                                            <rect key="frame" x="256" y="12" width="16" height="16"/>
                                                                             <constraints>
                                                                                 <constraint firstAttribute="width" secondItem="gl3-0T-NSK" secondAttribute="height" id="Ckq-iJ-xlA"/>
                                                                             </constraints>
@@ -1496,7 +1501,7 @@
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                             </scrollView>
                             <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rzb-IY-4hh">
-                                <rect key="frame" x="258" y="412" width="50" height="50"/>
+                                <rect key="frame" x="258" y="500" width="50" height="50"/>
                                 <color key="backgroundColor" name="Yellow800"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="rzb-IY-4hh" secondAttribute="height" id="Cj5-Xo-Wvv"/>
@@ -1532,6 +1537,7 @@
                         <outlet property="btnAttendance" destination="t5O-JV-cSW" id="br3-TO-2yW"/>
                         <outlet property="btnExpense" destination="rzb-IY-4hh" id="Nb4-1m-AGY"/>
                         <outlet property="btnVisits" destination="o2b-Uf-VRN" id="54i-Kf-8nr"/>
+                        <outlet property="btnVisitsHeight" destination="0dr-eJ-h0L" id="F3O-25-kIT"/>
                         <outlet property="ivCompanyLogo" destination="T97-CB-0W4" id="dw5-gT-IsR"/>
                         <outlet property="lDateAttendance" destination="ULu-u0-iuu" id="TvL-bU-2B2"/>
                         <outlet property="lTimeAttendance" destination="67k-2H-w6h" id="dtO-fr-1To"/>
@@ -1565,7 +1571,7 @@
             <objects>
                 <viewController storyboardIdentifier="vcStores" id="qdr-Wv-4DR" customClass="StoresViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="ieP-oF-Asr">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6kY-2f-uTK">
@@ -1647,7 +1653,7 @@
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                             </view>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" bounces="NO" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="rY6-Uz-9ro">
-                                <rect key="frame" x="0.0" y="124" width="320" height="356"/>
+                                <rect key="frame" x="0.0" y="124" width="320" height="444"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                 <color key="separatorColor" name="Grey200"/>
@@ -1661,7 +1667,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EGH-eo-1JJ">
-                                                    <rect key="frame" x="0.0" y="-0.5" width="320" height="1"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="320" height="1"/>
                                                     <color key="backgroundColor" name="Grey200"/>
                                                     <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                                 </view>
@@ -1673,7 +1679,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hRc-WN-boZ">
-                                                    <rect key="frame" x="0.0" y="27" width="320" height="1"/>
+                                                    <rect key="frame" x="0.0" y="26.5" width="320" height="1"/>
                                                     <color key="backgroundColor" name="ThemeSec.sevie"/>
                                                     <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                                 </view>
@@ -1777,7 +1783,7 @@
             <objects>
                 <viewController storyboardIdentifier="vcEditStore" id="V0m-yf-Ywr" customClass="EditStoreViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="7fF-BL-0WL">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="x24-dp-YP8">
@@ -1843,14 +1849,14 @@
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                             </view>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" bounces="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3Ew-1J-ULa">
-                                <rect key="frame" x="0.0" y="70" width="320" height="410"/>
+                                <rect key="frame" x="0.0" y="70" width="320" height="498"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1IZ-Eq-oqK">
-                                        <rect key="frame" x="0.0" y="0.5" width="320" height="410"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="320" height="498"/>
                                         <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                     </view>
                                     <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1gc-Ib-YIS">
-                                        <rect key="frame" x="0.0" y="0.5" width="320" height="440"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="320" height="440"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="Store Name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bkZ-Cz-mjo">
                                                 <rect key="frame" x="12" y="12" width="296" height="16"/>
@@ -1860,7 +1866,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textField opaque="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" adjustsFontSizeToFit="NO" minimumFontSize="16" translatesAutoresizingMaskIntoConstraints="NO" id="B5Y-b3-87v" customClass="TextField">
-                                                <rect key="frame" x="11.5" y="34" width="296" height="30"/>
+                                                <rect key="frame" x="12" y="34" width="296" height="30"/>
                                                 <color key="backgroundColor" name="Grey200"/>
                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="-3" leading="0.0" bottom="-12" trailing="0.0"/>
                                                 <color key="textColor" name="Grey800"/>
@@ -1880,7 +1886,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textField opaque="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" adjustsFontSizeToFit="NO" minimumFontSize="16" translatesAutoresizingMaskIntoConstraints="NO" id="P8q-hk-HWE" customClass="TextField">
-                                                <rect key="frame" x="11.5" y="110" width="296" height="30"/>
+                                                <rect key="frame" x="12" y="110" width="296" height="30"/>
                                                 <color key="backgroundColor" name="Grey200"/>
                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="-3" leading="0.0" bottom="-12" trailing="0.0"/>
                                                 <color key="textColor" name="Grey800"/>
@@ -1900,7 +1906,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textField opaque="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" adjustsFontSizeToFit="NO" minimumFontSize="16" translatesAutoresizingMaskIntoConstraints="NO" id="oSI-3s-Uoq" customClass="TextField">
-                                                <rect key="frame" x="11.5" y="186" width="296" height="30"/>
+                                                <rect key="frame" x="12" y="186" width="296" height="30"/>
                                                 <color key="backgroundColor" name="Grey200"/>
                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="-3" leading="0.0" bottom="-12" trailing="0.0"/>
                                                 <color key="textColor" name="Grey800"/>
@@ -2026,7 +2032,7 @@
                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                             </view>
                                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JSG-tg-oGO">
-                                                <rect key="frame" x="0.0" y="438.5" width="320" height="1.5"/>
+                                                <rect key="frame" x="0.0" y="439" width="320" height="1"/>
                                                 <color key="backgroundColor" name="Grey200"/>
                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                             </view>
@@ -2151,7 +2157,7 @@
             <objects>
                 <viewController storyboardIdentifier="vcStoreContacts" id="p04-rj-YVk" customClass="StoreContactsViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="c1u-Wj-Bdz">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Rb4-VF-L9d">
@@ -2179,7 +2185,7 @@
                                         </connections>
                                     </button>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="Contacts" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QTx-23-quO">
-                                        <rect key="frame" x="125.5" y="16" width="70" height="18"/>
+                                        <rect key="frame" x="125" y="16" width="70" height="18"/>
                                         <directionalEdgeInsets key="directionalLayoutMargins" top="-16" leading="-2" bottom="-16" trailing="-2"/>
                                         <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="18"/>
                                         <color key="textColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -2217,7 +2223,7 @@
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                             </view>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" bounces="NO" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="ikm-tD-Lmj">
-                                <rect key="frame" x="0.0" y="70" width="320" height="410"/>
+                                <rect key="frame" x="0.0" y="70" width="320" height="498"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                 <color key="separatorColor" name="Grey500"/>
@@ -2407,7 +2413,7 @@
                                                     <rect key="frame" x="72" y="70" width="224" height="15.5"/>
                                                     <subviews>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6cs-sj-LNe">
-                                                            <rect key="frame" x="0.0" y="0.5" width="15" height="15"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="15.5" height="15.5"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="width" secondItem="6cs-sj-LNe" secondAttribute="height" id="7KF-Vh-AVd"/>
                                                             </constraints>
@@ -2417,7 +2423,7 @@
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="Birthdate" lineBreakMode="wordWrap" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lFE-iX-oEb">
-                                                            <rect key="frame" x="21" y="0.0" width="203" height="15.5"/>
+                                                            <rect key="frame" x="21.5" y="0.0" width="202.5" height="15.5"/>
                                                             <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="-3" bottom="0.0" trailing="0.0"/>
                                                             <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="16"/>
                                                             <color key="textColor" name="Grey600"/>
@@ -2503,7 +2509,7 @@
             <objects>
                 <viewController storyboardIdentifier="vcEditStoreContact" id="lV2-Hg-ikA" customClass="EditStoreContactViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="ttd-4k-yNh">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7iZ-H4-3A5">
@@ -2569,14 +2575,14 @@
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                             </view>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" bounces="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IYc-0T-ZKl">
-                                <rect key="frame" x="0.0" y="70" width="320" height="410"/>
+                                <rect key="frame" x="0.0" y="70" width="320" height="498"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dMD-8a-qX3">
-                                        <rect key="frame" x="0.0" y="0.5" width="320" height="410"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="320" height="498"/>
                                         <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                     </view>
                                     <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Igp-WT-mhr">
-                                        <rect key="frame" x="0.0" y="0.5" width="320" height="582"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="320" height="582"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="Contact Name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0al-gG-YJz">
                                                 <rect key="frame" x="12" y="12" width="296" height="16"/>
@@ -2586,7 +2592,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textField opaque="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" adjustsFontSizeToFit="NO" minimumFontSize="16" translatesAutoresizingMaskIntoConstraints="NO" id="SFT-1O-p8Z" customClass="TextField">
-                                                <rect key="frame" x="11.5" y="34" width="296" height="30"/>
+                                                <rect key="frame" x="12" y="34" width="296" height="30"/>
                                                 <color key="backgroundColor" name="Grey200"/>
                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="-3" leading="0.0" bottom="-12" trailing="0.0"/>
                                                 <color key="textColor" name="Grey800"/>
@@ -2606,7 +2612,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textField opaque="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" adjustsFontSizeToFit="NO" minimumFontSize="16" translatesAutoresizingMaskIntoConstraints="NO" id="4jh-d9-a7r" customClass="TextField">
-                                                <rect key="frame" x="11.5" y="110" width="296" height="30"/>
+                                                <rect key="frame" x="12" y="110" width="296" height="30"/>
                                                 <color key="backgroundColor" name="Grey200"/>
                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="-3" leading="0.0" bottom="-12" trailing="0.0"/>
                                                 <color key="textColor" name="Grey800"/>
@@ -2626,7 +2632,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textField opaque="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" adjustsFontSizeToFit="NO" minimumFontSize="16" translatesAutoresizingMaskIntoConstraints="NO" id="y1b-C5-4Du" customClass="TextField">
-                                                <rect key="frame" x="11.5" y="186" width="296" height="30"/>
+                                                <rect key="frame" x="12" y="186" width="296" height="30"/>
                                                 <color key="backgroundColor" name="Grey200"/>
                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="-3" leading="0.0" bottom="-12" trailing="0.0"/>
                                                 <color key="textColor" name="Grey800"/>
@@ -2852,7 +2858,7 @@
             <objects>
                 <viewController storyboardIdentifier="vcVisits" id="rBd-4e-0EL" customClass="VisitsViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="oKW-N8-mnc">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" bounces="NO" pagingEnabled="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="jy3-bd-gzY" customClass="DateBarCollectionView">
@@ -2927,7 +2933,7 @@
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                             </view>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" bounces="NO" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="45W-Ps-NOv">
-                                <rect key="frame" x="0.0" y="90" width="320" height="390"/>
+                                <rect key="frame" x="0.0" y="90" width="320" height="478"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                 <color key="separatorColor" name="Grey500"/>
@@ -3020,7 +3026,7 @@
             <objects>
                 <viewController storyboardIdentifier="vcVisitDetails" id="0kU-Ou-P9u" customClass="VisitDetailsViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="d0W-HL-ABh">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KPx-Oq-AvI">
@@ -3084,14 +3090,14 @@
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                             </view>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" bounces="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vPi-OO-pNB">
-                                <rect key="frame" x="0.0" y="70" width="320" height="410"/>
+                                <rect key="frame" x="0.0" y="70" width="320" height="498"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="y93-Lf-hhq">
-                                        <rect key="frame" x="0.0" y="0.5" width="320" height="410"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="320" height="498"/>
                                         <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                     </view>
                                     <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3Hg-8n-pnn">
-                                        <rect key="frame" x="0.0" y="0.5" width="320" height="744.5"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="320" height="744"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="Store Name" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="N1j-hB-uyg">
                                                 <rect key="frame" x="12" y="12" width="258" height="20"/>
@@ -3122,7 +3128,7 @@
                                                 </connections>
                                             </button>
                                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Lpe-mM-Rcl">
-                                                <rect key="frame" x="0.0" y="58.5" width="320" height="1.5"/>
+                                                <rect key="frame" x="0.0" y="59" width="320" height="1"/>
                                                 <color key="backgroundColor" name="Grey200"/>
                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                             </view>
@@ -3152,12 +3158,12 @@
                                                 </connections>
                                             </button>
                                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1lo-Qu-Sp1">
-                                                <rect key="frame" x="0.0" y="98.5" width="320" height="1.5"/>
+                                                <rect key="frame" x="0.0" y="99" width="320" height="1"/>
                                                 <color key="backgroundColor" name="Grey200"/>
                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                             </view>
                                             <view clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zSt-Ot-j2g">
-                                                <rect key="frame" x="0.0" y="100" width="320" height="152.5"/>
+                                                <rect key="frame" x="0.0" y="100" width="320" height="152"/>
                                                 <subviews>
                                                     <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5U4-fK-V04">
                                                         <rect key="frame" x="0.0" y="0.0" width="320" height="1"/>
@@ -3177,7 +3183,7 @@
                                                         <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                                     </view>
                                                     <tableView clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" bounces="NO" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="rq1-ca-hHP">
-                                                        <rect key="frame" x="0.0" y="40.5" width="320" height="56"/>
+                                                        <rect key="frame" x="0.0" y="40" width="320" height="56"/>
                                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="56" id="x5J-77-yQY"/>
@@ -3234,7 +3240,7 @@
                                                         </connections>
                                                     </tableView>
                                                     <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Y3t-eV-NG3">
-                                                        <rect key="frame" x="12" y="108.5" width="117" height="32"/>
+                                                        <rect key="frame" x="12" y="108" width="117" height="32"/>
                                                         <color key="backgroundColor" name="ThemeSec.sevie"/>
                                                         <directionalEdgeInsets key="directionalLayoutMargins" top="-12" leading="-12" bottom="-12" trailing="-12"/>
                                                         <fontDescription key="fontDescription" name="ProximaNova-Semibold" family="Proxima Nova" pointSize="16"/>
@@ -3274,22 +3280,22 @@
                                                 </variation>
                                             </view>
                                             <view clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9aJ-4W-R5u">
-                                                <rect key="frame" x="0.0" y="252.5" width="320" height="153"/>
+                                                <rect key="frame" x="0.0" y="252" width="320" height="153"/>
                                                 <subviews>
                                                     <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KkU-v8-VAn">
-                                                        <rect key="frame" x="0.0" y="0.0" width="320" height="1.5"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="320" height="1"/>
                                                         <color key="backgroundColor" name="Grey200"/>
                                                         <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                                     </view>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="Forms" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gl7-nU-06Q">
-                                                        <rect key="frame" x="12" y="12" width="296.5" height="16"/>
+                                                        <rect key="frame" x="12" y="12" width="296" height="16"/>
                                                         <directionalEdgeInsets key="directionalLayoutMargins" top="-12" leading="-12" bottom="-12" trailing="-12"/>
                                                         <fontDescription key="fontDescription" name="ProximaNova-Semibold" family="Proxima Nova" pointSize="16"/>
                                                         <color key="textColor" name="Grey800"/>
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                     <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="V6v-8p-iMH">
-                                                        <rect key="frame" x="0.0" y="38.5" width="320" height="1.5"/>
+                                                        <rect key="frame" x="0.0" y="39" width="320" height="1"/>
                                                         <color key="backgroundColor" name="ThemeSec.sevie"/>
                                                         <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                                     </view>
@@ -3391,62 +3397,62 @@
                                                 </variation>
                                             </view>
                                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1lw-NR-Hbx">
-                                                <rect key="frame" x="0.0" y="405.5" width="320" height="1.5"/>
+                                                <rect key="frame" x="0.0" y="405" width="320" height="1"/>
                                                 <color key="backgroundColor" name="Grey200"/>
                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                             </view>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="Invoice" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Gjb-Dl-n2B">
-                                                <rect key="frame" x="12" y="417.5" width="51" height="16"/>
+                                                <rect key="frame" x="12" y="417" width="51" height="16"/>
                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="-12" leading="-12" bottom="-12" trailing="-4"/>
                                                 <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="16"/>
                                                 <color key="textColor" name="Grey800"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="N/A" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ntf-tU-1do">
-                                                <rect key="frame" x="71" y="417.5" width="237" height="16"/>
+                                                <rect key="frame" x="71" y="417" width="237" height="16"/>
                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="-12" leading="-4" bottom="-12" trailing="-12"/>
                                                 <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="16"/>
                                                 <color key="textColor" name="Grey500"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZEg-Ia-GWx">
-                                                <rect key="frame" x="0.0" y="445.5" width="320" height="1.5"/>
+                                                <rect key="frame" x="0.0" y="445" width="320" height="1"/>
                                                 <color key="backgroundColor" name="Grey200"/>
                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                             </view>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="Deliveries" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Be7-ox-lv4">
-                                                <rect key="frame" x="12" y="457.5" width="70" height="16"/>
+                                                <rect key="frame" x="12" y="457" width="70" height="16"/>
                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="-12" leading="-12" bottom="-12" trailing="-4"/>
                                                 <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="16"/>
                                                 <color key="textColor" name="Grey800"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="P0.00" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cYo-dl-LV5">
-                                                <rect key="frame" x="90" y="457.5" width="218" height="16"/>
+                                                <rect key="frame" x="90" y="457" width="218" height="16"/>
                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="-12" leading="-4" bottom="-12" trailing="-12"/>
                                                 <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="16"/>
                                                 <color key="textColor" name="ThemePriDark.sevie"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HEN-AK-DiU">
-                                                <rect key="frame" x="0.0" y="485.5" width="320" height="1.5"/>
+                                                <rect key="frame" x="0.0" y="485" width="320" height="1"/>
                                                 <color key="backgroundColor" name="Grey200"/>
                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                             </view>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="Photos" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3wU-gK-c8f">
-                                                <rect key="frame" x="12" y="497.5" width="296" height="16"/>
+                                                <rect key="frame" x="12" y="497" width="296" height="16"/>
                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="-12" leading="-12" bottom="-12" trailing="-12"/>
                                                 <fontDescription key="fontDescription" name="ProximaNova-Semibold" family="Proxima Nova" pointSize="16"/>
                                                 <color key="textColor" name="Grey800"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HpZ-9m-Xkj">
-                                                <rect key="frame" x="0.0" y="524" width="320" height="1.5"/>
+                                                <rect key="frame" x="0.0" y="524" width="320" height="1"/>
                                                 <color key="backgroundColor" name="ThemeSec.sevie"/>
                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                             </view>
                                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" bounces="NO" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="twx-Vb-9Ca" customClass="PhotoBarCollectionView">
-                                                <rect key="frame" x="0.0" y="525.5" width="320" height="75"/>
+                                                <rect key="frame" x="0.0" y="525" width="320" height="75"/>
                                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                                 <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="3" minimumInteritemSpacing="0.0" id="Rge-rQ-owj">
@@ -3521,24 +3527,24 @@
                                                 </cells>
                                             </collectionView>
                                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ot3-f9-ebd">
-                                                <rect key="frame" x="0.0" y="600.5" width="320" height="1.5"/>
+                                                <rect key="frame" x="0.0" y="600" width="320" height="1"/>
                                                 <color key="backgroundColor" name="Grey200"/>
                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                             </view>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="Notes" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nDL-oM-zG3">
-                                                <rect key="frame" x="12" y="612.5" width="296" height="16"/>
+                                                <rect key="frame" x="12" y="612" width="296" height="16"/>
                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="-12" leading="-12" bottom="-12" trailing="-12"/>
                                                 <fontDescription key="fontDescription" name="ProximaNova-Semibold" family="Proxima Nova" pointSize="16"/>
                                                 <color key="textColor" name="Grey800"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="K0P-XP-pcf">
-                                                <rect key="frame" x="0.0" y="639.5" width="320" height="1.5"/>
+                                                <rect key="frame" x="0.0" y="639" width="320" height="1"/>
                                                 <color key="backgroundColor" name="ThemeSec.sevie"/>
                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                             </view>
                                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="c7f-B1-V4Q" customClass="TextView">
-                                                <rect key="frame" x="12" y="653" width="296" height="80"/>
+                                                <rect key="frame" x="12" y="652" width="296" height="80"/>
                                                 <color key="backgroundColor" name="Grey200"/>
                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="-12" leading="-12" bottom="-12" trailing="-12"/>
                                                 <color key="textColor" name="Grey800"/>
@@ -3709,7 +3715,7 @@
             <objects>
                 <viewController storyboardIdentifier="vcExpense" id="u4A-PX-L3S" customClass="ExpenseViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="XD2-Ri-IuX">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" name="ThemePriDark.sevie"/>
                         <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
@@ -3725,7 +3731,7 @@
             <objects>
                 <viewController storyboardIdentifier="vcInventory" id="1yV-mJ-Lhy" customClass="InventoryViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="ZE6-86-csm">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" name="ThemeSec.sevie"/>
                         <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
@@ -3741,7 +3747,7 @@
             <objects>
                 <viewController storyboardIdentifier="vcForms" id="FBJ-y9-qIG" customClass="FormsViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="YB2-uh-tzO">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" name="ThemePriDark.sevie"/>
                         <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
@@ -3757,7 +3763,7 @@
             <objects>
                 <viewController storyboardIdentifier="vcHistory" id="5J4-Tu-dcG" customClass="HistoryViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="I1U-Kg-v6C">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" name="ThemeSec.sevie"/>
                         <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
@@ -3773,7 +3779,7 @@
             <objects>
                 <viewController storyboardIdentifier="vcCamera" id="9rU-Kk-Q8y" customClass="CameraViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="wkk-cA-lnz">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                         <viewLayoutGuide key="safeArea" id="6sS-kI-ysP"/>
@@ -3788,7 +3794,7 @@
             <objects>
                 <viewController storyboardIdentifier="vcCameraPreview" id="YRv-Wm-Ycm" customClass="CameraPreviewViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="mpS-Vg-v6U">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4mR-0S-7Aq">
@@ -3816,7 +3822,7 @@
                                         </connections>
                                     </button>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="751" insetsLayoutMarginsFromSafeArea="NO" text="Camera Preview" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ldw-gV-TRJ">
-                                        <rect key="frame" x="96" y="16" width="129.5" height="18"/>
+                                        <rect key="frame" x="95.5" y="16" width="129.5" height="18"/>
                                         <directionalEdgeInsets key="directionalLayoutMargins" top="-16" leading="-2" bottom="-16" trailing="-2"/>
                                         <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="18"/>
                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -3855,7 +3861,7 @@
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                             </view>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" bounces="NO" pagingEnabled="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="yeA-Mj-OUk" customClass="PhotoBarCollectionView">
-                                <rect key="frame" x="0.0" y="70" width="320" height="410"/>
+                                <rect key="frame" x="0.0" y="70" width="320" height="498"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="0.0" minimumInteritemSpacing="0.0" id="GwG-bF-wOv">
@@ -3866,7 +3872,7 @@
                                 </collectionViewFlowLayout>
                                 <cells>
                                     <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" reuseIdentifier="item" id="uXv-WZ-ZYb" customClass="PhotoBarItemCollectionViewCell">
-                                        <rect key="frame" x="0.0" y="0.0" width="320" height="410"/>
+                                        <rect key="frame" x="0.0" y="44" width="320" height="410"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="410"/>
@@ -3929,11 +3935,11 @@
             <objects>
                 <viewController storyboardIdentifier="vcDropDown" useStoryboardIdentifierAsRestorationIdentifier="YES" id="FEv-4n-vpe" customClass="DropDownDialogViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="Q9Y-WW-tmf">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xNx-xx-4vJ">
-                                <rect key="frame" x="33" y="162" width="254" height="176"/>
+                                <rect key="frame" x="33" y="206" width="254" height="176"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="Select Item" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nY3-xY-t2E">
                                         <rect key="frame" x="16" y="16" width="222" height="16"/>
@@ -4039,7 +4045,7 @@
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                             </view>
                             <tableView hidden="YES" clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" bounces="NO" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="wqJ-MB-mrG">
-                                <rect key="frame" x="49" y="250" width="222" height="0.0"/>
+                                <rect key="frame" x="49" y="294" width="222" height="0.0"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="height" id="chX-Rx-M50"/>
@@ -4120,11 +4126,11 @@
             <objects>
                 <viewController storyboardIdentifier="vcNoGPS" useStoryboardIdentifierAsRestorationIdentifier="YES" id="fd0-Bt-bHN" customClass="NoGPSDialogViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="atS-Pq-POo">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sRc-xb-mLo">
-                                <rect key="frame" x="33" y="171.5" width="254" height="158.5"/>
+                                <rect key="frame" x="33" y="215" width="254" height="158"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="No GPS Signal" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="y1d-hJ-Gcq">
                                         <rect key="frame" x="16" y="16" width="222" height="16"/>
@@ -4134,7 +4140,7 @@
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="Searching for GPS Signal. Please try going outside." textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EdU-08-ga4">
-                                        <rect key="frame" x="16" y="40" width="222" height="44.5"/>
+                                        <rect key="frame" x="16" y="40" width="222" height="44"/>
                                         <constraints>
                                             <constraint firstAttribute="width" relation="lessThanOrEqual" secondItem="EdU-08-ga4" secondAttribute="height" multiplier="5" id="nXv-h6-YBg"/>
                                         </constraints>
@@ -4144,14 +4150,14 @@
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3dB-lX-f9Z">
-                                        <rect key="frame" x="102" y="92.5" width="50" height="50"/>
+                                        <rect key="frame" x="102" y="92" width="50" height="50"/>
                                         <directionalEdgeInsets key="directionalLayoutMargins" top="-4" leading="-16" bottom="-16" trailing="-16"/>
                                         <fontDescription key="fontDescription" name="FontAwesome5FreeSolid" family="Font Awesome 5 Free" pointSize="50"/>
                                         <color key="textColor" name="Grey500"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hKK-im-e7M">
-                                        <rect key="frame" x="121" y="108.5" width="11.5" height="18"/>
+                                        <rect key="frame" x="121.5" y="108" width="11.5" height="18"/>
                                         <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                         <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="18"/>
                                         <color key="textColor" name="ThemePriDark.sevie"/>
@@ -4199,7 +4205,7 @@
             <objects>
                 <viewController storyboardIdentifier="vcAttendanceSummary" id="aPF-r4-0B9" customClass="AttendanceSummaryViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="LAV-Ol-jL0">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="myJ-NO-fjr">
@@ -4227,7 +4233,7 @@
                                         </connections>
                                     </button>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="Summary" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="e65-xm-vPu">
-                                        <rect key="frame" x="123.5" y="16" width="74" height="18"/>
+                                        <rect key="frame" x="123" y="16" width="74" height="18"/>
                                         <directionalEdgeInsets key="directionalLayoutMargins" top="-16" leading="-2" bottom="-16" trailing="-2"/>
                                         <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="18"/>
                                         <color key="textColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -4247,14 +4253,14 @@
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                             </view>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" bounces="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gdf-Pr-rcM">
-                                <rect key="frame" x="0.0" y="70" width="320" height="370"/>
+                                <rect key="frame" x="0.0" y="70" width="320" height="458"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="laI-br-Lrq">
-                                        <rect key="frame" x="0.0" y="0.5" width="320" height="370"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="320" height="458"/>
                                         <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                     </view>
                                     <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GCS-wB-Jxt">
-                                        <rect key="frame" x="0.0" y="0.5" width="320" height="366.5"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="320" height="366.5"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="Time In" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hBD-cw-dQ2">
                                                 <rect key="frame" x="12" y="12" width="51.5" height="16"/>
@@ -4309,7 +4315,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PLw-0c-TD3">
-                                                <rect key="frame" x="0.0" y="118.5" width="320" height="1"/>
+                                                <rect key="frame" x="0.0" y="119" width="320" height="1"/>
                                                 <color key="backgroundColor" name="Grey200"/>
                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                             </view>
@@ -4347,7 +4353,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rvj-XE-eXe">
-                                                <rect key="frame" x="0.0" y="198.5" width="320" height="1.5"/>
+                                                <rect key="frame" x="0.0" y="199" width="320" height="1"/>
                                                 <color key="backgroundColor" name="Grey200"/>
                                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                             </view>
@@ -4470,7 +4476,7 @@
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                             </scrollView>
                             <button opaque="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="AIp-VN-Org">
-                                <rect key="frame" x="0.0" y="440" width="160" height="40"/>
+                                <rect key="frame" x="0.0" y="528" width="160" height="40"/>
                                 <color key="backgroundColor" name="Grey700"/>
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                 <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="16"/>
@@ -4483,7 +4489,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gzw-f7-WbY">
-                                <rect key="frame" x="160" y="440" width="160" height="40"/>
+                                <rect key="frame" x="160" y="528" width="160" height="40"/>
                                 <color key="backgroundColor" name="ThemeSec.sevie"/>
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                 <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="16"/>
@@ -4553,7 +4559,7 @@
             <objects>
                 <viewController storyboardIdentifier="vcAddSignature" id="LD1-jD-dt1" customClass="AddSignatureViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="yby-yA-6wl">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2cZ-Nu-2xK">
@@ -4581,7 +4587,7 @@
                                         </connections>
                                     </button>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="Add Signature" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NAf-qv-huI">
-                                        <rect key="frame" x="104" y="16" width="113" height="18"/>
+                                        <rect key="frame" x="103.5" y="16" width="113" height="18"/>
                                         <directionalEdgeInsets key="directionalLayoutMargins" top="-16" leading="-2" bottom="-16" trailing="-2"/>
                                         <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="18"/>
                                         <color key="textColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -4601,14 +4607,14 @@
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                             </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="Please affix your signature below." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cOO-oU-B4k">
-                                <rect key="frame" x="12" y="104" width="296" height="16"/>
+                                <rect key="frame" x="12" y="152.5" width="296" height="16"/>
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="-12" leading="-12" bottom="-12" trailing="-12"/>
                                 <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="16"/>
                                 <color key="textColor" name="Grey800"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1HR-UF-xgn">
-                                <rect key="frame" x="222" y="132" width="86" height="40"/>
+                                <rect key="frame" x="222" y="180.5" width="86" height="40"/>
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="-12" bottom="-12" trailing="-12"/>
                                 <fontDescription key="fontDescription" name="ProximaNova-Semibold" family="Proxima Nova" pointSize="16"/>
                                 <inset key="contentEdgeInsets" minX="24" minY="12" maxX="24" maxY="12"/>
@@ -4620,7 +4626,7 @@
                                 </connections>
                             </button>
                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GUw-Ot-PCe" customClass="SignatureView">
-                                <rect key="frame" x="0.0" y="184" width="320" height="160"/>
+                                <rect key="frame" x="0.0" y="232.5" width="320" height="160"/>
                                 <color key="backgroundColor" name="Yellow100"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="GUw-Ot-PCe" secondAttribute="height" multiplier="2" id="Z6p-KJ-ctZ"/>
@@ -4628,7 +4634,7 @@
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                             </view>
                             <button opaque="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xaM-et-Df2">
-                                <rect key="frame" x="0.0" y="440" width="160" height="40"/>
+                                <rect key="frame" x="0.0" y="528" width="160" height="40"/>
                                 <color key="backgroundColor" name="Grey700"/>
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                 <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="16"/>
@@ -4641,7 +4647,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2Ls-oH-1mK">
-                                <rect key="frame" x="160" y="440" width="160" height="40"/>
+                                <rect key="frame" x="160" y="528" width="160" height="40"/>
                                 <color key="backgroundColor" name="ThemeSec.sevie"/>
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                 <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="16"/>
@@ -4700,7 +4706,7 @@
             <objects>
                 <viewController storyboardIdentifier="vcAnnouncements" id="eP7-dc-6cG" customClass="AnnouncementsViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="0dw-a4-Unh">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Sae-iu-VvW">
@@ -4756,7 +4762,7 @@
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" bounces="NO" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="hGZ-u7-dw6">
-                                <rect key="frame" x="0.0" y="124" width="320" height="356"/>
+                                <rect key="frame" x="0.0" y="124" width="320" height="444"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                 <color key="separatorColor" name="Grey200"/>
@@ -4770,7 +4776,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="252" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Xbo-tP-OlY">
-                                                    <rect key="frame" x="24" y="12.5" width="32" height="32"/>
+                                                    <rect key="frame" x="24" y="12" width="32" height="32"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" secondItem="Xbo-tP-OlY" secondAttribute="height" id="1ZS-iH-5Dg"/>
                                                         <constraint firstAttribute="height" constant="32" id="Klo-w1-shW"/>
@@ -4778,21 +4784,21 @@
                                                     <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="-4"/>
                                                 </imageView>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="751" verticalCompressionResistancePriority="751" insetsLayoutMarginsFromSafeArea="NO" text="Name" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3Bl-Gc-wN9">
-                                                    <rect key="frame" x="64" y="12.5" width="208" height="18"/>
+                                                    <rect key="frame" x="64" y="12" width="208" height="18"/>
                                                     <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="-4" bottom="0.0" trailing="-4"/>
                                                     <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="18"/>
                                                     <color key="textColor" name="Grey800"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="Details" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Sbj-Wu-FlH">
-                                                    <rect key="frame" x="64" y="30.5" width="207.5" height="13"/>
+                                                    <rect key="frame" x="64" y="30" width="208" height="13.5"/>
                                                     <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                                     <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="14"/>
                                                     <color key="textColor" name="Grey600"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="taT-KH-bEV">
-                                                    <rect key="frame" x="280" y="20.5" width="16" height="16"/>
+                                                    <rect key="frame" x="280" y="20" width="16" height="16"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" secondItem="taT-KH-bEV" secondAttribute="height" id="ATl-4G-pOb"/>
                                                     </constraints>
@@ -4880,7 +4886,7 @@
             <objects>
                 <viewController storyboardIdentifier="vcAnnouncementDetails" id="vy0-vD-wrc" customClass="AnnouncementDetailsViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="cTB-aK-gHd">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QPZ-P7-iY0">
@@ -4908,7 +4914,7 @@
                                         </connections>
                                     </button>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" text="Jan 1, 2018" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="g0x-3r-WMK">
-                                        <rect key="frame" x="117.5" y="16" width="86" height="18"/>
+                                        <rect key="frame" x="117" y="16" width="86" height="18"/>
                                         <directionalEdgeInsets key="directionalLayoutMargins" top="-16" leading="-2" bottom="-16" trailing="-2"/>
                                         <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="18"/>
                                         <color key="textColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -4928,14 +4934,14 @@
                                 <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                             </view>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" bounces="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HLI-ly-fQa">
-                                <rect key="frame" x="0.0" y="70" width="320" height="410"/>
+                                <rect key="frame" x="0.0" y="70" width="320" height="498"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vYm-kW-ZT1">
-                                        <rect key="frame" x="0.0" y="0.5" width="320" height="410"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="320" height="498"/>
                                         <directionalEdgeInsets key="directionalLayoutMargins" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
                                     </view>
                                     <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3QP-MF-ddn">
-                                        <rect key="frame" x="0.0" y="0.5" width="320" height="104"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="320" height="104"/>
                                         <subviews>
                                             <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7lP-kt-YYA">
                                                 <rect key="frame" x="0.0" y="0.0" width="320" height="64"/>
@@ -5047,14 +5053,14 @@
         </scene>
     </scenes>
     <resources>
-        <image name="AppLogo.sevie" width="307" height="75"/>
-        <image name="NavigationAnnouncements" width="21" height="20"/>
-        <image name="NavigationSyncData" width="27" height="20"/>
-        <image name="PageVisits" width="19" height="20"/>
-        <image name="Primary" width="270" height="480"/>
-        <image name="Secondary" width="270" height="461"/>
+        <image name="AppLogo.sevie" width="184.5" height="45.299999237060547"/>
+        <image name="NavigationAnnouncements" width="42" height="40"/>
+        <image name="NavigationSyncData" width="55" height="40"/>
+        <image name="PageVisits" width="11.699999809265137" height="12"/>
+        <image name="Primary" width="162" height="288"/>
+        <image name="Secondary" width="162" height="276.60000610351562"/>
         <namedColor name="BlackTransThirty">
-            <color red="0.0" green="0.0" blue="0.0" alpha="0.30000001189999997" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.30000001192092896" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="Grey200">
             <color red="0.93300002813339233" green="0.93300002813339233" blue="0.93300002813339233" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -5075,13 +5081,13 @@
             <color red="0.82745098039215681" green="0.18431372549019609" blue="0.18431372549019609" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="ThemePri.sevie">
-            <color red="0.1180000007" green="0.53299999239999996" blue="0.89800000189999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.11800000071525574" green="0.53299999237060547" blue="0.89800000190734863" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="ThemePriDark.sevie">
             <color red="0.097999997437000275" green="0.46299999952316284" blue="0.82400000095367432" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="ThemeSec.sevie">
-            <color red="0.29800000789999997" green="0.68599998949999996" blue="0.31400001049999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.29800000786781311" green="0.68599998950958252" blue="0.31400001049041748" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="WhiteTransSixty">
             <color red="1" green="1" blue="1" alpha="0.60000002384185791" colorSpace="custom" customColorSpace="sRGB"/>

@@ -50,13 +50,13 @@
 + (Users *)user:(NSManagedObjectContext *)db;
 + (long)userID:(NSManagedObjectContext *)db;
 + (Employees *)employee:(NSManagedObjectContext *)db employeeID:(long)employeeID;
++ (long)teamID:(NSManagedObjectContext *)db employeeID:(long)employeeID;
 + (Settings *)setting:(NSManagedObjectContext *)db settingID:(long)settingID;
-+ (SettingsTeams *)settingTeam:(NSManagedObjectContext *)db settingID:(long)settingID;
 + (SettingsTeams *)settingTeam:(NSManagedObjectContext *)db settingID:(long)settingID teamID:(long)teamID;
-+ (BOOL)isSettingEnabled:(NSManagedObjectContext *)db settingID:(long)settingID;
-+ (NSString *)dateFormat:(NSManagedObjectContext *)db;
-+ (NSString *)timeFormat:(NSManagedObjectContext *)db;
-+ (NSString *)currencySymbol:(NSManagedObjectContext *)db;
++ (BOOL)isSettingEnabled:(NSManagedObjectContext *)db settingID:(long)settingID teamID:(long)teamID;
++ (NSString *)settingCurrencySymbol:(NSManagedObjectContext *)db teamID:(long)teamID;
++ (NSString *)settingDateFormat:(NSManagedObjectContext *)db teamID:(long)teamID;
++ (NSString *)settingTimeFormat:(NSManagedObjectContext *)db teamID:(long)teamID;
 + (Conventions *)convention:(NSManagedObjectContext *)db conventionID:(long)conventionID;
 + (NSString *)conventionName:(NSManagedObjectContext *)db conventionID:(long)conventionID;
 + (AlertTypes *)alertType:(NSManagedObjectContext *)db alertTypeID:(long)alertTypeID;
@@ -69,22 +69,22 @@
 + (long)syncAnnouncementSeenCount:(NSManagedObjectContext *)db;
 
 //STORES
-+ (Stores *)store:(NSManagedObjectContext *)db storeID:(long)storeID;
 + (Stores *)store:(NSManagedObjectContext *)db webStoreID:(long)webStoreID;
++ (Stores *)store:(NSManagedObjectContext *)db storeID:(long)storeID;
 + (long)syncStoresCount:(NSManagedObjectContext *)db;
-+ (StoreContacts *)storeContact:(NSManagedObjectContext *)db storeContactID:(long)storeContactID;
 + (StoreContacts *)storeContact:(NSManagedObjectContext *)db webStoreContactID:(long)webStoreContactID;
++ (StoreContacts *)storeContact:(NSManagedObjectContext *)db storeContactID:(long)storeContactID;
 + (long)syncStoreContactsCount:(NSManagedObjectContext *)db;
 
 //ATTENDANCE
 + (ScheduleTimes *)scheduleTime:(NSManagedObjectContext *)db scheduleTimeID:(long)scheduleTimeID;
-+ (Schedules *)schedule:(NSManagedObjectContext *)db scheduleID:(long)scheduleID;
 + (Schedules *)schedule:(NSManagedObjectContext *)db webScheduleID:(long)webScheduleID scheduleDate:(NSString *)scheduleDate;
++ (Schedules *)schedule:(NSManagedObjectContext *)db scheduleID:(long)scheduleID;
 + (long)syncSchedulesCount:(NSManagedObjectContext *)db;
 + (TimeIn *)timeIn:(NSManagedObjectContext *)db;
-+ (long)timeInCount:(NSManagedObjectContext *)db date:(NSString *)date;
 + (TimeIn *)timeIn:(NSManagedObjectContext *)db timeInID:(long)timeInID;
 + (BOOL)isTimeIn:(NSManagedObjectContext *)db;
++ (long)timeInCount:(NSManagedObjectContext *)db date:(NSString *)date;
 + (long)syncTimeInCount:(NSManagedObjectContext *)db;
 + (long)uploadTimeInPhotoCount:(NSManagedObjectContext *)db;
 + (TimeOut *)timeOut:(NSManagedObjectContext *)db timeInID:(long)timeInID;
@@ -101,18 +101,17 @@
 + (long)uploadVisitPhotosCount:(NSManagedObjectContext *)db;
 + (Visits *)visit:(NSManagedObjectContext *)db visitID:(long)visitID;
 + (Visits *)visit:(NSManagedObjectContext *)db webVisitID:(long)webVisitID;
++ (long)visitTodayCount:(NSManagedObjectContext *)db date:(NSString *)date;
 + (long)syncVisitsCount:(NSManagedObjectContext *)db;
 + (VisitInventories *)visitInventory:(NSManagedObjectContext *)db visitID:(long)visitID inventoryID:(long)inventoryID;
 + (VisitForms *)visitForm:(NSManagedObjectContext *)db visitID:(long)visitID formID:(long)formID;
-+ (CheckIn *)checkIn:(NSManagedObjectContext *)db timeInID:(long)timeInID;
++ (CheckIn *)checkIn:(NSManagedObjectContext *)db;
 + (CheckIn *)checkIn:(NSManagedObjectContext *)db visitID:(long)visitID;
 + (CheckIn *)checkIn:(NSManagedObjectContext *)db checkInID:(long)checkInID;
-+ (BOOL)isCheckIn:(NSManagedObjectContext *)db timeInID:(long)timeInID;
++ (BOOL)isCheckIn:(NSManagedObjectContext *)db;
 + (long)syncCheckInCount:(NSManagedObjectContext *)db;
 + (long)uploadCheckInPhotoCount:(NSManagedObjectContext *)db;
 + (CheckOut *)checkOut:(NSManagedObjectContext *)db checkInID:(long)checkInID;
-+ (CheckOut *)checkOut:(NSManagedObjectContext *)db checkOutID:(long)checkOutID;
-+ (BOOL)isCheckOut:(NSManagedObjectContext *)db checkInID:(long)checkInID;
 + (long)syncCheckOutCount:(NSManagedObjectContext *)db;
 + (long)uploadCheckOutPhotoCount:(NSManagedObjectContext *)db;
 

@@ -1,5 +1,4 @@
 #import "DropDownDialogViewController.h"
-#import "ScheduleTimes+CoreDataClass.h"
 #import "AppDelegate.h"
 #import "App.h"
 #import "Get.h"
@@ -13,7 +12,6 @@
 @property (strong, nonatomic) AppDelegate *app;
 @property (strong, nonatomic) id item;
 @property (nonatomic) UIEdgeInsets tfNotesLayoutMargins;
-@property (strong, nonatomic) NSString *timeFormat;
 @property (nonatomic) BOOL viewDidAppear;
 
 @end
@@ -24,11 +22,7 @@
     [super viewDidLoad];
     self.app = (AppDelegate *)UIApplication.sharedApplication.delegate;
     self.tvItems.tableFooterView = UIView.alloc.init;
-    self.tvItems.hidden = YES;
     self.tvItemsHeight.constant = self.tfDropDown.frame.size.height * 5;
-    self.tfNotesLayoutMargins = self.tfNotes.layoutMargins;
-    self.tfNotes.layoutMargins = UIEdgeInsetsZero;
-    self.timeFormat = [Get timeFormat:self.app.db];
     self.viewDidAppear = NO;
 }
 
@@ -48,6 +42,8 @@
         CALayer *layer = self.tvItems.layer;
         layer.borderColor = [UIColor colorNamed:@"BlackTransThirty"].CGColor;
         layer.borderWidth = (1.0f / 568) * UIScreen.mainScreen.bounds.size.height;
+        self.tfNotesLayoutMargins = self.tfNotes.layoutMargins;
+        self.tfNotes.layoutMargins = UIEdgeInsetsZero;
         [self onRefresh];
     }
 }
@@ -61,12 +57,14 @@
         }
         case DROP_DOWN_TYPE_SCHEDULE: {
             self.lMessage.text = @"Select Schedule".uppercaseString;
+            self.tvItems.hidden = YES;
             break;
         }
         case DROP_DOWN_TYPE_CHECK_OUT_STATUS: {
-            NSString *message = [NSString stringWithFormat:@"%@%@%@", @"You are checking-out at\n", ((VisitDetailsViewController *)self.parent).visit.name, @"\nPlease choose the status\nof your visit:"];
+            Visits *visit = ((VisitDetailsViewController *)self.parent).visit;
+            NSString *message = [NSString stringWithFormat:@"%@%@%@", @"You are checking-out at\n", visit.name, @"\nPlease choose the status\nof your visit:"];
             NSMutableAttributedString *attributedText = [NSMutableAttributedString.alloc initWithString:message];
-            NSRange range = NSMakeRange(24, message.length - 24 - 40);
+            NSRange range = NSMakeRange(24, visit.name.length);
             [attributedText addAttribute:NSFontAttributeName value:[UIFont fontWithName:@"ProximaNova-Semibold" size:self.lMessage.font.pointSize] range:range];
             NSMutableParagraphStyle *paragraphStyle = NSMutableParagraphStyle.alloc.init;
             paragraphStyle.alignment = NSTextAlignmentCenter;
@@ -75,6 +73,7 @@
             [attributedText addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
             self.lMessage.attributedText = attributedText;
             self.tfNotes.placeholder = @"Tap to add notes...";
+            self.tfNotes.value = visit.notes;
             [self tableView:self.tvItems didSelectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
             self.tvItems.hidden = YES;
             break;
@@ -120,7 +119,7 @@
         }
         case DROP_DOWN_TYPE_SCHEDULE: {
             ScheduleTimes *scheduleTime = (ScheduleTimes *)self.items[indexPath.row];
-            item.lName.text = [NSString stringWithFormat:@"%@ - %@", [Time formatTime:self.timeFormat time:scheduleTime.timeIn], [Time formatTime:self.timeFormat time:scheduleTime.timeOut]];
+            item.lName.text = [NSString stringWithFormat:@"%@ - %@", [Time formatTime:self.app.settingDisplayTimeFormat time:scheduleTime.timeIn], [Time formatTime:self.app.settingDisplayTimeFormat time:scheduleTime.timeOut]];
             break;
         }
         case DROP_DOWN_TYPE_CHECK_OUT_STATUS: {
@@ -139,17 +138,18 @@
         }
         case DROP_DOWN_TYPE_SCHEDULE: {
             ScheduleTimes *scheduleTime = (ScheduleTimes *)self.items[indexPath.row];
-            self.tfDropDown.text = [NSString stringWithFormat:@"%@ - %@", [Time formatTime:self.timeFormat time:scheduleTime.timeIn], [Time formatTime:self.timeFormat time:scheduleTime.timeOut]];
+            self.tfDropDown.text = [NSString stringWithFormat:@"%@ - %@", [Time formatTime:self.app.settingDisplayTimeFormat time:scheduleTime.timeIn], [Time formatTime:self.app.settingDisplayTimeFormat time:scheduleTime.timeOut]];
             self.item = scheduleTime;
             self.tvItems.hidden = !self.tvItems.hidden;
             break;
         }
         case DROP_DOWN_TYPE_CHECK_OUT_STATUS: {
+            Visits *visit = ((VisitDetailsViewController *)self.parent).visit;
             NSString *visitStatus = (NSString *)self.items[indexPath.row];
             self.tfDropDown.text = visitStatus;
-            self.tfNotes.value = @"";
             self.item = nil;
-            if(([visitStatus isEqualToString:@"Not Completed"] || [visitStatus isEqualToString:@"Canceled"]) && ((VisitDetailsViewController *)self.parent).visit.notes.length == 0) {
+            if(visit.notes.length == 0 && (([visitStatus isEqualToString:@"Completed"] && self.app.settingVisitsNotesForCompleted) || ([visitStatus isEqualToString:@"Not Completed"] && self.app.settingVisitsNotesForNotCompleted) || ([visitStatus isEqualToString:@"Canceled"] && self.app.settingVisitsNotesForCanceled))) {
+                self.tfNotes.value = @"";
                 self.tfNotesHeight.constant = self.tfDropDown.frame.size.height * 2;
                 self.tfNotes.layoutMargins = self.tfNotesLayoutMargins;
             }
@@ -199,7 +199,7 @@
                     return;
                 }
                 [self.item setObject:visitStatus forKey:@"visitStatus"];
-                if(![visitStatus isEqualToString:@"completed"]) {
+                if(([visitStatus isEqualToString:@"completed"] && self.app.settingVisitsNotesForCompleted) || ([visitStatus isEqualToString:@"incomplete"] && self.app.settingVisitsNotesForNotCompleted) || ([visitStatus isEqualToString:@"cancelled"] && self.app.settingVisitsNotesForCanceled)) {
                     NSString *notes = self.tfNotes.text;
                     if([notes isEqualToString:self.tfNotes.placeholder]) {
                         notes = @"";
@@ -219,7 +219,7 @@
 }
 
 - (void)onStoresSelect:(Stores *)store {
-    self.tfDropDown.text = [Get isSettingEnabled:self.app.db settingID:SETTING_STORE_DISPLAY_LONG_NAME] ? store.name : store.shortName;
+    self.tfDropDown.text = self.app.settingStoreDisplayLongName ? store.name : store.shortName;
     self.item = store;
 }
 

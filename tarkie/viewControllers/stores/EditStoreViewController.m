@@ -8,7 +8,6 @@
 @interface EditStoreViewController()
 
 @property (strong, nonatomic) AppDelegate *app;
-@property (strong, nonatomic) NSString *conventionStores;
 @property (nonatomic) BOOL viewWillAppear;
 
 @end
@@ -56,11 +55,10 @@
 
 - (void)onRefresh {
     [super onRefresh];
-    self.conventionStores = [Get conventionName:self.app.db conventionID:CONVENTION_STORES];
-    self.lName.text = [NSString stringWithFormat:@"%@ %@", self.store.storeID != 0 ? @"Edit" : @"Add", self.conventionStores];
-    self.lStoreName.text = [NSString stringWithFormat:@"%@ %@", self.conventionStores, @" Name"];
+    self.lName.text = [NSString stringWithFormat:@"%@ %@", self.store.storeID != 0 ? @"Edit" : @"Add", self.app.conventionStores];
+    self.lStoreName.text = [NSString stringWithFormat:@"%@ %@", self.app.conventionStores, @" Name"];
     if(self.store != nil) {
-        self.tfStoreName.text = [Get isSettingEnabled:self.app.db settingID:SETTING_STORE_DISPLAY_LONG_NAME] ? self.store.name : self.store.shortName;
+        self.tfStoreName.text = self.app.settingStoreDisplayLongName ? self.store.name : self.store.shortName;
         self.tfContactNumber.text = self.store.contactNumber;
         self.tfEmail.text = self.store.email;
         self.tfAddress.value = self.store.address;
@@ -87,7 +85,7 @@
     else {
         self.store.isUpdate = YES;
     }
-    self.store.employeeID = [Get userID:self.app.db];
+    self.store.employeeID = self.app.userID;
     self.store.name = self.tfStoreName.text;
     self.store.shortName = self.tfStoreName.text;
     self.store.contactNumber = self.tfContactNumber.text;

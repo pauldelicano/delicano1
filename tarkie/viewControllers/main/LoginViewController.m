@@ -17,6 +17,7 @@
 @implementation LoginViewController
 
 static MessageDialogViewController *vcMessage;
+static LoadingDialogViewController *vcLoading;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -48,8 +49,8 @@ static MessageDialogViewController *vcMessage;
 - (IBAction)login:(id)sender {
     NSString *username = self.tfUsername.text;
     NSString *password = self.tfPassword.text;
-    username = username.length == 0 ? @"018-450" : username;
-    password = password.length == 0 ? @"12341234" : password;
+    username = username.length == 0 ? @"018-450" : username;//paul
+    password = password.length == 0 ? @"12341234" : password;//paul
     if(username.length == 0 || password.length == 0) {
         vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
         vcMessage.subject = @"Login";
@@ -65,7 +66,7 @@ static MessageDialogViewController *vcMessage;
     [params setObject:[Get apiKey:self.app.db] forKey:@"api_key"];
     [params setObject:username forKey:@"employee_number"];
     [params setObject:password forKey:@"password"];
-    LoadingDialogViewController *vcLoading = [self.storyboard instantiateViewControllerWithIdentifier:@"vcLoading"];
+    vcLoading = [self.storyboard instantiateViewControllerWithIdentifier:@"vcLoading"];
     vcLoading.delegate = self;
     vcLoading.action = LOADING_ACTION_LOGIN;
     vcLoading.params = params;
@@ -76,7 +77,7 @@ static MessageDialogViewController *vcMessage;
     
 }
 
-- (void)onLoadingFinish:(int)action params:(NSDictionary *)params result:(NSString *)result {
+- (void)onLoadingFinish:(int)action result:(NSString *)result {
     switch(action) {
         case LOADING_ACTION_LOGIN: {
             if(![result isEqualToString:@"ok"]) {
@@ -90,14 +91,14 @@ static MessageDialogViewController *vcMessage;
                 [View addSubview:self.view subview:vcMessage.view animated:NO];
                 break;
             }
-            LoadingDialogViewController *vcLoading = [self.storyboard instantiateViewControllerWithIdentifier:@"vcLoading"];
+            vcLoading = [self.storyboard instantiateViewControllerWithIdentifier:@"vcLoading"];
             vcLoading.delegate = self;
             vcLoading.action = LOADING_ACTION_TIME_SECURITY;
             [View addSubview:self.view subview:vcLoading.view animated:NO];
             break;
         }
         case LOADING_ACTION_TIME_SECURITY: {
-            LoadingDialogViewController *vcLoading = [self.storyboard instantiateViewControllerWithIdentifier:@"vcLoading"];
+            vcLoading = [self.storyboard instantiateViewControllerWithIdentifier:@"vcLoading"];
             vcLoading.delegate = self;
             vcLoading.action = LOADING_ACTION_UPDATE_MASTER_FILE;
             [View addSubview:self.view subview:vcLoading.view animated:NO];

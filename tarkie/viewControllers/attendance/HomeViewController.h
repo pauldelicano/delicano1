@@ -23,6 +23,7 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *vAttendanceHeight;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *vVisitsHeight;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *tvVisitsHeight;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *btnVisitsHeight;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *vFormsHeight;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *tvFormsHeight;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *vInventoryHeight;

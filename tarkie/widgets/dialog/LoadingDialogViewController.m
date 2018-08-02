@@ -81,7 +81,7 @@
                 self.background = UIBackgroundTaskInvalid;
             }];
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                [self.process updateMasterFile:self.app.db isAttendance:[Get isModuleEnabled:self.app.db moduleID:MODULE_ATTENDANCE] isVisits:[Get isModuleEnabled:self.app.db moduleID:MODULE_VISITS] isExpense:[Get isModuleEnabled:self.app.db moduleID:MODULE_EXPENSE] isInventory:[Get isModuleEnabled:self.app.db moduleID:MODULE_INVENTORY] isForms:[Get isModuleEnabled:self.app.db moduleID:MODULE_FORMS]];
+                [self.process updateMasterFile:self.app.db isAttendance:self.app.moduleAttendance isVisits:self.app.moduleVisits isExpense:self.app.moduleExpense isInventory:self.app.moduleInventory isForms:self.app.moduleForms];
             });
             break;
         }
