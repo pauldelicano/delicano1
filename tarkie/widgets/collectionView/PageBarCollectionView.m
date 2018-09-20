@@ -86,7 +86,7 @@
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    [self.pageBarDelegate onPageBarSelect:(int)indexPath.row];
+    [self.pageBarDelegate onPageBarSelect:indexPath.row];
     self.selectedIndexPath = indexPath;
 }
 

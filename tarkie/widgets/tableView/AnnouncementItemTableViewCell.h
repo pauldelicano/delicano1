@@ -1,6 +1,6 @@
-#import "CustomTableViewCell.h"
+#import "TableViewCell.h"
 
-@interface AnnouncementItemTableViewCell : CustomTableViewCell
+@interface AnnouncementItemTableViewCell : TableViewCell
 
 @property (weak, nonatomic) IBOutlet UIImageView *ivPhoto;
 @property (weak, nonatomic) IBOutlet UILabel *lName;

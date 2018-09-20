@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
+#import <CoreLocation/CoreLocation.h>
 
 @interface Update : NSObject
 
@@ -15,6 +16,7 @@
 //ATTENDANCE
 + (void)scheduleTimesDeactivate:(NSManagedObjectContext *)db;
 + (void)schedulesDeactivate:(NSManagedObjectContext *)db;
++ (void)overtimeReasonsDeactivate:(NSManagedObjectContext *)db;
 
 //VISITS
 
@@ -27,6 +29,7 @@
 
 //FORMS
 
++ (int64_t)gpsSave:(NSManagedObjectContext *)db location:(CLLocation *)location;
 
 + (BOOL)save:(NSManagedObjectContext *)db;
 

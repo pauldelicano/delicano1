@@ -28,7 +28,7 @@
     if(!self.viewWillAppear) {
         self.viewWillAppear = YES;
         self.vBackground.backgroundColor = THEME_PRI;
-        self.ivAppLogo.image = APP_LOGO;
+        self.ivAppLogo.image = APP_LOGO_WHITE;
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
             [self onRefresh];
         });

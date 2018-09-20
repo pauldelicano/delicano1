@@ -12,6 +12,7 @@
 
 @property (assign) id<ProcessDelegate> delegate;
 @property (nonatomic) long count;
+@property (nonatomic) BOOL isCanceled;
 
 - (void)authorize:(NSManagedObjectContext *)db params:(NSMutableDictionary *)params;
 - (void)login:(NSManagedObjectContext *)db params:(NSMutableDictionary *)params;

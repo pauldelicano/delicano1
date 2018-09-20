@@ -1,4 +1,5 @@
 #import "PageBarItemCollectionViewCell.h"
+#import "Color.h"
 
 @implementation PageBarItemCollectionViewCell
 
@@ -8,7 +9,7 @@
 
 - (void)setSelected:(BOOL)selected {
     [super setSelected:selected];
-    self.contentView.backgroundColor = selected ? [UIColor colorNamed:@"BlackTransThirty"] : UIColor.clearColor;
+    self.contentView.backgroundColor = selected ? [Color colorNamed:@"BlackTransThirty"] : UIColor.clearColor;
 }
 
 @end

@@ -9,11 +9,14 @@
 #import "Schedules+CoreDataClass.h"
 #import "TimeIn+CoreDataClass.h"
 #import "TimeOut+CoreDataClass.h"
+#import "Overtime+CoreDataClass.h"
 
 #import "Photos+CoreDataClass.h"
 #import "Visits+CoreDataClass.h"
 #import "CheckIn+CoreDataClass.h"
 #import "CheckOut+CoreDataClass.h"
+
+#import "Tracking+CoreDataClass.h"
 
 @interface Tx : NSObject
 
@@ -36,6 +39,7 @@
 + (BOOL)syncTimeOut:(NSManagedObjectContext *)db timeOut:(TimeOut *)timeOut delegate:(id)delegate;
 + (BOOL)uploadTimeOutPhoto:(NSManagedObjectContext *)db timeOut:(TimeOut *)timeOut delegate:(id)delegate;
 + (BOOL)uploadTimeOutSignature:(NSManagedObjectContext *)db timeOut:(TimeOut *)timeOut delegate:(id)delegate;
++ (BOOL)syncOvertime:(NSManagedObjectContext *)db overtime:(Overtime *)overtime delegate:(id)delegate;
 
 //VISITS
 + (BOOL)uploadVisitPhoto:(NSManagedObjectContext *)db photo:(Photos *)photo delegate:(id)delegate;
@@ -55,5 +59,10 @@
 
 //FORMS
 
+
++ (BOOL)syncTracking:(NSManagedObjectContext *)db tracking:(Tracking *)tracking delegate:(id)delegate;
++ (BOOL)sendBackupData:(NSManagedObjectContext *)db delegate:(id)delegate;
+
++ (void)isCanceled:(BOOL)canceled;
 
 @end

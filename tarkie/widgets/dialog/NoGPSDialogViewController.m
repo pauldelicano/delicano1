@@ -29,7 +29,7 @@ static MessageDialogViewController *vcMessage;
         self.viewDidAppear = YES;
         self.lSubject.textColor = THEME_PRI;
         self.lTimer.textColor = THEME_PRI;
-        [View setCornerRadiusByWidth:self.lSubject.superview cornerRadius:0.025];
+        [View setCornerRadiusByWidth:self.lSubject.superview cornerRadius:0.075];
         self.count = 10;
         [self onRefresh];
         [self startTimer];
@@ -81,6 +81,13 @@ static MessageDialogViewController *vcMessage;
             [self.delegate onNoGPSAcquired];
         };
         [View addSubview:self.view.superview subview:vcMessage.view animated:YES];
+    }
+    if(self.vContent.frame.size.height < self.vScroll.frame.size.height) {
+        CGFloat inset = self.vScroll.frame.size.height - self.vContent.frame.size.height;
+        self.vScroll.contentInset = UIEdgeInsetsMake(inset * 0.5, 0, inset * 0.5, 0);
+    }
+    else {
+        self.vScroll.contentInset = UIEdgeInsetsZero;
     }
 }
 

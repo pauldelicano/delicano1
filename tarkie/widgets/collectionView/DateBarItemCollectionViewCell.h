@@ -1,6 +1,6 @@
-#import "CustomCollectionViewCell.h"
+#import "CollectionViewCell.h"
 
-@interface DateBarItemCollectionViewCell : CustomCollectionViewCell
+@interface DateBarItemCollectionViewCell : CollectionViewCell
 
 @property (weak, nonatomic) IBOutlet UILabel *lDate;
 @property (weak, nonatomic) IBOutlet UILabel *lDay;

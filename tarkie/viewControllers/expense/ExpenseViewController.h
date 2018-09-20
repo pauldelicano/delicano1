@@ -1,5 +1,5 @@
-#import "CustomViewController.h"
+#import "ViewController.h"
 
-@interface ExpenseViewController : CustomViewController
+@interface ExpenseViewController : ViewController
 
 @end

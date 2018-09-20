@@ -1,12 +1,13 @@
-#import "CustomViewController.h"
+#import "ViewController.h"
 #import "Announcements+CoreDataClass.h"
+#import "ScrollView.h"
 
-@interface AnnouncementDetailsViewController : CustomViewController
+@interface AnnouncementDetailsViewController : ViewController
 
 @property (weak, nonatomic) IBOutlet UIView *vStatusBar;
 @property (weak, nonatomic) IBOutlet UIView *vNavBar;
 @property (weak, nonatomic) IBOutlet UILabel *lName;
-@property (weak, nonatomic) IBOutlet UIScrollView *vScroll;
+@property (weak, nonatomic) IBOutlet ScrollView *vScroll;
 @property (weak, nonatomic) IBOutlet UIView *vContent;
 @property (weak, nonatomic) IBOutlet UIImageView *ivPhoto;
 @property (weak, nonatomic) IBOutlet UILabel *lSubject;

@@ -18,6 +18,11 @@
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>fb</string>
+		<string>waze</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -29,13 +34,15 @@
 	<string>Camera required for selfie.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>GPS required for location updates.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>GPS required for location updates.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>GPS required for location updates.</string>
 	<key>UIAppFonts</key>
 	<array>
-		<string>Font-Awesome-Brands.ttf</string>
-		<string>Font-Awesome-Regular.ttf</string>
-		<string>Font-Awesome-Solid.ttf</string>
+		<string>Font-Awesome-Brands-Free.otf</string>
+		<string>Font-Awesome-Free-Regular.otf</string>
+		<string>Font-Awesome-Free-Solid.otf</string>
 		<string>Proxima-Nova-Light.otf</string>
 		<string>Proxima-Nova-Mid.otf</string>
 		<string>Proxima-Nova-Semi-Bold.otf</string>

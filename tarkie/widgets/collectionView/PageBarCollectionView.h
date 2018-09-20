@@ -3,7 +3,7 @@
 @protocol PageBarDelegate
 @optional
 
-- (void)onPageBarSelect:(int)page;
+- (void)onPageBarSelect:(long)page;
 
 @end
 

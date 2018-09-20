@@ -14,7 +14,7 @@
 @property (strong, nonatomic) MainViewController *main;
 @property (strong, nonatomic) NSMutableArray<Visits *> *visits;
 @property (strong, nonatomic) NSDate *selectedDate;
-@property (nonatomic) BOOL viewDidAppear;
+@property (nonatomic) BOOL viewWillAppear;
 
 @end
 
@@ -25,17 +25,16 @@
     self.app = (AppDelegate *)UIApplication.sharedApplication.delegate;
     self.main = (MainViewController *)self.parentViewController.parentViewController;
     self.cvDateBar.dateBarDelegate = self;
-    self.cvDateBarHeight.constant = ((MainViewController *)self.parentViewController.parentViewController).vNavBar.frame.size.height;
     self.tvVisits.tableFooterView = UIView.alloc.init;
     self.visits = NSMutableArray.alloc.init;
     self.selectedDate = nil;
-    self.viewDidAppear = NO;
+    self.viewWillAppear = NO;
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    if(!self.viewDidAppear) {
-        self.viewDidAppear = YES;
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    if(!self.viewWillAppear) {
+        self.viewWillAppear = YES;
         self.cvDateBar.selectedBackgroundColor = THEME_SEC;
         self.cvDateBar.textColor = THEME_PRI;
         self.vBorder.backgroundColor = THEME_SEC;
@@ -45,13 +44,7 @@
 
 - (void)onRefresh {
     [super onRefresh];
-    if(self.selectedDate != nil) {
-        self.lDate.text = [Time getFormattedDate:self.app.settingDisplayDateFormat date:self.selectedDate];
-        [self.visits removeAllObjects];
-        [self.visits addObjectsFromArray:[Load visits:self.app.db date:self.selectedDate isNoCheckOutOnly:NO]];
-        [self.tvVisits reloadData];
-    }
-    else {
+    if(self.selectedDate == nil) {
         NSMutableArray<NSDate *> *dates = NSMutableArray.alloc.init;
         NSDate *currentDate = NSDate.date;
         for(int x = -5; x < 10; x++) {
@@ -59,7 +52,12 @@
         }
         self.cvDateBar.dates = dates;
         [self.cvDateBar reloadData];
+        return;
     }
+    self.lDate.text = [Time getFormattedDate:self.app.settingDisplayDateFormat date:self.selectedDate];
+    [self.visits removeAllObjects];
+    [self.visits addObjectsFromArray:[Load visits:self.app.db date:self.selectedDate isNoCheckOutOnly:NO]];
+    [self.tvVisits reloadData];
 }
 
 - (void)onDateBarSelect:(NSDate *)date {
@@ -92,7 +90,7 @@
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
     VisitsTableViewCell *item = (VisitsTableViewCell *)cell;
     Visits *visit = self.visits[indexPath.row];
-    item.lStatus.textColor = visit.isCheckIn && visit.isCheckOut ? [UIColor colorNamed:@"ThemeSec.sevie"] : [UIColor colorNamed:@"Yellow800"];
+    item.lStatus.textColor = visit.isCheckIn && visit.isCheckOut ? [Color colorNamed:@"ThemeSec.sevie"] : [Color colorNamed:@"Yellow800"];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {

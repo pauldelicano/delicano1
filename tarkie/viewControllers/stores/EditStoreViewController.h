@@ -1,5 +1,6 @@
-#import "CustomViewController.h"
+#import "ViewController.h"
 #import "Stores+CoreDataClass.h"
+#import "ScrollView.h"
 #import "TextField.h"
 #import "TextView.h"
 
@@ -10,13 +11,13 @@
 
 @end
 
-@interface EditStoreViewController : CustomViewController
+@interface EditStoreViewController : ViewController
 
 @property (weak, nonatomic) IBOutlet UIView *vStatusBar;
 @property (weak, nonatomic) IBOutlet UIView *vNavBar;
 @property (weak, nonatomic) IBOutlet UILabel *lName;
 @property (weak, nonatomic) IBOutlet UIButton *btnSave;
-@property (weak, nonatomic) IBOutlet UIScrollView *vScroll;
+@property (weak, nonatomic) IBOutlet ScrollView *vScroll;
 @property (weak, nonatomic) IBOutlet UIView *vContent;
 @property (weak, nonatomic) IBOutlet UILabel *lStoreName;
 @property (weak, nonatomic) IBOutlet TextField *tfStoreName;

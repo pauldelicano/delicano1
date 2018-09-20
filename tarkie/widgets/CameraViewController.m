@@ -1,7 +1,9 @@
 #import "CameraViewController.h"
 #import "AppDelegate.h"
 #import "Get.h"
+#import "View.h"
 #import "Time.h"
+#import "MessageDialogViewController.h"
 
 @interface CameraViewController()
 
@@ -12,20 +14,38 @@
 
 @implementation CameraViewController
 
+static MessageDialogViewController *vcMessage;
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.app = (AppDelegate *)UIApplication.sharedApplication.delegate;
-    self.imagePicker = UIImagePickerController.alloc.init;
-    self.imagePicker.delegate = self;
-    self.imagePicker.sourceType = UIImagePickerControllerSourceTypeCamera;
-    self.imagePicker.cameraDevice = !self.isRearCamera ? UIImagePickerControllerCameraDeviceFront : UIImagePickerControllerCameraDeviceRear;
-    self.imagePicker.view.frame = self.view.bounds;
-    [self.view addSubview:self.imagePicker.view];
-    [self addChildViewController:self.imagePicker];
+    if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+        self.imagePicker = UIImagePickerController.alloc.init;
+        self.imagePicker.delegate = self;
+        self.imagePicker.sourceType = UIImagePickerControllerSourceTypeCamera;
+        self.imagePicker.cameraDevice = !self.isRearCamera ? UIImagePickerControllerCameraDeviceFront : UIImagePickerControllerCameraDeviceRear;
+        self.imagePicker.cameraFlashMode = UIImagePickerControllerCameraFlashModeOff;
+        self.imagePicker.view.frame = self.view.bounds;
+        [self.view addSubview:self.imagePicker.view];
+        [self addChildViewController:self.imagePicker];
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
+    if(![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+        vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
+        vcMessage.subject = @"Camera Access";
+        vcMessage.message = @"Device has no camera.";
+        vcMessage.positiveTitle = @"OK";
+        vcMessage.positiveTarget = ^{
+            [View removeView:vcMessage.view animated:NO];
+            [self.navigationController popViewControllerAnimated:YES];
+            [self.cameraDelegate onCameraCancel:self.action];
+        };
+        [View addSubview:self.view subview:vcMessage.view animated:YES];
+        return;
+    }
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info {
@@ -35,8 +55,7 @@
     UIGraphicsBeginImageContext(size);
     [image drawInRect:CGRectMake(0, 0, size.width, size.height)];
     CGFloat margin = (6.0f / 568) * UIScreen.mainScreen.bounds.size.height;
-    Employees *employee = [Get employee:self.app.db employeeID:self.app.userID];
-    NSString *timestamp = [NSString stringWithFormat:@"%@\n%@ %@\n%@", [Time getFormattedDate:[NSString stringWithFormat:@"%@ %@", self.app.settingDisplayDateFormat, self.app.settingDisplayTimeFormat] date:NSDate.date], employee.firstName, employee.lastName, [Get company:self.app.db].name];
+    NSString *timestamp = [NSString stringWithFormat:@"%@\n%@ %@\n%@", [Time getFormattedDate:[NSString stringWithFormat:@"%@ %@", self.app.settingDisplayDateFormat, self.app.settingDisplayTimeFormat] date:NSDate.date], self.app.employee.firstName, self.app.employee.lastName, self.app.company.name];
     UIFont *timestampFont = [UIFont fontWithName:@"ProximaNova-Regular" size:(12.0f / 568) * UIScreen.mainScreen.bounds.size.height];
     CGSize timestampSize = [timestamp sizeWithAttributes:@{NSFontAttributeName:timestampFont}];
     [timestamp drawInRect:CGRectMake(margin, size.height - timestampSize.height - margin, timestampSize.width, timestampSize.height) withAttributes:@{NSFontAttributeName:timestampFont, NSForegroundColorAttributeName:UIColor.whiteColor}];

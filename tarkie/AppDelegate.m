@@ -1,8 +1,14 @@
 #import "AppDelegate.h"
+#import "Get.h"
+#import "Update.h"
+#import "Time.h"
+#import "MainViewController.h"
 
 @interface AppDelegate()
 
 @property (strong, nonatomic) NSPersistentStoreCoordinator *psc;
+@property (strong, nonatomic) NSTimer *timer;
+@property (nonatomic) long interval;
 @property (nonatomic) BOOL applicationDidEnterBackground, isUpdatingLocation;
 
 @end
@@ -20,6 +26,13 @@
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
+    if(self.applicationDidEnterBackground) {
+        UIViewController *rootViewController = self.window.rootViewController;
+        if([rootViewController isKindOfClass:UINavigationController.class]) {
+            rootViewController = [(UINavigationController *)rootViewController topViewController];
+        }
+        [rootViewController viewDidAppear:NO];
+    }
     self.applicationDidEnterBackground = NO;
 }
 
@@ -83,6 +96,30 @@
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations {
     self.location = locations.lastObject;
+    if(self.isUpdatingLocation && self.settingLocationGPSTracking && self.settingLocationGPSTrackingInterval != 0) {
+        if(self.timer != nil && self.interval != 0 && self.interval != self.settingLocationGPSTrackingInterval) {
+            [self.timer invalidate];
+            self.timer = nil;
+        }
+        if(self.timer == nil) {
+            if([Get isTimeIn:self.db]) {
+                self.interval = self.settingLocationGPSTrackingInterval;
+                [self saveTracking];
+                self.timer = [NSTimer scheduledTimerWithTimeInterval:self.interval * 60 target:^{
+                    [self saveTracking];
+                } selector:@selector(invoke) userInfo:nil repeats:YES];
+            }
+        }
+    }
+}
+
+
+- (BOOL)application:(UIApplication *)application shouldSaveApplicationState:(NSCoder *)coder {
+    return YES;
+}
+
+- (BOOL)application:(UIApplication *)application shouldRestoreApplicationState:(NSCoder *)coder {
+    return YES;
 }
 
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler {
@@ -103,6 +140,33 @@
 - (void)stopUpdatingLocation {
     [self.locationManager stopUpdatingLocation];
     self.isUpdatingLocation = NO;
+    if(self.timer != nil) {
+        [self.timer invalidate];
+        self.timer = nil;
+    }
+}
+
+- (BOOL)saveTracking {
+    if(self.location == nil || (self.location.coordinate.latitude == 0 && self.location.coordinate.longitude == 0)) {
+        return NO;
+    }
+    int64_t gpsID = [Update gpsSave:self.dbTracking location:self.location];
+    if(gpsID == 0) {
+        return NO;
+    }
+    Sequences *sequence = [Get sequence:self.dbTracking];
+    Tracking *tracking = [NSEntityDescription insertNewObjectForEntityForName:@"Tracking" inManagedObjectContext:self.dbTracking];
+    sequence.tracking += 1;
+    tracking.trackingID = sequence.tracking;
+    tracking.syncBatchID = self.syncBatchID;
+    tracking.employeeID = self.employee.employeeID;
+    NSDate *currentDate = NSDate.date;
+    tracking.date = [Time getFormattedDate:DATE_FORMAT date:currentDate];
+    tracking.time = [Time getFormattedDate:TIME_FORMAT date:currentDate];
+    tracking.isSync = NO;
+    tracking.timeInID = [Get timeIn:self.db].timeInID;
+    tracking.gpsID = gpsID;
+    return [Update save:self.dbTracking];
 }
 
 @end

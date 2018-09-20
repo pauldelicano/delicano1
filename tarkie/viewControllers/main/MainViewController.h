@@ -1,4 +1,4 @@
-#import "CustomViewController.h"
+#import "ViewController.h"
 #import "DrawerViewController.h"
 #import "PageBarCollectionView.h"
 #import "LoadingDialogViewController.h"
@@ -7,11 +7,10 @@
 #import "CameraViewController.h"
 #import "AttendanceSummaryViewController.h"
 
-@interface MainViewController : CustomViewController<DrawerDelegate, PageBarDelegate, LoadingDelegate, NoGPSDelegate, DropDownDelegate, CameraDelegate, AttendanceSummaryDelegate>
+@interface MainViewController : ViewController<UIPageViewControllerDataSource, UIPageViewControllerDelegate, UIScrollViewDelegate, DrawerDelegate, PageBarDelegate, LoadingDelegate, NoGPSDelegate, DropDownDelegate, CameraDelegate, AttendanceSummaryDelegate>
 
 @property (weak, nonatomic) IBOutlet UIView *vStatusBar;
 @property (weak, nonatomic) IBOutlet UIView *vNavBar;
-@property (weak, nonatomic) IBOutlet UIView *vContent;
 @property (weak, nonatomic) IBOutlet PageBarCollectionView *cvPageBar;
 @property (weak, nonatomic) IBOutlet UIView *vBottomBar;
 

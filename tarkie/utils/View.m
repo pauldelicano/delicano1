@@ -34,11 +34,6 @@
         CGFloat rightImageEdgeInset = (button.imageEdgeInsets.right / baseHeight) * height;
         button.imageEdgeInsets = UIEdgeInsetsMake(topImageEdgeInset, leftImageEdgeInset, bottomImageEdgeInset, rightImageEdgeInset);
     }
-    CGFloat topMargin = (view.directionalLayoutMargins.top / baseHeight) * height;
-    CGFloat leadingMargin = (view.directionalLayoutMargins.leading / baseHeight) * height;
-    CGFloat bottomMargin = (view.directionalLayoutMargins.bottom / baseHeight) * height;
-    CGFloat trailingMargin = (view.directionalLayoutMargins.trailing / baseHeight) * height;
-    view.directionalLayoutMargins = NSDirectionalEdgeInsetsMake(topMargin, leadingMargin, bottomMargin, trailingMargin);
 }
 
 + (void)setCornerRadiusByWidth:(UIView *)view cornerRadius:(CGFloat)cornerRadius {

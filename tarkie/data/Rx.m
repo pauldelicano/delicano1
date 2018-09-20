@@ -4,10 +4,12 @@
 #import "Get.h"
 #import "Update.h"
 #import "Http.h"
-#import "Image.h"
+#import "File.h"
 #import "Time.h"
 
 @implementation Rx
+
+static BOOL isCanceled;
 
 + (BOOL)company:(NSManagedObjectContext *)db delegate:(id)delegate {
     BOOL result = NO;
@@ -27,8 +29,8 @@
             if(company == nil) {
                 company = [NSEntityDescription insertNewObjectForEntityForName:@"Company" inManagedObjectContext:db];
             }
-            for(int x = 0; x < data.count; x++) {
-                company.companyID = [[data[x] objectForKey:@"company_id"] longLongValue];
+            for(int x = 0; x < data.count && !isCanceled; x++) {
+                company.companyID = [[data[x] objectForKey:@"company_id"] intValue];
                 company.name = [data[x] objectForKey:@"company_name"];
                 company.logoURL = [data[x] objectForKey:@"company_logo"];
                 NSArray *modules = [data[x] objectForKey:@"modules"];
@@ -71,13 +73,17 @@
                 message = @"";
             }
             if(message == nil) {
-                [Image deleteFromCaches:[NSString stringWithFormat:@"COMPANY_LOGO_%lld%@", company.companyID, @".png"]];
+                [File deleteFromCaches:[NSString stringWithFormat:@"COMPANY_LOGO_%lld%@", company.companyID, @".png"]];
             }
         }
     }
     if(message == nil) {
         message = @"ok";
         result = YES;
+    }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
     }
     [delegate onProcessResult:message];
     return result;
@@ -98,8 +104,8 @@
         NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
         if(data != nil) {
             [Update employeesDeactivate:db];
-            for(int x = 0; x < data.count; x++) {
-                long employeeID = [[data[x] objectForKey:@"employee_id"] longLongValue];
+            for(int x = 0; x < data.count && !isCanceled; x++) {
+                int64_t employeeID = [[data[x] objectForKey:@"employee_id"] intValue];
                 Employees *employee = [Get employee:db employeeID:employeeID];
                 if(employee == nil) {
                     employee = [NSEntityDescription insertNewObjectForEntityForName:@"Employees" inManagedObjectContext:db];
@@ -109,8 +115,8 @@
                 employee.lastName = [data[x] objectForKey:@"lastname"];
                 employee.employeeNumber = [data[x] objectForKey:@"employee_number"];
                 employee.photoURL = [data[x] objectForKey:@"picture_url"];
-                employee.teamID = [[data[x] objectForKey:@"team_id"] longLongValue];
-                employee.storeID = [[data[x] objectForKey:@"store_id"] longLongValue];
+                employee.teamID = [[data[x] objectForKey:@"team_id"] intValue];
+                employee.storeID = [[data[x] objectForKey:@"store_id"] intValue];
                 employee.withLate = [[data[x] objectForKey:@"eligible_for_late"] intValue] == 1;
                 employee.withOvertime = [[data[x] objectForKey:@"eligible_for_ot"] intValue] == 1;
                 employee.isApprover = [[data[x] objectForKey:@"is_approver"] intValue] == 1;
@@ -120,13 +126,17 @@
                 message = @"";
             }
             if(message == nil) {
-                [Image deleteFromCaches:[NSString stringWithFormat:@"EMPLOYEE_PHOTO_%ld%@", [Get userID:db], @".png"]];
+                [File deleteFromCaches:[NSString stringWithFormat:@"EMPLOYEE_PHOTO_%lld%@", [Get userID:db], @".png"]];
             }
         }
     }
     if(message == nil) {
         message = @"ok";
         result = YES;
+    }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
     }
     [delegate onProcessResult:message];
     return result;
@@ -146,20 +156,22 @@
     if(message == nil) {
         NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
         if(data != nil) {
-            NSNumber *teamID = [NSNumber numberWithLong:[Get employee:db employeeID:[Get userID:db]].teamID];
-            for(int x = 0; x < data.count; x++) {
-                long settingID = [[data[x] objectForKey:@"settings_id"] longLongValue];
+            NSNumber *teamID = [NSNumber numberWithUnsignedLongLong:[Get employee:db employeeID:[Get userID:db]].teamID];
+            for(int x = 0; x < data.count && !isCanceled; x++) {
+                NSString *settingName = [data[x] objectForKey:@"settings_code"];
+                int64_t settingID = [[data[x] objectForKey:@"settings_id"] intValue];
+                settingID = [Get settingID:db settingName:settingName];
                 Settings *setting = [Get setting:db settingID:settingID];
                 if(setting == nil) {
                     setting = [NSEntityDescription insertNewObjectForEntityForName:@"Settings" inManagedObjectContext:db];
                     setting.settingID = settingID;
                 }
-                setting.name = [data[x] objectForKey:@"settings_code"];
-                SettingsTeams *settingTeam = [Get settingTeam:db settingID:settingID teamID:teamID.longLongValue];
+                setting.name = settingName;
+                SettingsTeams *settingTeam = [Get settingTeam:db settingID:settingID teamID:teamID.intValue];
                 if(settingTeam == nil) {
                     settingTeam = [NSEntityDescription insertNewObjectForEntityForName:@"SettingsTeams" inManagedObjectContext:db];
                     settingTeam.settingID = settingID;
-                    settingTeam.teamID = teamID.longLongValue;
+                    settingTeam.teamID = teamID.intValue;
                 }
                 NSString *value = [data[x] objectForKey:@"settings_value"];
                 if(![value isEqualToString:@"no"]) {
@@ -179,6 +191,10 @@
         message = @"ok";
         result = YES;
     }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
+    }
     [delegate onProcessResult:message];
     return result;
 }
@@ -197,7 +213,7 @@
     if(message == nil) {
         NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
         if(data != nil) {
-            for(int x = 0; x < data.count; x++) {
+            for(int x = 0; x < data.count && !isCanceled; x++) {
                 for(int y = 1; y <= CONVENTION_SALES; y++) {
                     Conventions *convention = [Get convention:db conventionID:y];
                     if(convention == nil) {
@@ -275,6 +291,10 @@
         message = @"ok";
         result = YES;
     }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
+    }
     [delegate onProcessResult:message];
     return result;
 }
@@ -293,8 +313,8 @@
     if(message == nil) {
         NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
         if(data != nil) {
-            for(int x = 0; x < data.count; x++) {
-                long alertTypeID = [[data[x] objectForKey:@"alert_type_id"] longLongValue];
+            for(int x = 0; x < data.count && !isCanceled; x++) {
+                int64_t alertTypeID = [[data[x] objectForKey:@"alert_type_id"] intValue];
                 AlertTypes *alertType = [Get alertType:db alertTypeID:alertTypeID];
                 if(alertType == nil) {
                     alertType = [NSEntityDescription insertNewObjectForEntityForName:@"AlertTypes" inManagedObjectContext:db];
@@ -310,6 +330,10 @@
     if(message == nil) {
         message = @"ok";
         result = YES;
+    }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
     }
     [delegate onProcessResult:message];
     return result;
@@ -329,7 +353,7 @@
     if(message == nil) {
         NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
         if(data != nil) {
-            for(int x = 0; x < data.count; x++) {
+            for(int x = 0; x < data.count && !isCanceled; x++) {
                 TimeSecurity *timeSecurity = [Get timeSecurity:db];
                 if(timeSecurity == nil) {
                     timeSecurity = [NSEntityDescription insertNewObjectForEntityForName:@"TimeSecurity" inManagedObjectContext:db];
@@ -348,6 +372,10 @@
         message = @"ok";
         result = YES;
     }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
+    }
     [delegate onProcessResult:message];
     return result;
 }
@@ -365,7 +393,7 @@
     if(message == nil) {
         NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
         if(data != nil) {
-            for(int x = 0; x < data.count; x++) {
+            for(int x = 0; x < data.count && !isCanceled; x++) {
                 SyncBatch *syncBatch = [Get syncBatch:db];
                 if(syncBatch == nil) {
                     syncBatch = [NSEntityDescription insertNewObjectForEntityForName:@"SyncBatch" inManagedObjectContext:db];
@@ -384,6 +412,10 @@
         message = @"ok";
         result = YES;
     }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
+    }
     [delegate onProcessResult:message];
     return result;
 }
@@ -392,7 +424,7 @@
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
     [params setObject:[Get apiKey:db] forKey:@"api_key"];
-    long userID = [Get userID:db];
+    int64_t userID = [Get userID:db];
     [params setObject:[NSString stringWithFormat:@"%lld", [Get employee:db employeeID:userID].teamID] forKey:@"team_id"];
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @"get-announcements-for-app"] params:params timeout:HTTP_TIMEOUT_RX];
     NSDictionary *init = [[response objectForKey:@"init"] lastObject];
@@ -405,8 +437,8 @@
         NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
         if(data != nil) {
             [Update announcementsDeactivate:db];
-            for(int x = 0; x < data.count; x++) {
-                long announcementID = [[data[x] objectForKey:@"announcement_id"] longLongValue];
+            for(int x = 0; x < data.count && !isCanceled; x++) {
+                int64_t announcementID = [[data[x] objectForKey:@"announcement_id"] intValue];
                 Announcements *announcement = [Get announcement:db announcementID:announcementID];
                 if(announcement == nil) {
                     announcement = [NSEntityDescription insertNewObjectForEntityForName:@"Announcements" inManagedObjectContext:db];
@@ -428,7 +460,7 @@
                 announcement.scheduledDate = [data[x] objectForKey:@"date_to_show"];
                 announcement.scheduledTime = [data[x] objectForKey:@"time_to_show"];
                 announcement.employeeID = userID;
-                announcement.createdByID = [[data[x] objectForKey:@"employee_id"] longLongValue];
+                announcement.createdByID = [[data[x] objectForKey:@"employee_id"] intValue];
                 announcement.isActive = [[data[x] objectForKey:@"is_active"] intValue] == 1;
             }
             if(![Update save:db]) {
@@ -440,6 +472,10 @@
         message = @"ok";
         result = YES;
     }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
+    }
     [delegate onProcessResult:message];
     return result;
 }
@@ -448,8 +484,8 @@
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
     [params setObject:[Get apiKey:db] forKey:@"api_key"];
-    long userID = [Get userID:db];
-    [params setObject:[NSString stringWithFormat:@"%ld", userID] forKey:@"employee_id"];
+    int64_t userID = [Get userID:db];
+    [params setObject:[NSString stringWithFormat:@"%lld", userID] forKey:@"employee_id"];
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @"get-stores-for-app"] params:params timeout:HTTP_TIMEOUT_RX];
     NSDictionary *init = [[response objectForKey:@"init"] lastObject];
     NSString *status = [init objectForKey:@"status"];
@@ -462,8 +498,8 @@
         if(data != nil) {
             [Update storesDeactivate:db];
             Sequences *sequence = [Get sequence:db];
-            for(int x = 0; x < data.count; x++) {
-                long webStoreID = [[data[x] objectForKey:@"store_id"] longLongValue];
+            for(int x = 0; x < data.count && !isCanceled; x++) {
+                int64_t webStoreID = [[data[x] objectForKey:@"store_id"] intValue];
                 Stores *store = [Get store:db webStoreID:webStoreID];
                 if(store == nil) {
                     store = [NSEntityDescription insertNewObjectForEntityForName:@"Stores" inManagedObjectContext:db];
@@ -478,12 +514,12 @@
                 store.contactNumber = [data[x] objectForKey:@"contact_number"];
                 store.email = [data[x] objectForKey:@"email"];
                 store.address = [data[x] objectForKey:@"address"];
-                store.class1ID = [[data[x] objectForKey:@"store_class_1_id"] longLongValue];
-                store.class2ID = [[data[x] objectForKey:@"store_class_2_id"] longLongValue];
-                store.class3ID = [[data[x] objectForKey:@"store_class_3_id"] longLongValue];
+                store.class1ID = [[data[x] objectForKey:@"store_class_1_id"] intValue];
+                store.class2ID = [[data[x] objectForKey:@"store_class_2_id"] intValue];
+                store.class3ID = [[data[x] objectForKey:@"store_class_3_id"] intValue];
                 store.latitude = [[data[x] objectForKey:@"latitude"] doubleValue];
                 store.longitude = [[data[x] objectForKey:@"longitude"] doubleValue];
-                store.geoFenceRadius = [[data[x] objectForKey:@"geo_fence_radius"] longLongValue];
+                store.geoFenceRadius = [[data[x] objectForKey:@"geo_fence_radius"] intValue];
                 store.isTag = YES;
                 store.isActive = [[data[x] objectForKey:@"is_active"] isEqualToString:@"1"];
                 store.isSync = YES;
@@ -498,6 +534,10 @@
     if(message == nil) {
         message = @"ok";
         result = YES;
+    }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
     }
     [delegate onProcessResult:message];
     return result;
@@ -519,8 +559,8 @@
         if(data != nil) {
             [Update storeContactsDeactivate:db];
             Sequences *sequence = [Get sequence:db];
-            for(int x = 0; x < data.count; x++) {
-                long webStoreContactID = [[data[x] objectForKey:@"contact_id"] longLongValue];
+            for(int x = 0; x < data.count && !isCanceled; x++) {
+                int64_t webStoreContactID = [[data[x] objectForKey:@"contact_id"] intValue];
                 StoreContacts *storeContact = [Get storeContact:db webStoreContactID:webStoreContactID];
                 if(storeContact == nil) {
                     storeContact = [NSEntityDescription insertNewObjectForEntityForName:@"StoreContacts" inManagedObjectContext:db];
@@ -530,7 +570,7 @@
                     storeContact.employeeID = [Get userID:db];
                     storeContact.isFromWeb = YES;
                 }
-                storeContact.storeID = [[data[x] objectForKey:@"store_id"] longLongValue];
+                storeContact.storeID = [[data[x] objectForKey:@"store_id"] intValue];
                 storeContact.name = [data[x] objectForKey:@"name"];
                 storeContact.designation = [data[x] objectForKey:@"designation"];
                 storeContact.email = [data[x] objectForKey:@"email"];
@@ -551,6 +591,10 @@
     if(message == nil) {
         message = @"ok";
         result = YES;
+    }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
     }
     [delegate onProcessResult:message];
     return result;
@@ -582,6 +626,10 @@
         message = @"ok";
         result = YES;
     }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
+    }
     [delegate onProcessResult:message];
     return result;
 }
@@ -610,6 +658,10 @@
         message = @"ok";
         result = YES;
     }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
+    }
     [delegate onProcessResult:message];
     return result;
 }
@@ -629,8 +681,8 @@
         NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
         if(data != nil) {
             [Update scheduleTimesDeactivate:db];
-            for(int x = 0; x < data.count; x++) {
-                long scheduleTimeID = [[data[x] objectForKey:@"time_schedule_id"] longLongValue];
+            for(int x = 0; x < data.count && !isCanceled; x++) {
+                int64_t scheduleTimeID = [[data[x] objectForKey:@"time_schedule_id"] intValue];
                 ScheduleTimes *scheduleTime = [Get scheduleTime:db scheduleTimeID:scheduleTimeID];
                 if(scheduleTime == nil) {
                     scheduleTime = [NSEntityDescription insertNewObjectForEntityForName:@"ScheduleTimes" inManagedObjectContext:db];
@@ -649,6 +701,10 @@
         message = @"ok";
         result = YES;
     }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
+    }
     [delegate onProcessResult:message];
     return result;
 }
@@ -657,8 +713,8 @@
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
     [params setObject:[Get apiKey:db] forKey:@"api_key"];
-    long userID = [Get userID:db];
-    [params setObject:[NSString stringWithFormat:@"%ld", userID] forKey:@"employee_id"];
+    int64_t userID = [Get userID:db];
+    [params setObject:[NSString stringWithFormat:@"%lld", userID] forKey:@"employee_id"];
     NSDate *currentDate = NSDate.date;
     [params setObject:[Time getFormattedDate:DATE_FORMAT date:currentDate] forKey:@"start_date"];
     [params setObject:[Time getFormattedDate:DATE_FORMAT date:isToday ? currentDate : [currentDate dateByAddingTimeInterval:60 * 60 * 24 * 15]] forKey:@"end_date"];
@@ -676,8 +732,8 @@
                 [Update schedulesDeactivate:db];
             }
             Sequences *sequence = [Get sequence:db];
-            for(int x = 0; x < data.count; x++) {
-                long webScheduleID = [[data[x] objectForKey:@"schedule_id"] longLongValue];
+            for(int x = 0; x < data.count && !isCanceled; x++) {
+                int64_t webScheduleID = [[data[x] objectForKey:@"schedule_id"] intValue];
                 NSString *scheduleDate = [data[x] objectForKey:@"date"];
                 Schedules *schedule = [Get schedule:db webScheduleID:webScheduleID scheduleDate:scheduleDate];
                 if(schedule == nil) {
@@ -695,7 +751,7 @@
                     schedule.scheduleDate = scheduleDate;
                     schedule.timeIn = [data[x] objectForKey:@"time_in"];
                     schedule.timeOut = [data[x] objectForKey:@"time_out"];
-                    schedule.shiftTypeID = [[data[x] objectForKey:@"shift_type_id"] longLongValue];
+                    schedule.shiftTypeID = [[data[x] objectForKey:@"shift_type_id"] intValue];
                     schedule.isDayOff = [[data[x] objectForKey:@"is_day_off"] isEqualToString:@"1"];
                     schedule.isActive = YES;
                 }
@@ -709,6 +765,10 @@
     if(message == nil) {
         message = @"ok";
         result = YES;
+    }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
     }
     [delegate onProcessResult:message];
     return result;
@@ -728,15 +788,15 @@
     if(message == nil) {
         NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
         if(data != nil) {
-            for(int x = 0; x < data.count; x++) {
-                long breakTypeID = [[data[x] objectForKey:@"break_id"] longLongValue];
+            for(int x = 0; x < data.count && !isCanceled; x++) {
+                int64_t breakTypeID = [[data[x] objectForKey:@"break_id"] intValue];
                 BreakTypes *breakType = [Get breakType:db breakTypeID:breakTypeID];
                 if(breakType == nil) {
                     breakType = [NSEntityDescription insertNewObjectForEntityForName:@"BreakTypes" inManagedObjectContext:db];
                     breakType.breakTypeID = breakTypeID;
                 }
                 breakType.name = [data[x] objectForKey:@"name"];
-                breakType.duration = [[data[x] objectForKey:@"duration"] longLongValue];
+                breakType.duration = [[data[x] objectForKey:@"duration"] intValue];
             }
             if(![Update save:db]) {
                 message = @"";
@@ -746,6 +806,10 @@
     if(message == nil) {
         message = @"ok";
         result = YES;
+    }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
     }
     [delegate onProcessResult:message];
     return result;
@@ -765,14 +829,16 @@
     if(message == nil) {
         NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
         if(data != nil) {
-            for(int x = 0; x < data.count; x++) {
-                long overtimeReasonID = [[data[x] objectForKey:@"overtime_reason_id"] longLongValue];
+            [Update overtimeReasonsDeactivate:db];
+            for(int x = 0; x < data.count && !isCanceled; x++) {
+                int64_t overtimeReasonID = [[data[x] objectForKey:@"overtime_reason_id"] intValue];
                 OvertimeReasons *overtimeReason = [Get overtimeReason:db overtimeReasonID:overtimeReasonID];
                 if(overtimeReason == nil) {
                     overtimeReason = [NSEntityDescription insertNewObjectForEntityForName:@"OvertimeReasons" inManagedObjectContext:db];
                     overtimeReason.overtimeReasonID = overtimeReasonID;
                 }
-                overtimeReason.name = [data[x] objectForKey:@"name"];
+                overtimeReason.name = [data[x] objectForKey:@"overtime_reason"];
+                overtimeReason.isActive = YES;
             }
             if(![Update save:db]) {
                 message = @"";
@@ -783,6 +849,10 @@
         message = @"ok";
         result = YES;
     }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
+    }
     [delegate onProcessResult:message];
     return result;
 }
@@ -791,7 +861,7 @@
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
     [params setObject:[Get apiKey:db] forKey:@"api_key"];
-    [params setObject:[NSString stringWithFormat:@"%ld", [Get userID:db]] forKey:@"employee_id"];
+    [params setObject:[NSString stringWithFormat:@"%lld", [Get userID:db]] forKey:@"employee_id"];
     NSDate *currentDate = NSDate.date;
     [params setObject:[Time getFormattedDate:DATE_FORMAT date:[currentDate dateByAddingTimeInterval:60 * 60 * 24 * -15]] forKey:@"start_date"];
     [params setObject:[Time getFormattedDate:DATE_FORMAT date:[currentDate dateByAddingTimeInterval:60 * 60 * 24 * 15]] forKey:@"end_date"];
@@ -808,8 +878,8 @@
         NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
         if(data != nil) {
             Sequences *sequence = [Get sequence:db];
-            for(int x = 0; x < data.count; x++) {
-                long webVisitID = [[data[x] objectForKey:@"itinerary_id"] longLongValue];
+            for(int x = 0; x < data.count && !isCanceled; x++) {
+                int64_t webVisitID = [[data[x] objectForKey:@"itinerary_id"] intValue];
                 Visits *visit = [Get visit:db webVisitID:webVisitID];
                 if(visit == nil) {
                     visit = [NSEntityDescription insertNewObjectForEntityForName:@"Visits" inManagedObjectContext:db];
@@ -818,7 +888,7 @@
                     visit.webVisitID = webVisitID;
                 }
 
-                long employeeID = [[data[x] objectForKey:@"employee_id"] longLongValue];
+                int64_t employeeID = [[data[x] objectForKey:@"employee_id"] intValue];
                 Employees *employee = [Get employee:db employeeID:employeeID];
                 if(employee == nil) {
                     employee = [NSEntityDescription insertNewObjectForEntityForName:@"Employees" inManagedObjectContext:db];
@@ -827,7 +897,7 @@
                 employee.firstName = [data[x] objectForKey:@"employee_firstname"];
                 employee.lastName = [data[x] objectForKey:@"employee_lastname"];
 
-                long webStoreID = [[data[x] objectForKey:@"store_id"] longLongValue];
+                int64_t webStoreID = [[data[x] objectForKey:@"store_id"] intValue];
                 Stores *store = [Get store:db webStoreID:webStoreID];
                 if(store == nil) {
                     store = [NSEntityDescription insertNewObjectForEntityForName:@"Stores" inManagedObjectContext:db];
@@ -850,7 +920,7 @@
                 store.email = [data[x] objectForKey:@"store_email"];
                 store.latitude = [[data[x] objectForKey:@"store_latitude"] doubleValue];
                 store.longitude = [[data[x] objectForKey:@"store_longitude"] doubleValue];
-                store.geoFenceRadius = [[data[x] objectForKey:@"store_radius"] longLongValue];
+                store.geoFenceRadius = [[data[x] objectForKey:@"store_radius"] intValue];
 
                 visit.storeID = store.storeID;
                 visit.name = [Get isSettingEnabled:db settingID:SETTING_STORE_DISPLAY_LONG_NAME teamID:employee.teamID] ? store.name : store.shortName;
@@ -867,7 +937,7 @@
                 
                 NSArray *inventories = [data[x] objectForKey:@"inventory"];
                 for(int x = 0; x < inventories.count; x++) {
-                    long inventoryID = [[inventories[x] objectForKey:@"inventory_id"] longLongValue];
+                    int64_t inventoryID = [[inventories[x] objectForKey:@"inventory_id"] intValue];
                     VisitInventories *inventory = [Get visitInventory:db visitID:visit.visitID inventoryID:inventoryID];
                     if(inventory == nil) {
                         inventory = [NSEntityDescription insertNewObjectForEntityForName:@"VisitInventories" inManagedObjectContext:db];
@@ -883,7 +953,7 @@
                 
                 NSArray<NSDictionary *> *forms = [data[x] objectForKey:@"forms"];
                 for(int x = 0; x < forms.count; x++) {
-                    long formID = [[forms[x] objectForKey:@"form_id"] longLongValue];
+                    int64_t formID = [[forms[x] objectForKey:@"form_id"] intValue];
                     VisitForms *form = [Get visitForm:db visitID:visit.visitID formID:formID];
                     if(form == nil) {
                         form = [NSEntityDescription insertNewObjectForEntityForName:@"VisitForms" inManagedObjectContext:db];
@@ -905,6 +975,10 @@
     if(message == nil) {
         message = @"ok";
         result = YES;
+    }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
     }
     [delegate onProcessResult:message];
     return result;
@@ -932,6 +1006,10 @@
         message = @"ok";
         result = YES;
     }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
+    }
     [delegate onProcessResult:message];
     return result;
 }
@@ -957,6 +1035,10 @@
     if(message == nil) {
         message = @"ok";
         result = YES;
+    }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
     }
     [delegate onProcessResult:message];
     return result;
@@ -984,6 +1066,10 @@
         message = @"ok";
         result = YES;
     }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
+    }
     [delegate onProcessResult:message];
     return result;
 }
@@ -1009,6 +1095,10 @@
     if(message == nil) {
         message = @"ok";
         result = YES;
+    }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
     }
     [delegate onProcessResult:message];
     return result;
@@ -1036,6 +1126,10 @@
         message = @"ok";
         result = YES;
     }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
+    }
     [delegate onProcessResult:message];
     return result;
 }
@@ -1061,6 +1155,10 @@
     if(message == nil) {
         message = @"ok";
         result = YES;
+    }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
     }
     [delegate onProcessResult:message];
     return result;
@@ -1088,6 +1186,10 @@
         message = @"ok";
         result = YES;
     }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
+    }
     [delegate onProcessResult:message];
     return result;
 }
@@ -1113,6 +1215,10 @@
     if(message == nil) {
         message = @"ok";
         result = YES;
+    }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
     }
     [delegate onProcessResult:message];
     return result;
@@ -1140,6 +1246,10 @@
         message = @"ok";
         result = YES;
     }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
+    }
     [delegate onProcessResult:message];
     return result;
 }
@@ -1165,6 +1275,10 @@
     if(message == nil) {
         message = @"ok";
         result = YES;
+    }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
     }
     [delegate onProcessResult:message];
     return result;
@@ -1192,6 +1306,10 @@
         message = @"ok";
         result = YES;
     }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
+    }
     [delegate onProcessResult:message];
     return result;
 }
@@ -1217,6 +1335,10 @@
     if(message == nil) {
         message = @"ok";
         result = YES;
+    }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
     }
     [delegate onProcessResult:message];
     return result;
@@ -1244,6 +1366,10 @@
         message = @"ok";
         result = YES;
     }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
+    }
     [delegate onProcessResult:message];
     return result;
 }
@@ -1269,6 +1395,10 @@
     if(message == nil) {
         message = @"ok";
         result = YES;
+    }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
     }
     [delegate onProcessResult:message];
     return result;
@@ -1296,6 +1426,10 @@
         message = @"ok";
         result = YES;
     }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
+    }
     [delegate onProcessResult:message];
     return result;
 }
@@ -1321,6 +1455,10 @@
     if(message == nil) {
         message = @"ok";
         result = YES;
+    }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
     }
     [delegate onProcessResult:message];
     return result;
@@ -1348,8 +1486,16 @@
         message = @"ok";
         result = YES;
     }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
+    }
     [delegate onProcessResult:message];
     return result;
+}
+
++ (void)isCanceled:(BOOL)canceled {
+    isCanceled = canceled;
 }
 
 @end

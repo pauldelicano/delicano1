@@ -1,6 +1,6 @@
-#import "CustomCollectionViewCell.h"
+#import "CollectionViewCell.h"
 
-@interface PhotoBarItemCollectionViewCell : CustomCollectionViewCell
+@interface PhotoBarItemCollectionViewCell : CollectionViewCell
 
 @property (weak, nonatomic) IBOutlet UIImageView *ivPhoto;
 

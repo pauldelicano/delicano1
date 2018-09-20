@@ -1,7 +1,7 @@
-#import "CustomViewController.h"
+#import "ViewController.h"
 #import "TextField.h"
 
-@interface AnnouncementsViewController : CustomViewController<UITableViewDataSource, UITableViewDelegate, TextFieldDelegate>
+@interface AnnouncementsViewController : ViewController<UITableViewDataSource, UITableViewDelegate, TextFieldDelegate>
 
 @property (weak, nonatomic) IBOutlet UIView *vStatusBar;
 @property (weak, nonatomic) IBOutlet UIView *vNavBar;

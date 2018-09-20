@@ -1,6 +1,6 @@
-#import "Image.h"
+#import "File.h"
 
-@implementation Image
+@implementation File
 
 + (NSString *)cachesPath:(NSString *)filename {
     return [[NSFileManager.defaultManager URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask].lastObject URLByAppendingPathComponent:filename].path;
@@ -30,7 +30,7 @@
     return isDeleted;
 }
 
-+ (UIImage *)fromColor:(UIColor *)color {
++ (UIImage *)imageFromColor:(UIColor *)color {
     CGRect rect = CGRectMake(0, 0, 1, 1);
     UIGraphicsBeginImageContext(rect.size);
     CGContextRef context = UIGraphicsGetCurrentContext();
@@ -41,15 +41,15 @@
     return image;
 }
 
-+ (UIImage *)fromCaches:(NSString *)filename {
++ (UIImage *)imageFromCaches:(NSString *)filename {
     return [UIImage imageWithContentsOfFile:[self cachesPath:filename]];
 }
 
-+ (UIImage *)fromDocument:(NSString *)filename {
++ (UIImage *)imageFromDocument:(NSString *)filename {
     return [UIImage imageWithContentsOfFile:[self documentPath:filename]];
 }
 
-+ (UIImage *)saveFromImage:(NSString *)path image:(UIImage *)image {
++ (UIImage *)saveImageFromImage:(NSString *)path image:(UIImage *)image {
     UIImage *directoryImage = [UIImage imageWithContentsOfFile:path];
     if(directoryImage == nil) {
         NSData *contents;
@@ -69,7 +69,7 @@
     return directoryImage;
 }
 
-+ (UIImage *)saveFromURL:(NSString *)path url:(NSString *)url {
++ (UIImage *)saveImageFromURL:(NSString *)path url:(NSString *)url {
     UIImage *directoryImage = [UIImage imageWithContentsOfFile:path];
     if(directoryImage == nil) {
         if([NSFileManager.defaultManager createFileAtPath:path contents:[NSData dataWithContentsOfURL:[NSURL URLWithString:url]] attributes:nil]) {
@@ -77,6 +77,20 @@
         }
     }
     return directoryImage;
+}
+
++ (NSData *)saveDataFromData:(NSString *)path data:(NSData *)data {
+    NSData *directoryData = [NSData.alloc initWithContentsOfFile:path];
+    if(directoryData == nil) {
+        NSData *contents;
+        if([path.pathExtension.lowercaseString isEqualToString:@"zip"]) {
+            contents = data;
+        }
+        if(contents != nil && [NSFileManager.defaultManager createFileAtPath:path contents:contents attributes:nil]) {
+            directoryData = [NSData.alloc initWithContentsOfFile:path];
+        }
+    }
+    return directoryData;
 }
 
 @end

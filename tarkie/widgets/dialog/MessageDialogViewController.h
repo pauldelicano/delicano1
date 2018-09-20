@@ -1,7 +1,10 @@
-#import "CustomViewController.h"
+#import "ViewController.h"
+#import "ScrollView.h"
 
-@interface MessageDialogViewController : CustomViewController
+@interface MessageDialogViewController : ViewController
 
+@property (weak, nonatomic) IBOutlet ScrollView *vScroll;
+@property (weak, nonatomic) IBOutlet UIView *vContent;
 @property (weak, nonatomic) IBOutlet UILabel *lSubject;
 @property (weak, nonatomic) IBOutlet UILabel *lMessage;
 @property (weak, nonatomic) IBOutlet UIButton *btnNegative;

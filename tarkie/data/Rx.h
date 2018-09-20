@@ -51,4 +51,6 @@
 + (BOOL)forms:(NSManagedObjectContext *)db delegate:(id)delegate;
 + (BOOL)formFields:(NSManagedObjectContext *)db delegate:(id)delegate;
 
++ (void)isCanceled:(BOOL)canceled;
+
 @end

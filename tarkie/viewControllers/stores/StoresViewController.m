@@ -23,6 +23,7 @@
     [super viewDidLoad];
     self.app = (AppDelegate *)UIApplication.sharedApplication.delegate;
     self.tvStores.tableFooterView = UIView.alloc.init;
+    self.tvStores.estimatedSectionHeaderHeight = 28;
     self.tfSearch.textFieldDelegate = self;
     self.stores = NSMutableArray.alloc.init;
     self.storesSectioned = NSMutableArray.alloc.init;

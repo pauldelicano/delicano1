@@ -1,6 +1,7 @@
-#import "CustomViewController.h"
+#import "ViewController.h"
 #import "TimeIn+CoreDataClass.h"
 #import "TimeOut+CoreDataClass.h"
+#import "ScrollView.h"
 #import "AddSignatureViewController.h"
 
 @protocol AttendanceSummaryDelegate
@@ -11,11 +12,11 @@
 
 @end
 
-@interface AttendanceSummaryViewController : CustomViewController<AddSignatureDelegate>
+@interface AttendanceSummaryViewController : ViewController<AddSignatureDelegate>
 
 @property (weak, nonatomic) IBOutlet UIView *vStatusBar;
 @property (weak, nonatomic) IBOutlet UIView *vNavBar;
-@property (weak, nonatomic) IBOutlet UIScrollView *vScroll;
+@property (weak, nonatomic) IBOutlet ScrollView *vScroll;
 @property (weak, nonatomic) IBOutlet UIView *vContent;
 @property (weak, nonatomic) IBOutlet UILabel *lTimeInLabel;
 @property (weak, nonatomic) IBOutlet UILabel *lTimeIn;
@@ -31,9 +32,9 @@
 @property (weak, nonatomic) IBOutlet UIButton *btnTimeOut;
 
 @property (assign) id <AttendanceSummaryDelegate> delegate;
-@property (strong, nonatomic) TimeIn *timeIn;
-@property (strong, nonatomic) TimeOut *timeOut;
-@property (strong, nonatomic) NSDate *timeOutPreview;
-
+@property (strong, nonatomic) NSString *timeIn, *timeOut;
+@property (strong, nonatomic) UIImage *signature;
+@property (nonatomic) NSTimeInterval workHours, breakHours;
+@property (nonatomic) BOOL isHistory;
 
 @end

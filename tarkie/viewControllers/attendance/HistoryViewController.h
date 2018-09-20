@@ -1,5 +1,5 @@
-#import "CustomViewController.h"
+#import "ViewController.h"
 
-@interface HistoryViewController : CustomViewController
+@interface HistoryViewController : ViewController
 
 @end

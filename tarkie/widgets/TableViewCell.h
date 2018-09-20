@@ -1,6 +1,6 @@
 #import <UIKit/UIKit.h>
 
-@interface CustomTableViewCell : UITableViewCell
+@interface TableViewCell : UITableViewCell
 
 @property (strong, nonatomic) UILongPressGestureRecognizer *longPressGesture;
 

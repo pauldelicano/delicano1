@@ -1,5 +1,6 @@
 #import "Update.h"
 #import "Get.h"
+#import "Time.h"
 
 @implementation Update
 
@@ -75,6 +76,32 @@
     for(int x = 0; x < result.count; x++) {
         result[x].isActive = NO;
     }
+}
+
++ (void)overtimeReasonsDeactivate:(NSManagedObjectContext *)db {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
+    NSArray<OvertimeReasons *> *result = [self execute:db entity:@"OvertimeReasons" predicates:predicates];
+    for(int x = 0; x < result.count; x++) {
+        result[x].isActive = NO;
+    }
+}
+
++ (int64_t)gpsSave:(NSManagedObjectContext *)db location:(CLLocation *)location {
+    if(location == nil || (location.coordinate.latitude == 0 && location.coordinate.longitude == 0)) {
+        return 0;
+    }
+    Sequences *sequence = [Get sequence:db];
+    GPS *gps = [NSEntityDescription insertNewObjectForEntityForName:@"GPS" inManagedObjectContext:db];
+    sequence.gps += 1;
+    gps.gpsID = sequence.gps;
+    gps.date = [Time getFormattedDate:DATE_FORMAT date:location.timestamp];
+    gps.time = [Time getFormattedDate:TIME_FORMAT date:location.timestamp];
+    gps.latitude = location.coordinate.latitude;
+    gps.longitude = location.coordinate.longitude;
+    gps.isValid = fabs([location.timestamp timeIntervalSinceNow]) <= 5;
+    NSLog(@"tracking: %@ %@ %f %f %d", gps.date, gps.time, gps.latitude, gps.longitude, gps.isValid);
+    return gps.gpsID;
 }
 
 + (NSArray *)execute:(NSManagedObjectContext *)db entity:(NSString *)entity predicates:(NSArray<NSPredicate *> *)predicates  {

@@ -1,4 +1,4 @@
-#import "CustomViewController.h"
+#import "ViewController.h"
 #import "Photos+CoreDataClass.h"
 
 @protocol CameraPreviewDelegate
@@ -8,7 +8,7 @@
 
 @end
 
-@interface CameraPreviewViewController : CustomViewController<UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UICollectionViewDelegate>
+@interface CameraPreviewViewController : ViewController<UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UICollectionViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UIView *vStatusBar;
 @property (weak, nonatomic) IBOutlet UIView *vNavBar;

@@ -39,10 +39,10 @@
         [View setCornerRadiusByHeight:self.lShareWithMeIcon cornerRadius:0.4];
         [View setCornerRadiusByHeight:self.lShareWithMyTeamIcon cornerRadius:0.4];
         CALayer *layer = self.lShareWithMeIcon.layer;
-        layer.borderColor = [UIColor colorNamed:@"Grey600"].CGColor;
+        layer.borderColor = [Color colorNamed:@"Grey500"].CGColor;
         layer.borderWidth = (1.0f / 568) * UIScreen.mainScreen.bounds.size.height;
         layer = self.lShareWithMyTeamIcon.layer;
-        layer.borderColor = [UIColor colorNamed:@"Grey600"].CGColor;
+        layer.borderColor = [Color colorNamed:@"Grey500"].CGColor;
         layer.borderWidth = (1.0f / 568) * UIScreen.mainScreen.bounds.size.height;
         [self onRefresh];
     }
@@ -50,7 +50,6 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    self.vScroll.contentSize = CGSizeMake(self.vScroll.frame.size.width, self.vContent.frame.size.height);
 }
 
 - (void)onRefresh {
@@ -77,7 +76,7 @@
         self.store = [NSEntityDescription insertNewObjectForEntityForName:@"Stores" inManagedObjectContext:self.app.db];
         sequence.stores += 1;
         self.store.storeID = sequence.stores;
-        self.store.syncBatchID = [Get syncBatchID:self.app.db];
+        self.store.syncBatchID = self.app.syncBatchID;
         self.store.isFromWeb = NO;
         self.store.isSync = NO;
         self.store.isUpdate = NO;
@@ -85,7 +84,7 @@
     else {
         self.store.isUpdate = YES;
     }
-    self.store.employeeID = self.app.userID;
+    self.store.employeeID = self.app.employee.employeeID;
     self.store.name = self.tfStoreName.text;
     self.store.shortName = self.tfStoreName.text;
     self.store.contactNumber = self.tfContactNumber.text;

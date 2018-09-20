@@ -1,5 +1,5 @@
-#import "CustomViewController.h"
+#import "ViewController.h"
 
-@interface InventoryViewController : CustomViewController
+@interface InventoryViewController : ViewController
 
 @end

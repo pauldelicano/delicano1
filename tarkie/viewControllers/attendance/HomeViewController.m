@@ -5,7 +5,7 @@
 #import "Get.h"
 #import "Load.h"
 #import "Update.h"
-#import "Image.h"
+#import "File.h"
 #import "View.h"
 #import "Time.h"
 #import "HomeTableViewCell.h"
@@ -21,8 +21,7 @@
 @property (strong, nonatomic) NSMutableArray<Forms *> *forms;
 @property (strong, nonatomic) NSMutableArray<Inventories *> *inventories;
 @property (strong, nonatomic) NSTimer *timer;
-@property (nonatomic) UIEdgeInsets vAttendanceLayoutMargins, vVisitsLayoutMargins, vFormsLayoutMargins, vInventoryLayoutMargins, btnVisitsLayoutMargins;
-@property (nonatomic) BOOL viewDidAppear,visitsLoaded, formsLoaded, inventoryLoaded;
+@property (nonatomic) BOOL viewWillAppear, viewDidAppear, visitsLoaded, formsLoaded, inventoryLoaded;
 
 @end
 
@@ -44,13 +43,25 @@ static MessageDialogViewController *vcMessage;
     self.visitsLoaded = NO;
     self.formsLoaded = NO;
     self.inventoryLoaded = NO;
-    self.viewDidAppear = NO;
+    self.ivCompanyLogo.image = nil;
+    self.viewWillAppear = NO;
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    if(!self.viewDidAppear) {
-        self.viewDidAppear = YES;
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    if(self.vContent.frame.size.height < self.vScroll.frame.size.height) {
+        CGFloat inset = self.vScroll.frame.size.height - self.vContent.frame.size.height;
+        self.vScroll.contentInset = UIEdgeInsetsMake(inset * 0.4, 0, inset * 0.6, 0);
+    }
+    else {
+        self.vScroll.contentInset = UIEdgeInsetsZero;
+    }
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    if(!self.viewWillAppear) {
+        self.viewWillAppear = YES;
         self.btnAttendance.backgroundColor = THEME_PRI;
         self.btnVisits.backgroundColor = THEME_SEC;
         self.vVisitsHeader.backgroundColor = THEME_PRI;
@@ -61,26 +72,25 @@ static MessageDialogViewController *vcMessage;
         [View setCornerRadiusByWidth:self.vForms cornerRadius:0.025];
         [View setCornerRadiusByWidth:self.vInventory cornerRadius:0.025];
         [View setCornerRadiusByHeight:self.btnAttendance cornerRadius:1];
-        [View setCornerRadiusByHeight:self.btnVisits cornerRadius:0.3];
+        [View setCornerRadiusByHeight:self.btnVisits cornerRadius:0.2];
         [View setCornerRadiusByHeight:self.btnExpense cornerRadius:1];
-        self.vAttendanceLayoutMargins = self.vAttendance.layoutMargins;
-        self.vVisitsLayoutMargins = self.vVisits.layoutMargins;
-        self.vFormsLayoutMargins = self.vForms.layoutMargins;
-        self.vInventoryLayoutMargins = self.vInventory.layoutMargins;
-        self.btnVisitsLayoutMargins = self.btnVisits.layoutMargins;
     }
     [self onRefresh];
 }
 
 - (void)onRefresh {
     [super onRefresh];
-    [self.btnVisits setTitle:[NSString stringWithFormat:@"New %@", self.app.conventionVisits] forState:UIControlStateNormal];
+    [self.btnVisits setTitle:[NSString stringWithFormat:@"NEW %@", self.app.conventionVisits.uppercaseString] forState:UIControlStateNormal];
     [self.btnExpense setTitle:self.app.settingDisplayCurrencySymbol forState:UIControlStateNormal];
     [self.visits removeAllObjects];
     [self.forms removeAllObjects];
     [self.inventories removeAllObjects];
-    Company *company = [Get company:self.app.db];
-    self.ivCompanyLogo.image = [Image saveFromURL:[Image cachesPath:[NSString stringWithFormat:@"COMPANY_LOGO_%lld%@", company.companyID, @".png"]] url:company.logoURL];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        UIImage *image = [File saveImageFromURL:[File cachesPath:[NSString stringWithFormat:@"COMPANY_LOGO_%lld%@", self.app.company.companyID, @".png"]] url:self.app.company.logoURL];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.ivCompanyLogo.image = image;
+        });
+    });
     NSDate *currentDate = NSDate.date;
     if(self.app.moduleVisits) {
         [self.visits addObjectsFromArray:[Load visits:self.app.db date:currentDate isNoCheckOutOnly:YES]];
@@ -103,9 +113,9 @@ static MessageDialogViewController *vcMessage;
 - (void)updateHome {
     if(!self.main.isTimeIn) {
         [self.btnAttendance setTitle:@"Time In" forState:UIControlStateNormal];
-        self.vVisitsHeader.backgroundColor = [UIColor colorNamed:@"Grey600"];
-        self.vFormsHeader.backgroundColor = [UIColor colorNamed:@"Grey600"];
-        self.vInventoryHeader.backgroundColor = [UIColor colorNamed:@"Grey600"];
+        self.vVisitsHeader.backgroundColor = [Color colorNamed:@"Grey600"];
+        self.vFormsHeader.backgroundColor = [Color colorNamed:@"Grey600"];
+        self.vInventoryHeader.backgroundColor = [Color colorNamed:@"Grey600"];
     }
     else {
         [self.btnAttendance setTitle:@"Time Out" forState:UIControlStateNormal];
@@ -115,7 +125,6 @@ static MessageDialogViewController *vcMessage;
     }
     if(self.app.moduleAttendance && !(self.app.moduleVisits || self.app.moduleForms || self.app.moduleInventory)) {
         self.vAttendance.hidden = NO;
-        self.vAttendance.layoutMargins = self.vAttendanceLayoutMargins;
         self.vAttendanceHeight.active = NO;
         if(self.timer == nil) {
             UIFont *font = self.lTimeAttendance.font;
@@ -128,7 +137,6 @@ static MessageDialogViewController *vcMessage;
     }
     else {
         self.vAttendance.hidden = YES;
-        self.vAttendance.layoutMargins = UIEdgeInsetsZero;
         self.vAttendanceHeight.active = YES;
         if(self.timer != nil) {
             [self.timer invalidate];
@@ -137,47 +145,31 @@ static MessageDialogViewController *vcMessage;
     }
     if(self.app.moduleVisits) {
         self.vVisits.hidden = NO;
-        self.vVisits.layoutMargins = self.vVisitsLayoutMargins;
         self.vVisitsHeight.active = NO;
-        if(!self.app.settingVisitsAdd) {
-            self.btnVisits.hidden = YES;
-            self.btnVisits.layoutMargins = UIEdgeInsetsZero;
-            self.btnVisitsHeight.active = YES;
-        }
-        else {
-            self.btnVisits.hidden = NO;
-            self.btnVisits.layoutMargins = self.btnVisitsLayoutMargins;
-            self.btnVisitsHeight.active = NO;
-        }
         self.tvVisitsHeight.constant = self.tvVisits.contentSize.height;
     }
     else {
         self.vVisits.hidden = YES;
-        self.vVisits.layoutMargins = UIEdgeInsetsZero;
         self.vVisitsHeight.active = YES;
         self.tvVisitsHeight.constant = 0;
     }
     if(self.forms.count > 0) {
         self.vForms.hidden = NO;
-        self.vForms.layoutMargins = self.vFormsLayoutMargins;
         self.vFormsHeight.active = NO;
         self.tvFormsHeight.constant = self.tvForms.contentSize.height;
     }
     else {
         self.vForms.hidden = YES;
-        self.vForms.layoutMargins = UIEdgeInsetsZero;
         self.vFormsHeight.active = YES;
         self.tvFormsHeight.constant = 0;
     }
     if(self.inventories.count > 0) {
         self.vInventory.hidden = NO;
-        self.vInventory.layoutMargins = self.vInventoryLayoutMargins;
         self.vInventoryHeight.active = NO;
         self.tvInventoryHeight.constant = self.tvInventory.contentSize.height;
     }
     else {
         self.vInventory.hidden = YES;
-        self.vInventory.layoutMargins = UIEdgeInsetsZero;
         self.vInventoryHeight.active = YES;
         self.tvInventoryHeight.constant = 0;
     }
@@ -187,15 +179,6 @@ static MessageDialogViewController *vcMessage;
     else {
         self.btnExpense.hidden = YES;
     }
-    [self.view layoutIfNeeded];
-    self.vScroll.contentSize = CGSizeMake(self.vScroll.frame.size.width, self.vContent.frame.size.height);
-    if(self.vContent.frame.size.height < self.vScroll.frame.size.height) {
-        CGFloat inset = self.vScroll.frame.size.height - self.vContent.frame.size.height - self.vContent.layoutMargins.top - self.vContent.layoutMargins.bottom;
-        self.vScroll.contentInset = UIEdgeInsetsMake(inset * 0.3, 0, inset * 0.7, 0);
-    }
-    else {
-        self.vScroll.contentInset = UIEdgeInsetsZero;
-    }
 }
 
 - (IBAction)timeInOut:(id)sender {
@@ -203,6 +186,17 @@ static MessageDialogViewController *vcMessage;
 }
 
 - (IBAction)addVisit:(id)sender {
+    if(!self.app.settingVisitsAdd) {
+        vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
+        vcMessage.subject = @"Not Allowed";
+        vcMessage.message = [NSString stringWithFormat:@"You are not allowed to add new %@.", self.app.conventionVisits.lowercaseString];
+        vcMessage.positiveTitle = @"OK";
+        vcMessage.positiveTarget = ^{
+            [View removeView:vcMessage.view animated:YES];
+        };
+        [View addSubview:self.main.view subview:vcMessage.view animated:YES];
+        return;
+    }
     vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
     vcMessage.subject = [NSString stringWithFormat:@"Add %@", self.app.conventionVisits];
     vcMessage.message = [NSString stringWithFormat:@"Are you sure you want to add new %@?", self.app.conventionVisits];
@@ -216,12 +210,12 @@ static MessageDialogViewController *vcMessage;
         Visits *visit = [NSEntityDescription insertNewObjectForEntityForName:@"Visits" inManagedObjectContext:self.app.db];
         sequence.visits += 1;
         visit.visitID = sequence.visits;
+        visit.syncBatchID = self.app.syncBatchID;
+        visit.employeeID = self.app.employee.employeeID;
         visit.webVisitID = 0;
         visit.storeID = 0;
         NSDate *currentDate = NSDate.date;
         visit.name = [NSString stringWithFormat:@"New %@ %ld", self.app.conventionVisits, [Get visitTodayCount:self.app.db date:[Time getFormattedDate:DATE_FORMAT date:currentDate]] + 1];
-        visit.employeeID = self.app.userID;
-        visit.syncBatchID = [Get syncBatchID:self.app.db];
         visit.createdDate = [Time getFormattedDate:DATE_FORMAT date:currentDate];
         visit.createdTime = [Time getFormattedDate:TIME_FORMAT date:currentDate];
         visit.startDate = [Time getFormattedDate:DATE_FORMAT date:currentDate];
@@ -244,10 +238,26 @@ static MessageDialogViewController *vcMessage;
     [View addSubview:self.main.view subview:vcMessage.view animated:YES];
 }
 
-- (void)deleteVisit:(UILongPressGestureRecognizer *)longPressGesture {
-    if(self.app.settingVisitsDelete && longPressGesture.state == UIGestureRecognizerStateBegan) {
+- (IBAction)addExpense:(id)sender {
+    NSLog(@"paul: addExpense");
+}
+
+- (void)onLongPress:(UILongPressGestureRecognizer *)longPressGesture {
+    if(longPressGesture.state == UIGestureRecognizerStateBegan) {
         longPressGesture.state = UIGestureRecognizerStateEnded;
-        if(self.visits[longPressGesture.view.tag].isCheckIn || self.visits[longPressGesture.view.tag].isCheckOut) {
+        if(longPressGesture.view.superview == self.tvVisits) {
+            [self deleteVisit:[NSIndexPath indexPathForRow:longPressGesture.view.tag inSection:0]];
+        }
+        if(longPressGesture.view.superview == self.tvForms) {
+        }
+        if(longPressGesture.view.superview == self.tvInventory) {
+        }
+    }
+}
+
+- (void)deleteVisit:(NSIndexPath *)indexPath {
+    if(self.app.settingVisitsDelete) {
+        if(self.visits[indexPath.row].isCheckIn || self.visits[indexPath.row].isCheckOut) {
             vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
             vcMessage.subject = [NSString stringWithFormat:@"Delete %@", self.app.conventionVisits];
             vcMessage.message = [NSString stringWithFormat:@"This %@ has already been checked-in. You're not allowed to delete it.", self.app.conventionVisits];
@@ -267,7 +277,7 @@ static MessageDialogViewController *vcMessage;
         };
         vcMessage.positiveTitle = @"Yes";
         vcMessage.positiveTarget = ^{
-            self.visits[longPressGesture.view.tag].isDelete = YES;
+            self.visits[indexPath.row].isDelete = YES;
             if([Update save:self.app.db]) {
                 [View removeView:vcMessage.view animated:YES];
                 [self onRefresh];
@@ -276,10 +286,6 @@ static MessageDialogViewController *vcMessage;
         };
         [View addSubview:self.main.view subview:vcMessage.view animated:YES];
     }
-}
-
-- (IBAction)addExpense:(id)sender {
-    NSLog(@"paul: addExpense");
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -297,16 +303,16 @@ static MessageDialogViewController *vcMessage;
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     HomeTableViewCell *item = [tableView dequeueReusableCellWithIdentifier:@"item" forIndexPath:indexPath];
+    item.tag = indexPath.row;
+    [item.longPressGesture addTarget:self action:@selector(onLongPress:)];
     if(tableView == self.tvVisits) {
         Visits *visit = self.visits[indexPath.row];
         Stores *store = [Get store:self.app.db storeID:visit.storeID];
         item.lName.text = visit.name;
-        item.lDetails.text = self.app.settingVisitsNotesAsAddress && visit.notes.length > 0 ? visit.notes : store.address.length > 0 ? store.address : @"No address";
+        item.lDetails.text = self.app.settingVisitsNotesAsAddress && visit.notes.length > 0 ? visit.notes : store.storeID != 0 ? store.address.length > 0 ? store.address : @"No address" : nil;
         if(indexPath.row == self.visits.count - 1) {
             self.visitsLoaded = YES;
         }
-        item.tag = indexPath.row;
-        [item.longPressGesture addTarget:self action:@selector(deleteVisit:)];
     }
     if(tableView == self.tvForms) {
         Forms *form = self.forms[indexPath.row];
@@ -328,7 +334,7 @@ static MessageDialogViewController *vcMessage;
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
     if(tableView == self.tvVisits) {
         HomeTableViewCell *item = (HomeTableViewCell *)cell;
-        item.lName.textColor = !self.visits[indexPath.row].isCheckIn ? [UIColor colorNamed:@"Grey800"] : THEME_SEC;
+        item.lName.textColor = !self.visits[indexPath.row].isCheckIn ? [Color colorNamed:@"Grey800"] : THEME_SEC;
     }
     if(self.visitsLoaded && self.formsLoaded && self.inventoryLoaded) {
         self.visitsLoaded = NO;

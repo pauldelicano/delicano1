@@ -1,6 +1,6 @@
-#import "CustomTableViewCell.h"
+#import "TableViewCell.h"
 
-@interface DrawerHeaderTableViewCell : CustomTableViewCell
+@interface DrawerHeaderTableViewCell : TableViewCell
 
 @property (weak, nonatomic) IBOutlet UIView *vBackground;
 @property (weak, nonatomic) IBOutlet UIImageView *ivEmployeePhoto;

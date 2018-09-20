@@ -1,6 +1,6 @@
 #import <UIKit/UIKit.h>
 
-@interface CustomViewController : UIViewController
+@interface ViewController : UIViewController
 
 - (void)onRefresh;
 

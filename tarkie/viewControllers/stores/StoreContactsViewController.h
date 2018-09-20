@@ -1,4 +1,4 @@
-#import "CustomViewController.h"
+#import "ViewController.h"
 #import "Stores+CoreDataClass.h"
 #import "EditStoreViewController.h"
 #import "EditStoreContactViewController.h"
@@ -10,7 +10,7 @@
 
 @end
 
-@interface StoreContactsViewController : CustomViewController<EditStoreDelegate, EditStoreContactDelegate>
+@interface StoreContactsViewController : ViewController<EditStoreDelegate, EditStoreContactDelegate>
 
 @property (weak, nonatomic) IBOutlet UIView *vStatusBar;
 @property (weak, nonatomic) IBOutlet UIView *vNavBar;

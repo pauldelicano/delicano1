@@ -3,7 +3,7 @@
 #import "App.h"
 #import "Get.h"
 #import "Update.h"
-#import "Image.h"
+#import "File.h"
 #import "View.h"
 #import "Time.h"
 
@@ -32,6 +32,7 @@
         announcementSeen.isSync = NO;
         [Update save:self.app.db];
     }
+    self.ivPhoto.image = nil;
     self.viewWillAppear = NO;
 }
 
@@ -49,7 +50,12 @@
 - (void)onRefresh {
     self.lName.text = [Time formatDate:self.app.settingDisplayDateFormat date:self.announcement.scheduledDate];
     Employees *createdBy = [Get employee:self.app.db employeeID:self.announcement.createdByID];
-    self.ivPhoto.image = [Image saveFromURL:[Image cachesPath:[NSString stringWithFormat:@"EMPLOYEE_PHOTO_%lld%@", createdBy.employeeID, @".png"]] url:createdBy.photoURL];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        UIImage *image = [File saveImageFromURL:[File cachesPath:[NSString stringWithFormat:@"EMPLOYEE_PHOTO_%lld%@", createdBy.employeeID, @".png"]] url:createdBy.photoURL];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.ivPhoto.image = image;
+        });
+    });
     self.lSubject.text = self.announcement.subject;
     self.lDetails.text = [NSString stringWithFormat:@"%@ %@ | %@", createdBy.firstName, createdBy.lastName, [Time formatTime:self.app.settingDisplayTimeFormat time:self.announcement.scheduledTime]];
     self.lMessage.text = self.announcement.message;

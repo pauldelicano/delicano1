@@ -1,5 +1,5 @@
-#import "CustomViewController.h"
+#import "ViewController.h"
 
-@interface FormsViewController : CustomViewController
+@interface FormsViewController : ViewController
 
 @end

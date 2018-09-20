@@ -1,4 +1,5 @@
 #import "TextField.h"
+#import "Color.h"
 
 @interface TextField()
 
@@ -22,7 +23,7 @@
 
 - (instancetype)initialize:(TextField *)instance {
     instance.delegate = self;
-    self.defaultBorderColor = [UIColor colorNamed:@"Grey200"];
+    self.defaultBorderColor = [Color colorNamed:@"Grey200"];
     self.layer.borderWidth = (1.0f / 568) * UIScreen.mainScreen.bounds.size.height;
     self.layer.borderColor = self.defaultBorderColor.CGColor;
     return instance;

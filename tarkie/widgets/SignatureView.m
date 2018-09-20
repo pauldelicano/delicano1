@@ -17,11 +17,12 @@
 - (instancetype)initialize:(SignatureView *)instance {
     self.multipleTouchEnabled = NO;
     self.path = UIBezierPath.bezierPath;
-    self.path.lineWidth = 2;
+    self.path.lineWidth = (2.0f / 568) * UIScreen.mainScreen.bounds.size.height;
     return instance;
 }
 
 - (void)drawRect:(CGRect)rect {
+    [super drawRect:rect];
     self.path.lineCapStyle = kCGLineCapRound;
     [self.path stroke];
 }

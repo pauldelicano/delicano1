@@ -23,7 +23,7 @@
         self.vNavBar.backgroundColor = THEME_PRI;
         [self.btnClear setTitleColor:THEME_SEC forState:UIControlStateNormal];
         self.btnSave.backgroundColor = THEME_SEC;
-        [View setCornerRadiusByHeight:self.btnClear cornerRadius:0.3];
+        [View setCornerRadiusByHeight:self.btnClear cornerRadius:0.2];
         CALayer *layer = self.btnClear.layer;
         layer.borderColor = THEME_SEC.CGColor;
         layer.borderWidth = (1.0f / 568) * UIScreen.mainScreen.bounds.size.height;
@@ -48,7 +48,7 @@
     [self.vSignature.layer renderInContext:UIGraphicsGetCurrentContext()];
     UIImage *signature = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
-    self.vSignature.backgroundColor = [UIColor colorNamed:@"Yellow100"];
+    self.vSignature.backgroundColor = [Color colorNamed:@"Yellow100"];
     if(UIImagePNGRepresentation(signature).length > 1062) {
         [self back:self];
         [self.delegate onAddSignatureSave:signature];

@@ -49,7 +49,6 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    self.vScroll.contentSize = CGSizeMake(self.vScroll.frame.size.width, self.vContent.frame.size.height);
 }
 
 - (void)onRefresh {

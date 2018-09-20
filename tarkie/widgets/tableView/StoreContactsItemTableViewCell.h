@@ -1,6 +1,6 @@
-#import "CustomTableViewCell.h"
+#import "TableViewCell.h"
 
-@interface StoreContactsItemTableViewCell : CustomTableViewCell
+@interface StoreContactsItemTableViewCell : TableViewCell
 
 @property (weak, nonatomic) IBOutlet UILabel *lName;
 @property (weak, nonatomic) IBOutlet UILabel *lDesignation;

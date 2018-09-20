@@ -3,7 +3,7 @@
 #import "App.h"
 #import "Get.h"
 #import "Load.h"
-#import "Image.h"
+#import "File.h"
 #import "View.h"
 #import "Time.h"
 #import "AnnouncementItemTableViewCell.h"
@@ -63,7 +63,7 @@
     Employees *createdBy = [Get employee:self.app.db employeeID:announcement.createdByID];
     item.ivPhoto.image = nil;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        UIImage *image = [Image saveFromURL:[Image cachesPath:[NSString stringWithFormat:@"EMPLOYEE_PHOTO_%lld%@", createdBy.employeeID, @".png"]] url:createdBy.photoURL];
+        UIImage *image = [File saveImageFromURL:[File cachesPath:[NSString stringWithFormat:@"EMPLOYEE_PHOTO_%lld%@", createdBy.employeeID, @".png"]] url:createdBy.photoURL];
         dispatch_async(dispatch_get_main_queue(), ^{
             item.ivPhoto.image = image;
         });

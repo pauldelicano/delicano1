@@ -1,18 +1,19 @@
-#import "CustomViewController.h"
+#import "ViewController.h"
 #import "Visits+CoreDataClass.h"
+#import "ScrollView.h"
 #import "TextView.h"
 #import "MainViewController.h"
 #import "StoresViewController.h"
 #import "PhotoBarCollectionView.h"
 #import "CameraPreviewViewController.h"
 
-@interface VisitDetailsViewController : CustomViewController<UITableViewDataSource, UITableViewDelegate, StoresDelegate, PhotoBarDelegate, CameraDelegate, CameraPreviewDelegate, DropDownDelegate>
+@interface VisitDetailsViewController : ViewController<UITableViewDataSource, UITableViewDelegate, StoresDelegate, PhotoBarDelegate, CameraDelegate, CameraPreviewDelegate, DropDownDelegate>
 
 @property (weak, nonatomic) IBOutlet UIView *vStatusBar;
 @property (weak, nonatomic) IBOutlet UIView *vNavBar;
 @property (weak, nonatomic) IBOutlet UILabel *lName;
 @property (weak, nonatomic) IBOutlet UIButton *btnSave;
-@property (weak, nonatomic) IBOutlet UIScrollView *vScroll;
+@property (weak, nonatomic) IBOutlet ScrollView *vScroll;
 @property (weak, nonatomic) IBOutlet UIView *vContent;
 @property (weak, nonatomic) IBOutlet UILabel *lStoreName;
 @property (weak, nonatomic) IBOutlet UILabel *lStoreAddress;

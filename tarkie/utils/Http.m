@@ -1,5 +1,5 @@
 #import "Http.h"
-#import "Image.h"
+#import "File.h"
 
 @implementation Http
 
@@ -9,6 +9,10 @@
 
 + (NSDictionary *)post:(NSString *)url params:(NSDictionary *)params timeout:(int)timeout {
     return [self request:url params:params file:nil timeout:timeout method:POST];
+}
+
++ (NSDictionary *)postImage:(NSString *)url params:(NSDictionary *)params image:(NSString *)image timeout:(int)timeout {
+    return [self request:url params:params file:image timeout:timeout method:POST_IMAGE];
 }
 
 + (NSDictionary *)postFile:(NSString *)url params:(NSDictionary *)params file:(NSString *)file timeout:(int)timeout {
@@ -43,7 +47,7 @@
             }
             break;
         }
-        case POST_FILE: {
+        case POST_IMAGE: {
             request.HTTPMethod = @"POST";
             NSString *boundary = @"---------------------------14737809831466499882746641449";
             [request setValue:[NSString stringWithFormat:@"multipart/form-data; boundary=%@", boundary] forHTTPHeaderField: @"Content-Type"];
@@ -58,7 +62,30 @@
                 [body appendData:[[NSString stringWithFormat:@"--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
                 [body appendData:[[NSString stringWithFormat:@"Content-Disposition:form-data; name=\"image\"; filename=\"%@\"\r\n", file] dataUsingEncoding:NSUTF8StringEncoding]];
                 [body appendData:[[NSString stringWithFormat:@"Content-Type: image/png\r\n\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
-                [body appendData:UIImagePNGRepresentation([Image fromDocument:file])];
+                [body appendData:UIImagePNGRepresentation([File imageFromDocument:file])];
+                [body appendData:[[NSString stringWithFormat:@"\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+            }
+            [body appendData:[[NSString stringWithFormat:@"--%@--\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+            request.HTTPBody = body;
+            break;
+        }
+        case POST_FILE: {
+            request.HTTPMethod = @"POST";
+            NSString *boundary = @"---------------------------14737809831466499882746641449";
+            [request setValue:[NSString stringWithFormat:@"multipart/form-data; boundary=%@", boundary] forHTTPHeaderField: @"Content-Type"];
+            NSMutableData *body = NSMutableData.data;
+            if(paramsData != nil) {
+                [body appendData:[[NSString stringWithFormat:@"--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+                [body appendData:[[NSString stringWithFormat:@"Content-Disposition:form-data; name=\"params\"\r\n\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+                [body appendData:paramsData];
+                [body appendData:[[NSString stringWithFormat:@"\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+            }
+            if(file != nil) {
+                NSLog(@"info: start\n\tbackup: %@", file);
+                [body appendData:[[NSString stringWithFormat:@"--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+                [body appendData:[[NSString stringWithFormat:@"Content-Disposition:form-data; name=\"backup\"; filename=\"%@\"\r\n", file] dataUsingEncoding:NSUTF8StringEncoding]];
+                [body appendData:[[NSString stringWithFormat:@"Content-Type: application/zip\r\n\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+                [body appendData:[NSData.alloc initWithContentsOfFile:[File documentPath:file]]];
                 [body appendData:[[NSString stringWithFormat:@"\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
             }
             [body appendData:[[NSString stringWithFormat:@"--%@--\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];

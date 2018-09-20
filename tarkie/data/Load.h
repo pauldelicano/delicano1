@@ -12,6 +12,8 @@
 #import "Schedules+CoreDataClass.h"
 #import "TimeIn+CoreDataClass.h"
 #import "TimeOut+CoreDataClass.h"
+#import "OvertimeReasons+CoreDataClass.h"
+#import "Overtime+CoreDataClass.h"
 
 #import "Visits+CoreDataClass.h"
 #import "VisitInventories+CoreDataClass.h"
@@ -24,12 +26,14 @@
 
 #import "Forms+CoreDataClass.h"
 
+#import "Tracking+CoreDataClass.h"
+
 @interface Load : NSObject
 
 //COMPANY
 + (NSArray<NSDictionary *> *)drawerMenus:(NSManagedObjectContext *)db;
 + (NSArray<NSDictionary *> *)modulePages:(NSManagedObjectContext *)db;
-+ (NSArray<Employees *> *)employeeIDs:(NSManagedObjectContext *)db teamID:(long)teamID;
++ (NSArray<Employees *> *)employeeIDs:(NSManagedObjectContext *)db teamID:(int64_t)teamID;
 + (NSArray<Announcements *> *)announcements:(NSManagedObjectContext *)db searchFilter:(NSString *)searchFilter isScheduled:(BOOL)isScheduled;
 + (NSArray<AnnouncementSeen *> *)syncAnnouncementSeen:(NSManagedObjectContext *)db;
 
@@ -37,7 +41,7 @@
 + (NSArray<Stores *> *)stores:(NSManagedObjectContext *)db searchFilter:(NSString *)searchFilter;
 + (NSArray<Stores *> *)syncStores:(NSManagedObjectContext *)db;
 + (NSArray<Stores *> *)updateStores:(NSManagedObjectContext *)db;
-+ (NSArray<StoreContacts *> *)storeContacts:(NSManagedObjectContext *)db storeID:(long)storeID;
++ (NSArray<StoreContacts *> *)storeContacts:(NSManagedObjectContext *)db storeID:(int64_t)storeID;
 + (NSArray<StoreContacts *> *)syncStoreContacts:(NSManagedObjectContext *)db;
 + (NSArray<StoreContacts *> *)updateStoreContacts:(NSManagedObjectContext *)db;
 
@@ -50,16 +54,18 @@
 + (NSArray<TimeOut *> *)syncTimeOut:(NSManagedObjectContext *)db;
 + (NSArray<TimeOut *> *)uploadTimeOutPhoto:(NSManagedObjectContext *)db;
 + (NSArray<TimeOut *> *)uploadTimeOutSignature:(NSManagedObjectContext *)db;
++ (NSArray<OvertimeReasons *> *)overtimeReasons:(NSManagedObjectContext *)db;
++ (NSArray<Overtime *> *)syncOvertime:(NSManagedObjectContext *)db;
 
 //VISITS
-+ (NSArray<Photos *> *)visitPhotos:(NSManagedObjectContext *)db visitID:(long)visitID;
++ (NSArray<Photos *> *)visitPhotos:(NSManagedObjectContext *)db visitID:(int64_t)visitID;
 + (NSArray<Photos *> *)uploadVisitPhotos:(NSManagedObjectContext *)db;
 + (NSArray<Visits *> *)visits:(NSManagedObjectContext *)db date:(NSDate *)date isNoCheckOutOnly:(BOOL)isNoCheckOutOnly;
 + (NSArray<Visits *> *)syncVisits:(NSManagedObjectContext *)db;
 + (NSArray<Visits *> *)updateVisits:(NSManagedObjectContext *)db;
 + (NSArray<Visits *> *)deleteVisits:(NSManagedObjectContext *)db;
-+ (NSArray<VisitInventories *> *)visitInventories:(NSManagedObjectContext *)db visitID:(long)visitID;
-+ (NSArray<VisitForms *> *)visitForms:(NSManagedObjectContext *)db visitID:(long)visitID;
++ (NSArray<VisitInventories *> *)visitInventories:(NSManagedObjectContext *)db visitID:(int64_t)visitID;
++ (NSArray<VisitForms *> *)visitForms:(NSManagedObjectContext *)db visitID:(int64_t)visitID;
 + (NSArray<CheckIn *> *)syncCheckIn:(NSManagedObjectContext *)db;
 + (NSArray<CheckIn *> *)uploadCheckInPhoto:(NSManagedObjectContext *)db;
 + (NSArray<CheckOut *> *)syncCheckOut:(NSManagedObjectContext *)db;
@@ -73,5 +79,7 @@
 
 //FORMS
 + (NSArray<Forms *> *)forms:(NSManagedObjectContext *)db date:(NSDate *)date;
+
++ (NSArray<Tracking *> *)syncTracking:(NSManagedObjectContext *)db;
 
 @end

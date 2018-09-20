@@ -114,6 +114,9 @@
             if([name isEqualToString:@"Visits"]) {
                 name = [Get conventionName:db conventionID:CONVENTION_VISITS];
             }
+            if([name isEqualToString:@"Forms"]) {
+                name = @"Entries";
+            }
             [page setObject:name forKey:@"name"];
             [pages addObject:page];
         }
@@ -121,7 +124,7 @@
     return pages;
 }
 
-+ (NSArray<Employees *> *)employeeIDs:(NSManagedObjectContext *)db teamID:(long)teamID {
++ (NSArray<Employees *> *)employeeIDs:(NSManagedObjectContext *)db teamID:(int64_t)teamID {
     NSMutableArray *predicates = NSMutableArray.alloc.init;
     [predicates addObject:[NSPredicate predicateWithFormat:@"teamID == %lld", teamID]];
     [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
@@ -153,7 +156,12 @@
     NSMutableArray *predicates = NSMutableArray.alloc.init;
     BOOL settingStoreDisplayLongName = [Get isSettingEnabled:db settingID:SETTING_STORE_DISPLAY_LONG_NAME teamID:[Get teamID:db employeeID:[Get userID:db]]];
     if(searchFilter.length > 0) {
-        [predicates addObject:[NSPredicate predicateWithFormat:@"%@ CONTAINS[cd] %@", settingStoreDisplayLongName ? @"name" : @"shortName", searchFilter.lowercaseString]];
+        if(settingStoreDisplayLongName) {
+            [predicates addObject:[NSPredicate predicateWithFormat:@"name CONTAINS[cd] %@", searchFilter]];
+        }
+        else {
+            [predicates addObject:[NSPredicate predicateWithFormat:@"shortName CONTAINS[cd] %@", searchFilter]];
+        }
     }
     [predicates addObject:[NSPredicate predicateWithFormat:@"%@.length > 0", settingStoreDisplayLongName ? @"name" : @"shortName"]];
     [predicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
@@ -179,7 +187,7 @@
     return [self execute:db entity:@"Stores" predicates:predicates];
 }
 
-+ (NSArray<StoreContacts *> *)storeContacts:(NSManagedObjectContext *)db storeID:(long)storeID {
++ (NSArray<StoreContacts *> *)storeContacts:(NSManagedObjectContext *)db storeID:(int64_t)storeID {
     NSMutableArray *predicates = NSMutableArray.alloc.init;
     [predicates addObject:[NSPredicate predicateWithFormat:@"storeID == %lld", storeID]];
     [predicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
@@ -265,7 +273,21 @@
     return [self execute:db entity:@"TimeOut" predicates:predicates];
 }
 
-+ (NSArray<Photos *> *)visitPhotos:(NSManagedObjectContext *)db visitID:(long)visitID {
++ (NSArray<OvertimeReasons *> *)overtimeReasons:(NSManagedObjectContext *)db {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
+    NSMutableArray *sortDescriptors = NSMutableArray.alloc.init;
+    [sortDescriptors addObject:[NSSortDescriptor.alloc initWithKey:@"name" ascending:YES]];
+    return [self execute:db entity:@"OvertimeReasons" predicates:predicates sortDescriptors:sortDescriptors];
+}
+
++ (NSArray<Overtime *> *)syncOvertime:(NSManagedObjectContext *)db {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
+    return [self execute:db entity:@"Overtime" predicates:predicates];
+}
+
++ (NSArray<Photos *> *)visitPhotos:(NSManagedObjectContext *)db visitID:(int64_t)visitID {
     NSMutableArray<Photos *> *photos = NSMutableArray.alloc.init;
     NSMutableArray *predicates = NSMutableArray.alloc.init;
     [predicates addObject:[NSPredicate predicateWithFormat:@"visitID == %ld", visitID]];
@@ -289,11 +311,11 @@
 + (NSArray<Visits *> *)visits:(NSManagedObjectContext *)db date:(NSDate *)date isNoCheckOutOnly:(BOOL)isNoCheckOutOnly {
     NSMutableArray *predicates = NSMutableArray.alloc.init;
     [predicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
-    [predicates addObject:[NSPredicate predicateWithFormat:@"%@ BETWEEN {startDate, endDate}", [Time getFormattedDate:DATE_FORMAT date:date]]];
     if(isNoCheckOutOnly) {
         [predicates addObject:[NSPredicate predicateWithFormat:@"isCheckOut == %@", @NO]];
     }
     [predicates addObject:[NSPredicate predicateWithFormat:@"isDelete == %@", @NO]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"%@ BETWEEN {startDate, endDate}", [Time getFormattedDate:DATE_FORMAT date:date]]];
     return [self execute:db entity:@"Visits" predicates:predicates];
 }
 
@@ -322,46 +344,46 @@
     return [self execute:db entity:@"Visits" predicates:predicates];
 }
 
-+ (NSArray<VisitInventories *> *)visitInventories:(NSManagedObjectContext *)db visitID:(long)visitID {
++ (NSArray<VisitInventories *> *)visitInventories:(NSManagedObjectContext *)db visitID:(int64_t)visitID {
     return nil;
-    NSMutableArray<VisitInventories *> *visitInventories = [NSMutableArray.alloc initWithArray:[self execute:db entity:@"VisitInventories"]];
-    if(visitInventories.count == 0) {
-        Sequences *sequence = [Get sequence:db];
-        for(int x = 1; x <= 5; x++) {
-            sequence.visitInventories += 1;
-            VisitInventories *visitInventory = [NSEntityDescription insertNewObjectForEntityForName:@"VisitInventories" inManagedObjectContext:db];
-            visitInventory.name = [NSString stringWithFormat:@"Visit Inventory %lld", sequence.visitInventories];
-            visitInventory.visitInventoryID = sequence.visitInventories;
-            visitInventory.visitID = visitID;
-            visitInventory.isActive = YES;
-            [visitInventories addObject:visitInventory];
-        }
-    }
-    NSMutableArray *predicates = NSMutableArray.alloc.init;
-    [predicates addObject:[NSPredicate predicateWithFormat:@"visitID == %ld", visitID]];
-    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
-    return [self execute:db entity:@"VisitInventories" predicates:predicates];
+//    NSMutableArray<VisitInventories *> *visitInventories = [NSMutableArray.alloc initWithArray:[self execute:db entity:@"VisitInventories"]];
+//    if(visitInventories.count == 0) {
+//        Sequences *sequence = [Get sequence:db];
+//        for(int x = 1; x <= 5; x++) {
+//            VisitInventories *visitInventory = [NSEntityDescription insertNewObjectForEntityForName:@"VisitInventories" inManagedObjectContext:db];
+//            sequence.visitInventories += 1;
+//            visitInventory.name = [NSString stringWithFormat:@"Visit Inventory %lld", sequence.visitInventories];
+//            visitInventory.visitInventoryID = sequence.visitInventories;
+//            visitInventory.visitID = visitID;
+//            visitInventory.isActive = YES;
+//            [visitInventories addObject:visitInventory];
+//        }
+//    }
+//    NSMutableArray *predicates = NSMutableArray.alloc.init;
+//    [predicates addObject:[NSPredicate predicateWithFormat:@"visitID == %ld", visitID]];
+//    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
+//    return [self execute:db entity:@"VisitInventories" predicates:predicates];
 }
 
-+ (NSArray<VisitForms *> *)visitForms:(NSManagedObjectContext *)db visitID:(long)visitID {
++ (NSArray<VisitForms *> *)visitForms:(NSManagedObjectContext *)db visitID:(int64_t)visitID {
     return nil;
-    NSMutableArray<VisitForms *> *visitForms = [NSMutableArray.alloc initWithArray:[self execute:db entity:@"VisitForms"]];
-    if(visitForms.count == 0) {
-        Sequences *sequence = [Get sequence:db];
-        for(int x = 1; x <= 5; x++) {
-            sequence.visitForms += 1;
-            VisitForms *visitForm = [NSEntityDescription insertNewObjectForEntityForName:@"VisitForms" inManagedObjectContext:db];
-            visitForm.name = [NSString stringWithFormat:@"Visit Form %lld", sequence.visitForms];
-            visitForm.visitFormID = sequence.visitForms;
-            visitForm.visitID = visitID;
-            visitForm.isActive = YES;
-            [visitForms addObject:visitForm];
-        }
-    }
-    NSMutableArray *predicates = NSMutableArray.alloc.init;
-    [predicates addObject:[NSPredicate predicateWithFormat:@"visitID == %ld", visitID]];
-    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
-    return [self execute:db entity:@"VisitForms" predicates:predicates];
+//    NSMutableArray<VisitForms *> *visitForms = [NSMutableArray.alloc initWithArray:[self execute:db entity:@"VisitForms"]];
+//    if(visitForms.count == 0) {
+//        Sequences *sequence = [Get sequence:db];
+//        for(int x = 1; x <= 5; x++) {
+//            VisitForms *visitForm = [NSEntityDescription insertNewObjectForEntityForName:@"VisitForms" inManagedObjectContext:db];
+//            sequence.visitForms += 1;
+//            visitForm.name = [NSString stringWithFormat:@"Visit Form %lld", sequence.visitForms];
+//            visitForm.visitFormID = sequence.visitForms;
+//            visitForm.visitID = visitID;
+//            visitForm.isActive = YES;
+//            [visitForms addObject:visitForm];
+//        }
+//    }
+//    NSMutableArray *predicates = NSMutableArray.alloc.init;
+//    [predicates addObject:[NSPredicate predicateWithFormat:@"visitID == %ld", visitID]];
+//    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
+//    return [self execute:db entity:@"VisitForms" predicates:predicates];
 }
 
 + (NSArray<CheckIn *> *)syncCheckIn:(NSManagedObjectContext *)db {
@@ -392,34 +414,40 @@
 
 + (NSArray<Inventories *> *)inventories:(NSManagedObjectContext *)db date:(NSDate *)date {
     return nil;
-    NSMutableArray<Inventories *> *inventories = [NSMutableArray.alloc initWithArray:[self execute:db entity:@"Inventories"]];
-    if(inventories.count == 0) {
-        for(int x = 1; x <= 5; x++) {
-            Inventories *inventory = [NSEntityDescription insertNewObjectForEntityForName:@"Inventories" inManagedObjectContext:db];
-            inventory.inventoryID = x;
-            inventory.name = [NSString stringWithFormat:@"Inventory %d", x];
-            [inventories addObject:inventory];
-        }
-    }
-    NSMutableArray *sortDescriptors = NSMutableArray.alloc.init;
-    [sortDescriptors addObject:[NSSortDescriptor.alloc initWithKey:@"inventoryID" ascending:YES]];
-    return [self execute:db entity:@"Inventories" predicates:nil sortDescriptors:sortDescriptors];
+//    NSMutableArray<Inventories *> *inventories = [NSMutableArray.alloc initWithArray:[self execute:db entity:@"Inventories"]];
+//    if(inventories.count == 0) {
+//        for(int x = 1; x <= 5; x++) {
+//            Inventories *inventory = [NSEntityDescription insertNewObjectForEntityForName:@"Inventories" inManagedObjectContext:db];
+//            inventory.inventoryID = x;
+//            inventory.name = [NSString stringWithFormat:@"Inventory %d", x];
+//            [inventories addObject:inventory];
+//        }
+//    }
+//    NSMutableArray *sortDescriptors = NSMutableArray.alloc.init;
+//    [sortDescriptors addObject:[NSSortDescriptor.alloc initWithKey:@"inventoryID" ascending:YES]];
+//    return [self execute:db entity:@"Inventories" predicates:nil sortDescriptors:sortDescriptors];
 }
 
 + (NSArray<Forms *> *)forms:(NSManagedObjectContext *)db date:(NSDate *)date {
     return nil;
-    NSMutableArray<Forms *> *forms = [NSMutableArray.alloc initWithArray:[self execute:db entity:@"Forms"]];
-    if(forms.count == 0) {
-        for(int x = 1; x <= 5; x++) {
-            Forms *form = [NSEntityDescription insertNewObjectForEntityForName:@"Forms" inManagedObjectContext:db];
-            form.formID = x;
-            form.name = [NSString stringWithFormat:@"Form %d", x];
-            [forms addObject:form];
-        }
-    }
-    NSMutableArray *sortDescriptors = NSMutableArray.alloc.init;
-    [sortDescriptors addObject:[NSSortDescriptor.alloc initWithKey:@"formID" ascending:YES]];
-    return [self execute:db entity:@"Forms" predicates:nil sortDescriptors:sortDescriptors];
+//    NSMutableArray<Forms *> *forms = [NSMutableArray.alloc initWithArray:[self execute:db entity:@"Forms"]];
+//    if(forms.count == 0) {
+//        for(int x = 1; x <= 5; x++) {
+//            Forms *form = [NSEntityDescription insertNewObjectForEntityForName:@"Forms" inManagedObjectContext:db];
+//            form.formID = x;
+//            form.name = [NSString stringWithFormat:@"Form %d", x];
+//            [forms addObject:form];
+//        }
+//    }
+//    NSMutableArray *sortDescriptors = NSMutableArray.alloc.init;
+//    [sortDescriptors addObject:[NSSortDescriptor.alloc initWithKey:@"formID" ascending:YES]];
+//    return [self execute:db entity:@"Forms" predicates:nil sortDescriptors:sortDescriptors];
+}
+
++ (NSArray<Tracking *> *)syncTracking:(NSManagedObjectContext *)db {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
+    return [self execute:db entity:@"Tracking" predicates:predicates];
 }
 
 + (NSArray *)execute:(NSManagedObjectContext *)db entity:(NSString *)entity {

@@ -7,7 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		DA0B7CCE203A89B000844221 /* Image.m in Sources */ = {isa = PBXBuildFile; fileRef = DA0B7CC6203A89B000844221 /* Image.m */; };
+		4717DB0C21478A54006A2FF6 /* ScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4717DB0B21478A54006A2FF6 /* ScrollView.m */; };
+		4731BF3F2124555A00473261 /* LayoutConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = 4731BF3E2124555A00473261 /* LayoutConstraint.m */; };
+		47591A66211D6C2000E21A44 /* OvertimeFormViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 47591A65211D6C2000E21A44 /* OvertimeFormViewController.m */; };
+		47AC039D21180538002CEFA8 /* Color.m in Sources */ = {isa = PBXBuildFile; fileRef = 47AC039C21180538002CEFA8 /* Color.m */; };
+		47B6382621463171009914F2 /* CircularProgressBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 47B6382521463171009914F2 /* CircularProgressBar.m */; };
+		47C6CA7821213C8A0000B03D /* OvertimeFormTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 47C6CA7721213C8A0000B03D /* OvertimeFormTableViewCell.m */; };
+		47C6CA7B21218D520000B03D /* AboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 47C6CA7A21218D520000B03D /* AboutViewController.m */; };
+		A1180173C060A68B3FC0BCB9 /* libPods-tarkie.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D0A83862F986EF0BF691B8AD /* libPods-tarkie.a */; };
+		DA0B7CCE203A89B000844221 /* File.m in Sources */ = {isa = PBXBuildFile; fileRef = DA0B7CC6203A89B000844221 /* File.m */; };
 		DA0B7CD0203A89B000844221 /* Http.m in Sources */ = {isa = PBXBuildFile; fileRef = DA0B7CCB203A89B000844221 /* Http.m */; };
 		DA0B7CD1203A89B000844221 /* View.m in Sources */ = {isa = PBXBuildFile; fileRef = DA0B7CCD203A89B000844221 /* View.m */; };
 		DA0B7CD6203A89C100844221 /* MessageDialogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DA0B7CD4203A89C100844221 /* MessageDialogViewController.m */; };
@@ -42,7 +50,7 @@
 		DA6C84372058FEB800E2103C /* DateBarItemCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = DA6C84362058FEB800E2103C /* DateBarItemCollectionViewCell.m */; };
 		DA6E406620BD921300EB8BCA /* PhotoBarItemCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = DA6E406520BD921300EB8BCA /* PhotoBarItemCollectionViewCell.m */; };
 		DA6E406C20BD95AA00EB8BCA /* PhotoBarCollectionView.m in Sources */ = {isa = PBXBuildFile; fileRef = DA6E406B20BD95AA00EB8BCA /* PhotoBarCollectionView.m */; };
-		DA6FE7022043BAB400BFC7A7 /* CustomViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DA6FE7012043BAB400BFC7A7 /* CustomViewController.m */; };
+		DA6FE7022043BAB400BFC7A7 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DA6FE7012043BAB400BFC7A7 /* ViewController.m */; };
 		DA6FE70720441E7F00BFC7A7 /* DrawerHeaderTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = DA6FE70520441E7E00BFC7A7 /* DrawerHeaderTableViewCell.m */; };
 		DA6FE70820441E7F00BFC7A7 /* DrawerItemTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = DA6FE70620441E7F00BFC7A7 /* DrawerItemTableViewCell.m */; };
 		DA728859204E331200355734 /* PageBarCollectionView.m in Sources */ = {isa = PBXBuildFile; fileRef = DA728858204E331200355734 /* PageBarCollectionView.m */; };
@@ -58,9 +66,9 @@
 		DA9D207120BFA7F000E13E83 /* DropDownDialogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DA9D207020BFA7F000E13E83 /* DropDownDialogViewController.m */; };
 		DAA947CB1FD1354D00B3FA3E /* AuthorizationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DAA947CA1FD1354D00B3FA3E /* AuthorizationViewController.m */; };
 		DAA947CE1FD135D100B3FA3E /* LoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DAA947CD1FD135D100B3FA3E /* LoginViewController.m */; };
-		DAB3702220846E71003C588F /* Font-Awesome-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DAB3701F20846E70003C588F /* Font-Awesome-Regular.ttf */; };
-		DAB3702320846E71003C588F /* Font-Awesome-Solid.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DAB3702020846E70003C588F /* Font-Awesome-Solid.ttf */; };
-		DAB3702420846E71003C588F /* Font-Awesome-Brands.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DAB3702120846E71003C588F /* Font-Awesome-Brands.ttf */; };
+		DAB3702220846E71003C588F /* Font-Awesome-Free-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = DAB3701F20846E70003C588F /* Font-Awesome-Free-Regular.otf */; };
+		DAB3702320846E71003C588F /* Font-Awesome-Free-Solid.otf in Resources */ = {isa = PBXBuildFile; fileRef = DAB3702020846E70003C588F /* Font-Awesome-Free-Solid.otf */; };
+		DAB3702420846E71003C588F /* Font-Awesome-Brands-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = DAB3702120846E71003C588F /* Font-Awesome-Brands-Regular.otf */; };
 		DAB8DE6220DCF8B100329A3F /* AnnouncementItemTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = DAB8DE6120DCF8B100329A3F /* AnnouncementItemTableViewCell.m */; };
 		DAB8DE6520DD23FD00329A3F /* AnnouncementDetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DAB8DE6420DD23FD00329A3F /* AnnouncementDetailsViewController.m */; };
 		DAB945CD1FCEB1DB00FCB299 /* SplashViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DAB945CC1FCEB1DB00FCB299 /* SplashViewController.m */; };
@@ -69,8 +77,8 @@
 		DAC24C232091959900CCCAD6 /* StoreContactsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DAC24C222091959900CCCAD6 /* StoreContactsViewController.m */; };
 		DAC24C26209195A800CCCAD6 /* EditStoreContactViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DAC24C25209195A800CCCAD6 /* EditStoreContactViewController.m */; };
 		DAC869E42047C4C000C21D23 /* Time.m in Sources */ = {isa = PBXBuildFile; fileRef = DAC869E32047C4C000C21D23 /* Time.m */; };
-		DAC8990220AA9A2400458285 /* CustomTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = DAC8990120AA9A2400458285 /* CustomTableViewCell.m */; };
-		DAC8990520AA9DD400458285 /* CustomCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = DAC8990420AA9DD400458285 /* CustomCollectionViewCell.m */; };
+		DAC8990220AA9A2400458285 /* TableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = DAC8990120AA9A2400458285 /* TableViewCell.m */; };
+		DAC8990520AA9DD400458285 /* CollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = DAC8990420AA9DD400458285 /* CollectionViewCell.m */; };
 		DACD98652060EF2500C2A4B8 /* VisitsTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = DACD98642060EF2500C2A4B8 /* VisitsTableViewCell.m */; };
 		DAE2684A20627E13004F7EF8 /* DataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = DAE2684820627E13004F7EF8 /* DataModel.xcdatamodeld */; };
 		DAE62D481FFC7BF0007D0865 /* DrawerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DAE62D471FFC7BF0007D0865 /* DrawerViewController.m */; };
@@ -79,8 +87,30 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		DA0B7CC6203A89B000844221 /* Image.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Image.m; sourceTree = "<group>"; };
-		DA0B7CC7203A89B000844221 /* Image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Image.h; sourceTree = "<group>"; };
+		14840DEEFCDCCE914EDDC146 /* Pods-tarkie.tarkie debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tarkie.tarkie debug.xcconfig"; path = "Pods/Target Support Files/Pods-tarkie/Pods-tarkie.tarkie debug.xcconfig"; sourceTree = "<group>"; };
+		28CDBEA7A8ED9A48F91A5338 /* Pods-tarkie.sevie release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tarkie.sevie release.xcconfig"; path = "Pods/Target Support Files/Pods-tarkie/Pods-tarkie.sevie release.xcconfig"; sourceTree = "<group>"; };
+		3D576833A30E7C71E3C393D9 /* Pods-tarkie.timsie debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tarkie.timsie debug.xcconfig"; path = "Pods/Target Support Files/Pods-tarkie/Pods-tarkie.timsie debug.xcconfig"; sourceTree = "<group>"; };
+		4717DB0A21478A54006A2FF6 /* ScrollView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScrollView.h; sourceTree = "<group>"; };
+		4717DB0B21478A54006A2FF6 /* ScrollView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ScrollView.m; sourceTree = "<group>"; };
+		4731BF3D2124555A00473261 /* LayoutConstraint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LayoutConstraint.h; sourceTree = "<group>"; };
+		4731BF3E2124555A00473261 /* LayoutConstraint.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LayoutConstraint.m; sourceTree = "<group>"; };
+		47591A64211D6C2000E21A44 /* OvertimeFormViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OvertimeFormViewController.h; sourceTree = "<group>"; };
+		47591A65211D6C2000E21A44 /* OvertimeFormViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OvertimeFormViewController.m; sourceTree = "<group>"; };
+		478C8CD3211979EA00B5BBF9 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Main.strings; sourceTree = "<group>"; };
+		47AC039B21180538002CEFA8 /* Color.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Color.h; sourceTree = "<group>"; };
+		47AC039C21180538002CEFA8 /* Color.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Color.m; sourceTree = "<group>"; };
+		47B6382421463171009914F2 /* CircularProgressBar.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CircularProgressBar.h; sourceTree = "<group>"; };
+		47B6382521463171009914F2 /* CircularProgressBar.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CircularProgressBar.m; sourceTree = "<group>"; };
+		47C6CA7621213C8A0000B03D /* OvertimeFormTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OvertimeFormTableViewCell.h; sourceTree = "<group>"; };
+		47C6CA7721213C8A0000B03D /* OvertimeFormTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OvertimeFormTableViewCell.m; sourceTree = "<group>"; };
+		47C6CA7921218D520000B03D /* AboutViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AboutViewController.h; sourceTree = "<group>"; };
+		47C6CA7A21218D520000B03D /* AboutViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AboutViewController.m; sourceTree = "<group>"; };
+		7722A72D704B4C9374172CFD /* Pods-tarkie.tarkie release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tarkie.tarkie release.xcconfig"; path = "Pods/Target Support Files/Pods-tarkie/Pods-tarkie.tarkie release.xcconfig"; sourceTree = "<group>"; };
+		85E3731E89DC93C596E8C8DB /* Pods-tarkie.sevie debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tarkie.sevie debug.xcconfig"; path = "Pods/Target Support Files/Pods-tarkie/Pods-tarkie.sevie debug.xcconfig"; sourceTree = "<group>"; };
+		B8C772CBFB7C80AFC9A1070E /* Pods-tarkie.timsie release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tarkie.timsie release.xcconfig"; path = "Pods/Target Support Files/Pods-tarkie/Pods-tarkie.timsie release.xcconfig"; sourceTree = "<group>"; };
+		D0A83862F986EF0BF691B8AD /* libPods-tarkie.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-tarkie.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		DA0B7CC6203A89B000844221 /* File.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = File.m; sourceTree = "<group>"; };
+		DA0B7CC7203A89B000844221 /* File.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = File.h; sourceTree = "<group>"; };
 		DA0B7CCA203A89B000844221 /* Http.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Http.h; sourceTree = "<group>"; };
 		DA0B7CCB203A89B000844221 /* Http.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Http.m; sourceTree = "<group>"; };
 		DA0B7CCC203A89B000844221 /* View.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = View.h; sourceTree = "<group>"; };
@@ -144,8 +174,8 @@
 		DA6E406520BD921300EB8BCA /* PhotoBarItemCollectionViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PhotoBarItemCollectionViewCell.m; sourceTree = "<group>"; };
 		DA6E406A20BD95AA00EB8BCA /* PhotoBarCollectionView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PhotoBarCollectionView.h; sourceTree = "<group>"; };
 		DA6E406B20BD95AA00EB8BCA /* PhotoBarCollectionView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PhotoBarCollectionView.m; sourceTree = "<group>"; };
-		DA6FE7002043BAB400BFC7A7 /* CustomViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomViewController.h; sourceTree = "<group>"; };
-		DA6FE7012043BAB400BFC7A7 /* CustomViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CustomViewController.m; sourceTree = "<group>"; };
+		DA6FE7002043BAB400BFC7A7 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		DA6FE7012043BAB400BFC7A7 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		DA6FE70320441E7E00BFC7A7 /* DrawerHeaderTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawerHeaderTableViewCell.h; sourceTree = "<group>"; };
 		DA6FE70420441E7E00BFC7A7 /* DrawerItemTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawerItemTableViewCell.h; sourceTree = "<group>"; };
 		DA6FE70520441E7E00BFC7A7 /* DrawerHeaderTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawerHeaderTableViewCell.m; sourceTree = "<group>"; };
@@ -179,9 +209,9 @@
 		DAA947CA1FD1354D00B3FA3E /* AuthorizationViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AuthorizationViewController.m; sourceTree = "<group>"; };
 		DAA947CC1FD135D100B3FA3E /* LoginViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LoginViewController.h; sourceTree = "<group>"; };
 		DAA947CD1FD135D100B3FA3E /* LoginViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LoginViewController.m; sourceTree = "<group>"; };
-		DAB3701F20846E70003C588F /* Font-Awesome-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Font-Awesome-Regular.ttf"; sourceTree = "<group>"; };
-		DAB3702020846E70003C588F /* Font-Awesome-Solid.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Font-Awesome-Solid.ttf"; sourceTree = "<group>"; };
-		DAB3702120846E71003C588F /* Font-Awesome-Brands.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Font-Awesome-Brands.ttf"; sourceTree = "<group>"; };
+		DAB3701F20846E70003C588F /* Font-Awesome-Free-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Font-Awesome-Free-Regular.otf"; sourceTree = "<group>"; };
+		DAB3702020846E70003C588F /* Font-Awesome-Free-Solid.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Font-Awesome-Free-Solid.otf"; sourceTree = "<group>"; };
+		DAB3702120846E71003C588F /* Font-Awesome-Brands-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Font-Awesome-Brands-Regular.otf"; sourceTree = "<group>"; };
 		DAB8DE6020DCF8B100329A3F /* AnnouncementItemTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AnnouncementItemTableViewCell.h; sourceTree = "<group>"; };
 		DAB8DE6120DCF8B100329A3F /* AnnouncementItemTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AnnouncementItemTableViewCell.m; sourceTree = "<group>"; };
 		DAB8DE6320DD23FD00329A3F /* AnnouncementDetailsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AnnouncementDetailsViewController.h; sourceTree = "<group>"; };
@@ -198,10 +228,10 @@
 		DAC24C25209195A800CCCAD6 /* EditStoreContactViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EditStoreContactViewController.m; sourceTree = "<group>"; };
 		DAC869E22047C4C000C21D23 /* Time.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Time.h; sourceTree = "<group>"; };
 		DAC869E32047C4C000C21D23 /* Time.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Time.m; sourceTree = "<group>"; };
-		DAC8990020AA9A2400458285 /* CustomTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomTableViewCell.h; sourceTree = "<group>"; };
-		DAC8990120AA9A2400458285 /* CustomTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CustomTableViewCell.m; sourceTree = "<group>"; };
-		DAC8990320AA9DD400458285 /* CustomCollectionViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomCollectionViewCell.h; sourceTree = "<group>"; };
-		DAC8990420AA9DD400458285 /* CustomCollectionViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CustomCollectionViewCell.m; sourceTree = "<group>"; };
+		DAC8990020AA9A2400458285 /* TableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TableViewCell.h; sourceTree = "<group>"; };
+		DAC8990120AA9A2400458285 /* TableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TableViewCell.m; sourceTree = "<group>"; };
+		DAC8990320AA9DD400458285 /* CollectionViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CollectionViewCell.h; sourceTree = "<group>"; };
+		DAC8990420AA9DD400458285 /* CollectionViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CollectionViewCell.m; sourceTree = "<group>"; };
 		DACD98632060EF2500C2A4B8 /* VisitsTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VisitsTableViewCell.h; sourceTree = "<group>"; };
 		DACD98642060EF2500C2A4B8 /* VisitsTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VisitsTableViewCell.m; sourceTree = "<group>"; };
 		DAE2684920627E13004F7EF8 /* DataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DataModel.xcdatamodel; sourceTree = "<group>"; };
@@ -218,12 +248,26 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1180173C060A68B3FC0BCB9 /* libPods-tarkie.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		AFBE2F449B0B7C7718D76CF2 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				85E3731E89DC93C596E8C8DB /* Pods-tarkie.sevie debug.xcconfig */,
+				3D576833A30E7C71E3C393D9 /* Pods-tarkie.timsie debug.xcconfig */,
+				28CDBEA7A8ED9A48F91A5338 /* Pods-tarkie.sevie release.xcconfig */,
+				B8C772CBFB7C80AFC9A1070E /* Pods-tarkie.timsie release.xcconfig */,
+				14840DEEFCDCCE914EDDC146 /* Pods-tarkie.tarkie debug.xcconfig */,
+				7722A72D704B4C9374172CFD /* Pods-tarkie.tarkie release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 		DA0B7CBE203A79AB00844221 /* constants */ = {
 			isa = PBXGroup;
 			children = (
@@ -257,12 +301,14 @@
 			children = (
 				DA0B7CCA203A89B000844221 /* Http.h */,
 				DA0B7CCB203A89B000844221 /* Http.m */,
-				DA0B7CC7203A89B000844221 /* Image.h */,
-				DA0B7CC6203A89B000844221 /* Image.m */,
+				DA0B7CC7203A89B000844221 /* File.h */,
+				DA0B7CC6203A89B000844221 /* File.m */,
 				DA0B7CCC203A89B000844221 /* View.h */,
 				DA0B7CCD203A89B000844221 /* View.m */,
 				DAC869E22047C4C000C21D23 /* Time.h */,
 				DAC869E32047C4C000C21D23 /* Time.m */,
+				47AC039B21180538002CEFA8 /* Color.h */,
+				47AC039C21180538002CEFA8 /* Color.m */,
 			);
 			path = utils;
 			sourceTree = "<group>";
@@ -271,9 +317,9 @@
 			isa = PBXGroup;
 			children = (
 				DA8A5C7820E0DD3F00C7BE6E /* Announcement.m4a */,
-				DAB3702120846E71003C588F /* Font-Awesome-Brands.ttf */,
-				DAB3701F20846E70003C588F /* Font-Awesome-Regular.ttf */,
-				DAB3702020846E70003C588F /* Font-Awesome-Solid.ttf */,
+				DAB3702120846E71003C588F /* Font-Awesome-Brands-Regular.otf */,
+				DAB3701F20846E70003C588F /* Font-Awesome-Free-Regular.otf */,
+				DAB3702020846E70003C588F /* Font-Awesome-Free-Solid.otf */,
 				DA0B7CDC203A89DA00844221 /* Proxima-Nova-Bold.otf */,
 				DA0B7CD8203A89DA00844221 /* Proxima-Nova-Light.otf */,
 				DA0B7CDB203A89DA00844221 /* Proxima-Nova-Mid.otf */,
@@ -288,6 +334,7 @@
 				DA1532C91FCE9A80003FD977 /* tarkie */,
 				DA1532C81FCE9A80003FD977 /* Products */,
 				DA823451208DAEBB00F8F8B4 /* Frameworks */,
+				AFBE2F449B0B7C7718D76CF2 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -326,6 +373,7 @@
 			children = (
 				DA823454208DB3EE00F8F8B4 /* UIKit.framework */,
 				DA823452208DAEBC00F8F8B4 /* Foundation.framework */,
+				D0A83862F986EF0BF691B8AD /* libPods-tarkie.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -336,12 +384,16 @@
 				DA9D207220BFA84A00E13E83 /* dialog */,
 				DA9D207320BFA86B00E13E83 /* tableView */,
 				DA9D207420BFA87500E13E83 /* collectionView */,
-				DA6FE7002043BAB400BFC7A7 /* CustomViewController.h */,
-				DA6FE7012043BAB400BFC7A7 /* CustomViewController.m */,
-				DAC8990020AA9A2400458285 /* CustomTableViewCell.h */,
-				DAC8990120AA9A2400458285 /* CustomTableViewCell.m */,
-				DAC8990320AA9DD400458285 /* CustomCollectionViewCell.h */,
-				DAC8990420AA9DD400458285 /* CustomCollectionViewCell.m */,
+				4731BF3D2124555A00473261 /* LayoutConstraint.h */,
+				4731BF3E2124555A00473261 /* LayoutConstraint.m */,
+				DA6FE7002043BAB400BFC7A7 /* ViewController.h */,
+				DA6FE7012043BAB400BFC7A7 /* ViewController.m */,
+				4717DB0A21478A54006A2FF6 /* ScrollView.h */,
+				4717DB0B21478A54006A2FF6 /* ScrollView.m */,
+				DAC8990020AA9A2400458285 /* TableViewCell.h */,
+				DAC8990120AA9A2400458285 /* TableViewCell.m */,
+				DAC8990320AA9DD400458285 /* CollectionViewCell.h */,
+				DAC8990420AA9DD400458285 /* CollectionViewCell.m */,
 				DA88308420BE5305003C4D4E /* CameraViewController.h */,
 				DA88308520BE5305003C4D4E /* CameraViewController.m */,
 				DA7D425D20BF086500E2FCF0 /* CameraPreviewViewController.h */,
@@ -354,6 +406,8 @@
 				DA339528208B04FF00F9B992 /* TextView.m */,
 				DA75F5F120D4AC5900E21D86 /* SignatureView.h */,
 				DA75F5F220D4AC5900E21D86 /* SignatureView.m */,
+				47B6382421463171009914F2 /* CircularProgressBar.h */,
+				47B6382521463171009914F2 /* CircularProgressBar.m */,
 			);
 			path = widgets;
 			sourceTree = "<group>";
@@ -390,6 +444,8 @@
 				DA512D092057E071008414C9 /* HomeTableViewCell.m */,
 				DACD98632060EF2500C2A4B8 /* VisitsTableViewCell.h */,
 				DACD98642060EF2500C2A4B8 /* VisitsTableViewCell.m */,
+				47C6CA7621213C8A0000B03D /* OvertimeFormTableViewCell.h */,
+				47C6CA7721213C8A0000B03D /* OvertimeFormTableViewCell.m */,
 			);
 			path = tableView;
 			sourceTree = "<group>";
@@ -439,6 +495,8 @@
 				DAA947CD1FD135D100B3FA3E /* LoginViewController.m */,
 				DA26F0731FD250F3009074CB /* MainViewController.h */,
 				DA26F0741FD250F3009074CB /* MainViewController.m */,
+				47C6CA7921218D520000B03D /* AboutViewController.h */,
+				47C6CA7A21218D520000B03D /* AboutViewController.m */,
 				DA73ADA720DCD2AD0031D48F /* AnnouncementsViewController.h */,
 				DA73ADA820DCD2AD0031D48F /* AnnouncementsViewController.m */,
 				DAB8DE6320DD23FD00329A3F /* AnnouncementDetailsViewController.h */,
@@ -472,6 +530,8 @@
 				DA30067720D0EE040082DA34 /* AttendanceSummaryViewController.m */,
 				DA30067920D0EE200082DA34 /* AddSignatureViewController.h */,
 				DA30067A20D0EE200082DA34 /* AddSignatureViewController.m */,
+				47591A64211D6C2000E21A44 /* OvertimeFormViewController.h */,
+				47591A65211D6C2000E21A44 /* OvertimeFormViewController.m */,
 			);
 			path = attendance;
 			sourceTree = "<group>";
@@ -521,6 +581,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = DA1532DD1FCE9A80003FD977 /* Build configuration list for PBXNativeTarget "tarkie" */;
 			buildPhases = (
+				C8CFC8389D4096D57F442C32 /* [CP] Check Pods Manifest.lock */,
 				DA1532C31FCE9A80003FD977 /* Sources */,
 				DA1532C41FCE9A80003FD977 /* Frameworks */,
 				DA1532C51FCE9A80003FD977 /* Resources */,
@@ -580,9 +641,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				DA8A5C7920E0DD4000C7BE6E /* Announcement.m4a in Resources */,
-				DAB3702220846E71003C588F /* Font-Awesome-Regular.ttf in Resources */,
-				DAB3702320846E71003C588F /* Font-Awesome-Solid.ttf in Resources */,
-				DAB3702420846E71003C588F /* Font-Awesome-Brands.ttf in Resources */,
+				DAB3702220846E71003C588F /* Font-Awesome-Free-Regular.otf in Resources */,
+				DAB3702320846E71003C588F /* Font-Awesome-Free-Solid.otf in Resources */,
+				DAB3702420846E71003C588F /* Font-Awesome-Brands-Regular.otf in Resources */,
 				DA1532D41FCE9A80003FD977 /* Assets.xcassets in Resources */,
 				DA0B7CE0203A89DA00844221 /* Proxima-Nova-Mid.otf in Resources */,
 				DA1532D21FCE9A80003FD977 /* Main.storyboard in Resources */,
@@ -594,14 +655,40 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		C8CFC8389D4096D57F442C32 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-tarkie-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		DA1532C31FCE9A80003FD977 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				DA0B7CD1203A89B000844221 /* View.m in Sources */,
-				DA6FE7022043BAB400BFC7A7 /* CustomViewController.m in Sources */,
+				DA6FE7022043BAB400BFC7A7 /* ViewController.m in Sources */,
 				DA0B7CEF203A89F400844221 /* Load.m in Sources */,
+				47591A66211D6C2000E21A44 /* OvertimeFormViewController.m in Sources */,
 				DA1532CF1FCE9A80003FD977 /* HomeViewController.m in Sources */,
 				DA7DA8231FDF7E8900EA2358 /* InventoryViewController.m in Sources */,
 				DA6E406C20BD95AA00EB8BCA /* PhotoBarCollectionView.m in Sources */,
@@ -614,8 +701,11 @@
 				DAC869E42047C4C000C21D23 /* Time.m in Sources */,
 				DAC24C202091952B00CCCAD6 /* EditStoreViewController.m in Sources */,
 				DA339529208B04FF00F9B992 /* TextView.m in Sources */,
+				47C6CA7821213C8A0000B03D /* OvertimeFormTableViewCell.m in Sources */,
+				4731BF3F2124555A00473261 /* LayoutConstraint.m in Sources */,
 				DA30067B20D0EE200082DA34 /* AddSignatureViewController.m in Sources */,
 				DAA947CE1FD135D100B3FA3E /* LoginViewController.m in Sources */,
+				4717DB0C21478A54006A2FF6 /* ScrollView.m in Sources */,
 				DA0B7CF0203A89F400844221 /* Get.m in Sources */,
 				DAC24C26209195A800CCCAD6 /* EditStoreContactViewController.m in Sources */,
 				DA7DA8201FDF7E6400EA2358 /* ExpenseViewController.m in Sources */,
@@ -637,25 +727,28 @@
 				DA7DA8291FDF7EFA00EA2358 /* HistoryViewController.m in Sources */,
 				DA0B7CD0203A89B000844221 /* Http.m in Sources */,
 				DA1532DA1FCE9A80003FD977 /* main.m in Sources */,
-				DA0B7CCE203A89B000844221 /* Image.m in Sources */,
+				DA0B7CCE203A89B000844221 /* File.m in Sources */,
 				DA0B7CF2203A89F400844221 /* Rx.m in Sources */,
 				DA728859204E331200355734 /* PageBarCollectionView.m in Sources */,
 				DA7DA8261FDF7ECA00EA2358 /* FormsViewController.m in Sources */,
 				DAC24C232091959900CCCAD6 /* StoreContactsViewController.m in Sources */,
+				47C6CA7B21218D520000B03D /* AboutViewController.m in Sources */,
 				DA30067820D0EE040082DA34 /* AttendanceSummaryViewController.m in Sources */,
+				47B6382621463171009914F2 /* CircularProgressBar.m in Sources */,
 				DA1532CC1FCE9A80003FD977 /* AppDelegate.m in Sources */,
 				DAE2684A20627E13004F7EF8 /* DataModel.xcdatamodeld in Sources */,
 				DA26F0781FD55890009074CB /* VisitsViewController.m in Sources */,
-				DAC8990520AA9DD400458285 /* CustomCollectionViewCell.m in Sources */,
+				DAC8990520AA9DD400458285 /* CollectionViewCell.m in Sources */,
 				DA7D425F20BF086500E2FCF0 /* CameraPreviewViewController.m in Sources */,
 				DACD98652060EF2500C2A4B8 /* VisitsTableViewCell.m in Sources */,
 				DAA947CB1FD1354D00B3FA3E /* AuthorizationViewController.m in Sources */,
 				DAE62D481FFC7BF0007D0865 /* DrawerViewController.m in Sources */,
 				DA6FE70720441E7F00BFC7A7 /* DrawerHeaderTableViewCell.m in Sources */,
-				DAC8990220AA9A2400458285 /* CustomTableViewCell.m in Sources */,
+				DAC8990220AA9A2400458285 /* TableViewCell.m in Sources */,
 				DA512D0A2057E071008414C9 /* HomeTableViewCell.m in Sources */,
 				DA88308620BE5305003C4D4E /* CameraViewController.m in Sources */,
 				DA0B7CD7203A89C100844221 /* LoadingDialogViewController.m in Sources */,
+				47AC039D21180538002CEFA8 /* Color.m in Sources */,
 				DAB8DE6220DCF8B100329A3F /* AnnouncementItemTableViewCell.m in Sources */,
 				DAB8DE6520DD23FD00329A3F /* AnnouncementDetailsViewController.m in Sources */,
 			);
@@ -668,6 +761,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				DA1532D11FCE9A80003FD977 /* Base */,
+				478C8CD3211979EA00B5BBF9 /* en */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -675,6 +769,162 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		47F5413821527C7800BD4F2A /* Tarkie Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = "Tarkie Debug";
+		};
+		47F5413921527C7800BD4F2A /* Tarkie Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 14840DEEFCDCCE914EDDC146 /* Pods-tarkie.tarkie debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon.$(FLAVOR:lower)";
+				BUILD_TYPE = DEBUG;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E26F49V7U6;
+				FLAVOR = TARKIE;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"FLAVOR_$(FLAVOR)=1",
+					"BUILD_TYPE_$(BUILD_TYPE)=1",
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = tarkie/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.mobileoptima$(PRODUCT_BUNDLE_IDENTIFIER_SUFFIX)";
+				PRODUCT_BUNDLE_IDENTIFIER_SUFFIX = ".$(FLAVOR:lower).$(BUILD_TYPE:lower)";
+				PRODUCT_NAME = "Tarkie-Debug";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "Tarkie Debug";
+		};
+		47F5413A21527C8800BD4F2A /* Tarkie Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = "Tarkie Release";
+		};
+		47F5413B21527C8800BD4F2A /* Tarkie Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7722A72D704B4C9374172CFD /* Pods-tarkie.tarkie release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon.$(FLAVOR:lower)";
+				BUILD_TYPE = RELEASE;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E26F49V7U6;
+				FLAVOR = TARKIE;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"FLAVOR_$(FLAVOR)=1",
+					"BUILD_TYPE_$(BUILD_TYPE)=1",
+				);
+				INFOPLIST_FILE = tarkie/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.mobileoptima$(PRODUCT_BUNDLE_IDENTIFIER_SUFFIX)";
+				PRODUCT_BUNDLE_IDENTIFIER_SUFFIX = ".$(FLAVOR:lower)";
+				PRODUCT_NAME = Tarkie;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "Tarkie Release";
+		};
 		DA1532DB1FCE9A80003FD977 /* Sevie Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -785,6 +1035,7 @@
 		};
 		DA1532DE1FCE9A80003FD977 /* Sevie Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 85E3731E89DC93C596E8C8DB /* Pods-tarkie.sevie debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon.$(FLAVOR:lower)";
 				BUILD_TYPE = DEBUG;
@@ -798,9 +1049,9 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = tarkie/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.mobileoptima.tarkie$(PRODUCT_BUNDLE_IDENTIFIER_SUFFIX)";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.mobileoptima$(PRODUCT_BUNDLE_IDENTIFIER_SUFFIX)";
 				PRODUCT_BUNDLE_IDENTIFIER_SUFFIX = ".$(FLAVOR:lower).$(BUILD_TYPE:lower)";
 				PRODUCT_NAME = "Sevie-Debug";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -809,6 +1060,7 @@
 		};
 		DA1532DF1FCE9A80003FD977 /* Sevie Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 28CDBEA7A8ED9A48F91A5338 /* Pods-tarkie.sevie release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon.$(FLAVOR:lower)";
 				BUILD_TYPE = RELEASE;
@@ -820,9 +1072,9 @@
 					"BUILD_TYPE_$(BUILD_TYPE)=1",
 				);
 				INFOPLIST_FILE = tarkie/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.mobileoptima.tarkie$(PRODUCT_BUNDLE_IDENTIFIER_SUFFIX)";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.mobileoptima$(PRODUCT_BUNDLE_IDENTIFIER_SUFFIX)";
 				PRODUCT_BUNDLE_IDENTIFIER_SUFFIX = ".$(FLAVOR:lower)";
 				PRODUCT_NAME = Sevie;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -888,6 +1140,7 @@
 		};
 		DAB945C81FCEA92000FCB299 /* Timsie Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3D576833A30E7C71E3C393D9 /* Pods-tarkie.timsie debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon.$(FLAVOR:lower)";
 				BUILD_TYPE = DEBUG;
@@ -901,9 +1154,9 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = tarkie/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.mobileoptima.tarkie$(PRODUCT_BUNDLE_IDENTIFIER_SUFFIX)";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.mobileoptima$(PRODUCT_BUNDLE_IDENTIFIER_SUFFIX)";
 				PRODUCT_BUNDLE_IDENTIFIER_SUFFIX = ".$(FLAVOR:lower).$(BUILD_TYPE:lower)";
 				PRODUCT_NAME = "Timsie-Debug";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -963,6 +1216,7 @@
 		};
 		DAB945CA1FCEA93100FCB299 /* Timsie Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B8C772CBFB7C80AFC9A1070E /* Pods-tarkie.timsie release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon.$(FLAVOR:lower)";
 				BUILD_TYPE = RELEASE;
@@ -974,9 +1228,9 @@
 					"BUILD_TYPE_$(BUILD_TYPE)=1",
 				);
 				INFOPLIST_FILE = tarkie/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.mobileoptima.tarkie$(PRODUCT_BUNDLE_IDENTIFIER_SUFFIX)";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.mobileoptima$(PRODUCT_BUNDLE_IDENTIFIER_SUFFIX)";
 				PRODUCT_BUNDLE_IDENTIFIER_SUFFIX = ".$(FLAVOR:lower)";
 				PRODUCT_NAME = Timsie;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -990,8 +1244,10 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				DA1532DB1FCE9A80003FD977 /* Sevie Debug */,
+				47F5413821527C7800BD4F2A /* Tarkie Debug */,
 				DAB945C71FCEA92000FCB299 /* Timsie Debug */,
 				DA1532DC1FCE9A80003FD977 /* Sevie Release */,
+				47F5413A21527C8800BD4F2A /* Tarkie Release */,
 				DAB945C91FCEA93100FCB299 /* Timsie Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -1001,8 +1257,10 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				DA1532DE1FCE9A80003FD977 /* Sevie Debug */,
+				47F5413921527C7800BD4F2A /* Tarkie Debug */,
 				DAB945C81FCEA92000FCB299 /* Timsie Debug */,
 				DA1532DF1FCE9A80003FD977 /* Sevie Release */,
+				47F5413B21527C8800BD4F2A /* Tarkie Release */,
 				DAB945CA1FCEA93100FCB299 /* Timsie Release */,
 			);
 			defaultConfigurationIsVisible = 0;

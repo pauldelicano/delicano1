@@ -1,14 +1,21 @@
-#import "CustomCollectionViewCell.h"
-#import "Image.h"
+#import "TableViewCell.h"
+#import "File.h"
 #import "View.h"
+#import "Color.h"
 #import "TextField.h"
 #import "TextView.h"
 
-@implementation CustomCollectionViewCell
+@implementation TableViewCell
 
 - (void)awakeFromNib {
     [super awakeFromNib];
     [self scaleView:self];
+    self.longPressGesture = UILongPressGestureRecognizer.alloc.init;
+}
+
+- (void)drawRect:(CGRect)rect {
+    [super drawRect:rect];
+    [self addGestureRecognizer:self.longPressGesture];
 }
 
 - (void)scaleView:(UIView *)view {
@@ -19,7 +26,7 @@
     }
     if([view isKindOfClass:UIButton.class]) {
         [View scaleFontSize:((UIButton *)view).titleLabel];
-        [(UIButton *)view setBackgroundImage:[Image fromColor:[UIColor colorNamed:@"BlackTransSixty"]] forState:UIControlStateHighlighted];
+        [(UIButton *)view setBackgroundImage:[File imageFromColor:[Color colorNamed:@"BlackTransSixty"]] forState:UIControlStateHighlighted];
         return;
     }
     if([view isKindOfClass:TextField.class]) {
@@ -30,8 +37,8 @@
         [View scaleFontSize:view];
         return;
     }
-    for(int x = 0; x < view.subviews.count; x++) {
-        [self scaleView:view.subviews[x]];
+    for(UIView *subview in view.subviews) {
+        [self scaleView:subview];
     }
 }
 

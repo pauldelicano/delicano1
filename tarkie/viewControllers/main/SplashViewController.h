@@ -1,6 +1,6 @@
-#import "CustomViewController.h"
+#import "ViewController.h"
 
-@interface SplashViewController : CustomViewController
+@interface SplashViewController : ViewController
 
 @property (weak, nonatomic) IBOutlet UIView *vBackground;
 @property (weak, nonatomic) IBOutlet UIImageView *ivAppLogo;

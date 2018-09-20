@@ -1,4 +1,5 @@
 #import "TextView.h"
+#import "Color.h"
 
 @interface TextView()
 
@@ -22,15 +23,19 @@
 
 - (instancetype)initialize:(TextView *)instance {
     instance.delegate = self;
-    self.placeholderColor = [UIColor colorNamed:@"Grey500"];
-    self.valueColor = [UIColor colorNamed:@"Grey800"];
-    self.defaultBorderColor = [UIColor colorNamed:@"Grey200"];
+    self.placeholderColor = [Color colorNamed:@"Grey500"];
+    self.valueColor = [Color colorNamed:@"Grey800"];
+    self.defaultBorderColor = [Color colorNamed:@"Grey200"];
     self.layer.borderWidth = (1.0f / 568) * UIScreen.mainScreen.bounds.size.height;
     self.layer.borderColor = self.defaultBorderColor.CGColor;
     CGFloat inset = (12.0f / 568) * UIScreen.mainScreen.bounds.size.height;
     self.textContainer.lineFragmentPadding = 0;
     self.textContainerInset = UIEdgeInsetsMake(inset, inset, inset, inset);
     return instance;
+}
+
+- (void)awakeFromNib {
+    [super awakeFromNib];
 }
 
 - (void)setValue:(NSString *)value {

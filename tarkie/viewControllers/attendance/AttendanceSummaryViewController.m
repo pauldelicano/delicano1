@@ -2,7 +2,7 @@
 #import "AppDelegate.h"
 #import "App.h"
 #import "Get.h"
-#import "Image.h"
+#import "File.h"
 #import "View.h"
 #import "Time.h"
 
@@ -29,13 +29,13 @@
         self.vNavBar.backgroundColor = THEME_PRI;
         [self.btnAddSignature setTitleColor:THEME_SEC forState:UIControlStateNormal];
         self.btnTimeOut.backgroundColor = THEME_SEC;
-        [View setCornerRadiusByHeight:self.btnAddSignature cornerRadius:0.3];
+        [View setCornerRadiusByHeight:self.btnAddSignature cornerRadius:0.2];
         [View setCornerRadiusByWidth:self.ivSignature cornerRadius:0.025];
         CALayer *layer = self.btnAddSignature.layer;
         layer.borderColor = THEME_SEC.CGColor;
         layer.borderWidth = (1.0f / 568) * UIScreen.mainScreen.bounds.size.height;
         layer = self.ivSignature.layer;
-        layer.borderColor = [UIColor colorNamed:@"Grey800"].CGColor;
+        layer.borderColor = [Color colorNamed:@"Grey500"].CGColor;
         layer.borderWidth = (1.0f / 568) * UIScreen.mainScreen.bounds.size.height;
         [self onRefresh];
     }
@@ -43,32 +43,31 @@
 
 - (void)onRefresh {
     [super onRefresh];
-    self.lTimeIn.text = [NSString stringWithFormat:@"%@ %@", [Time formatDate:self.app.settingDisplayDateFormat date:self.timeIn.date], [Time formatTime:self.app.settingDisplayTimeFormat time:self.timeIn.time]];
-    if(self.timeOut != nil) {
-        self.lTimeOut.text = [NSString stringWithFormat:@"%@ %@", [Time formatDate:self.app.settingDisplayDateFormat date:self.timeOut.date], [Time formatTime:self.app.settingDisplayTimeFormat time:self.timeOut.time]];
+    self.lTimeIn.text = self.timeIn;
+    self.lTimeOut.text = self.timeOut;
+    if(self.isHistory) {
         self.btnAddSignature.hidden = YES;
-        self.ivSignature.image = [Image fromDocument:self.timeOut.signature];
+        self.ivSignature.image = self.signature;
         self.ivSignature.hidden = NO;
         self.btnEditSignature.hidden = YES;
         self.btnCancel.hidden = YES;
         self.btnTimeOut.hidden = YES;
     }
     else {
-        self.lTimeOut.text = [Time getFormattedDate:[NSString stringWithFormat:@"%@ %@", self.app.settingDisplayDateFormat, self.app.settingDisplayTimeFormat] date:self.timeOutPreview];
         self.btnAddSignature.hidden = !self.app.settingAttendanceTimeOutSignature;
         self.ivSignature.hidden = YES;
         self.btnEditSignature.hidden = YES;
         self.btnCancel.hidden = NO;
         self.btnTimeOut.hidden = NO;
     }
-    self.lTotalWorkHours.text = @"";
-    self.lTotalBreak.text = @"";
-    self.lTotalNetWorkHours.text = @"";
+    self.lTotalWorkHours.text = [Time secondsToHoursMinutes:self.workHours];
+    self.lTotalBreak.text = [Time secondsToHoursMinutes:self.breakHours];
+    self.lTotalNetWorkHours.text = [Time secondsToHoursMinutes:self.workHours - self.breakHours];
 }
 
 - (IBAction)back:(id)sender {
     [self.navigationController popViewControllerAnimated:YES];
-    if(self.timeOutPreview != nil) {
+    if(!self.isHistory) {
         [self.delegate onAttendanceSummaryCancel];
     }
 }

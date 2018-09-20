@@ -21,9 +21,9 @@
         self.viewDidAppear = YES;
         self.lSubject.textColor = THEME_PRI;
         self.btnPositive.backgroundColor = THEME_SEC;
-        [View setCornerRadiusByWidth:self.lSubject.superview cornerRadius:0.025];
-        [View setCornerRadiusByHeight:self.btnNegative cornerRadius:0.3];
-        [View setCornerRadiusByHeight:self.btnPositive cornerRadius:0.3];
+        [View setCornerRadiusByWidth:self.lSubject.superview cornerRadius:0.075];
+        [View setCornerRadiusByHeight:self.btnNegative cornerRadius:0.2];
+        [View setCornerRadiusByHeight:self.btnPositive cornerRadius:0.2];
         [self onRefresh];
     }
 }
@@ -51,6 +51,13 @@
         if(self.positiveTarget != nil) {
             [self.btnPositive addTarget:self.positiveTarget action:@selector(invoke) forControlEvents:UIControlEventTouchUpInside];
         }
+    }
+    if(self.vContent.frame.size.height < self.vScroll.frame.size.height) {
+        CGFloat inset = self.vScroll.frame.size.height - self.vContent.frame.size.height;
+        self.vScroll.contentInset = UIEdgeInsetsMake(inset * 0.5, 0, inset * 0.5, 0);
+    }
+    else {
+        self.vScroll.contentInset = UIEdgeInsetsZero;
     }
 }
 

@@ -1,7 +1,7 @@
 #import "CameraPreviewViewController.h"
 #import "AppDelegate.h"
 #import "App.h"
-#import "Image.h"
+#import "File.h"
 #import "View.h"
 #import "MessageDialogViewController.h"
 #import "PhotoBarItemCollectionViewCell.h"
@@ -68,18 +68,18 @@ static MessageDialogViewController *vcMessage;
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     PhotoBarItemCollectionViewCell *item = [collectionView dequeueReusableCellWithReuseIdentifier:@"item" forIndexPath:indexPath];
-    UIImage *image = [self.cache objectForKey:[NSString stringWithFormat:@"%ld", indexPath.row]];
+    UIImage *image = [self.cache objectForKey:[NSString stringWithFormat:@"%ld", (long)indexPath.row]];
     item.ivPhoto.image = image;
     if(image == nil) {
         CGSize size = [(UICollectionViewFlowLayout *)collectionView.collectionViewLayout itemSize];
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            UIImage *image = [Image fromDocument:self.photos[indexPath.row].filename];
+            UIImage *image = [File imageFromDocument:self.photos[indexPath.row].filename];
             UIGraphicsBeginImageContext(size);
             [image drawInRect:CGRectMake(0, 0, size.width, size.height)];
-            [self.cache setObject:UIGraphicsGetImageFromCurrentImageContext() forKey:[NSString stringWithFormat:@"%ld", indexPath.row]];
+            [self.cache setObject:UIGraphicsGetImageFromCurrentImageContext() forKey:[NSString stringWithFormat:@"%ld", (long)indexPath.row]];
             UIGraphicsEndImageContext();
             dispatch_async(dispatch_get_main_queue(), ^{
-                item.ivPhoto.image = [self.cache objectForKey:[NSString stringWithFormat:@"%ld", indexPath.row]];
+                item.ivPhoto.image = [self.cache objectForKey:[NSString stringWithFormat:@"%ld", (long)indexPath.row]];
             });
         });
     }

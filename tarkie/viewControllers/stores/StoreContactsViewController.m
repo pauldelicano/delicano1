@@ -23,6 +23,7 @@
     [super viewDidLoad];
     self.app = (AppDelegate *)UIApplication.sharedApplication.delegate;
     self.tvStoreContacts.tableFooterView = UIView.alloc.init;
+    self.tvStoreContacts.estimatedSectionHeaderHeight = 60;
     self.storeContacts = NSMutableArray.alloc.init;
     self.btnAdd.hidden = !self.app.settingStoreAdd;
     self.viewWillAppear = NO;

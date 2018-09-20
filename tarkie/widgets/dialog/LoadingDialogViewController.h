@@ -1,5 +1,7 @@
-#import "CustomViewController.h"
+#import "ViewController.h"
 #import "Process.h"
+#import "ScrollView.h"
+#import "CircularProgressBar.h"
 
 @protocol LoadingDelegate
 @optional
@@ -9,10 +11,14 @@
 
 @end
 
-@interface LoadingDialogViewController : CustomViewController<ProcessDelegate>
+@interface LoadingDialogViewController : ViewController<ProcessDelegate>
 
-@property (weak, nonatomic) IBOutlet UILabel *lMessage;
-@property (weak, nonatomic) IBOutlet UIProgressView *pvProgress;
+@property (weak, nonatomic) IBOutlet ScrollView *vScroll;
+@property (weak, nonatomic) IBOutlet UIView *vContent;
+@property (weak, nonatomic) IBOutlet UILabel *lSubject;
+@property (weak, nonatomic) IBOutlet UIButton *btnClose;
+@property (weak, nonatomic) IBOutlet CircularProgressBar *vCircularProgressBar;
+@property (weak, nonatomic) IBOutlet UILabel *lProgress;
 
 typedef enum {
     LOADING_ACTION_AUTHORIZE,

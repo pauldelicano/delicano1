@@ -11,7 +11,7 @@
 
 @property (strong, nonatomic) AppDelegate *app;
 @property (strong, nonatomic) id item;
-@property (nonatomic) UIEdgeInsets tfNotesLayoutMargins;
+@property (nonatomic) CGFloat notesHeight;
 @property (nonatomic) BOOL viewDidAppear;
 
 @end
@@ -22,7 +22,8 @@
     [super viewDidLoad];
     self.app = (AppDelegate *)UIApplication.sharedApplication.delegate;
     self.tvItems.tableFooterView = UIView.alloc.init;
-    self.tvItemsHeight.constant = self.tfDropDown.frame.size.height * 5;
+    self.notesHeight = self.tfNotesHeight.constant;
+    self.tfNotesHeight.constant = 0;
     self.viewDidAppear = NO;
 }
 
@@ -33,17 +34,15 @@
         self.tfNotes.highlightedBorderColor = THEME_SEC;
         self.btnPositive.backgroundColor = THEME_SEC;
         [self.btnDropDown setTitleColor:THEME_SEC forState:UIControlStateNormal];
-        [View setCornerRadiusByWidth:self.lMessage.superview cornerRadius:0.025];
+        [View setCornerRadiusByWidth:self.lSubject.superview cornerRadius:0.075];
         [View setCornerRadiusByHeight:self.tfDropDown cornerRadius:0.3];
         [View setCornerRadiusByHeight:self.btnDropDown cornerRadius:0.3];
         [View setCornerRadiusByWidth:self.tfNotes cornerRadius:0.025];
-        [View setCornerRadiusByHeight:self.btnNegative cornerRadius:0.3];
-        [View setCornerRadiusByHeight:self.btnPositive cornerRadius:0.3];
+        [View setCornerRadiusByHeight:self.btnNegative cornerRadius:0.2];
+        [View setCornerRadiusByHeight:self.btnPositive cornerRadius:0.2];
         CALayer *layer = self.tvItems.layer;
-        layer.borderColor = [UIColor colorNamed:@"BlackTransThirty"].CGColor;
-        layer.borderWidth = (1.0f / 568) * UIScreen.mainScreen.bounds.size.height;
-        self.tfNotesLayoutMargins = self.tfNotes.layoutMargins;
-        self.tfNotes.layoutMargins = UIEdgeInsetsZero;
+        layer.borderColor = [Color colorNamed:@"Grey500"].CGColor;
+        layer.borderWidth = (0.5f / 568) * UIScreen.mainScreen.bounds.size.height;
         [self onRefresh];
     }
 }
@@ -52,12 +51,11 @@
     [super onRefresh];
     switch(self.type) {
         case DROP_DOWN_TYPE_STORE: {
-            self.lMessage.text = @"Select Store".uppercaseString;
+            self.lSubject.text = @"Select Store".uppercaseString;
             break;
         }
         case DROP_DOWN_TYPE_SCHEDULE: {
-            self.lMessage.text = @"Select Schedule".uppercaseString;
-            self.tvItems.hidden = YES;
+            self.lSubject.text = @"Select Schedule".uppercaseString;
             break;
         }
         case DROP_DOWN_TYPE_CHECK_OUT_STATUS: {
@@ -65,25 +63,32 @@
             NSString *message = [NSString stringWithFormat:@"%@%@%@", @"You are checking-out at\n", visit.name, @"\nPlease choose the status\nof your visit:"];
             NSMutableAttributedString *attributedText = [NSMutableAttributedString.alloc initWithString:message];
             NSRange range = NSMakeRange(24, visit.name.length);
-            [attributedText addAttribute:NSFontAttributeName value:[UIFont fontWithName:@"ProximaNova-Semibold" size:self.lMessage.font.pointSize] range:range];
+            [attributedText addAttribute:NSFontAttributeName value:[UIFont fontWithName:@"ProximaNova-Semibold" size:self.lSubject.font.pointSize] range:range];
             NSMutableParagraphStyle *paragraphStyle = NSMutableParagraphStyle.alloc.init;
             paragraphStyle.alignment = NSTextAlignmentCenter;
             paragraphStyle.lineHeightMultiple = 1.5;
             paragraphStyle.lineSpacing = 6;
             [attributedText addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
-            self.lMessage.attributedText = attributedText;
+            self.lSubject.attributedText = attributedText;
             self.tfNotes.placeholder = @"Tap to add notes...";
             self.tfNotes.value = visit.notes;
             [self tableView:self.tvItems didSelectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
-            self.tvItems.hidden = YES;
             break;
         }
     }
+    self.tvItems.hidden = YES;
     if([self.tfDropDown.text isEqualToString:@"Item 1"]) {
         self.tfDropDown.text = nil;
     }
     if(self.tvItemsHeight.constant > self.tvItems.contentSize.height) {
         self.tvItemsHeight.constant = self.tvItems.contentSize.height;
+    }
+    if(self.vContent.frame.size.height < self.vScroll.frame.size.height) {
+        CGFloat inset = self.vScroll.frame.size.height - self.vContent.frame.size.height;
+        self.vScroll.contentInset = UIEdgeInsetsMake(inset * 0.5, 0, inset * 0.5, 0);
+    }
+    else {
+        self.vScroll.contentInset = UIEdgeInsetsZero;
     }
 }
 
@@ -150,12 +155,10 @@
             self.item = nil;
             if(visit.notes.length == 0 && (([visitStatus isEqualToString:@"Completed"] && self.app.settingVisitsNotesForCompleted) || ([visitStatus isEqualToString:@"Not Completed"] && self.app.settingVisitsNotesForNotCompleted) || ([visitStatus isEqualToString:@"Canceled"] && self.app.settingVisitsNotesForCanceled))) {
                 self.tfNotes.value = @"";
-                self.tfNotesHeight.constant = self.tfDropDown.frame.size.height * 2;
-                self.tfNotes.layoutMargins = self.tfNotesLayoutMargins;
+                self.tfNotesHeight.constant = self.notesHeight;
             }
             else {
                 self.tfNotesHeight.constant = 0;
-                self.tfNotes.layoutMargins = UIEdgeInsetsZero;
             }
             if(![visitStatus isEqualToString:@"Select Status"]) {
                 NSMutableDictionary *visit = NSMutableDictionary.alloc.init;

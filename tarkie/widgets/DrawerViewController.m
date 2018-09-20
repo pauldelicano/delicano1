@@ -1,14 +1,15 @@
 #import "DrawerViewController.h"
-#import "Image.h"
+#import "App.h"
+#import "File.h"
 #import "View.h"
+#import "Color.h"
 #import "DrawerHeaderTableViewCell.h"
 #import "DrawerItemTableViewCell.h"
 
 @interface DrawerViewController()
 
-@property (strong, nonatomic) UIView *vScreen;
-@property (nonatomic) float originX;
-@property (nonatomic) BOOL viewDidAppear, isOpening, isClosing;
+@property (nonatomic) float edge, originX;
+@property (nonatomic) BOOL viewWillAppear;
 
 @end
 
@@ -18,37 +19,25 @@
     [super viewDidLoad];
     self.openGesture = [UIScreenEdgePanGestureRecognizer.alloc initWithTarget:self action:@selector(openDrawer)];
     self.closeGesture = [UIPanGestureRecognizer.alloc initWithTarget:self action:@selector(closeDrawer)];
-    self.openGesture.edges = self.position == DRAWER_POSITION_LEFT ? UIRectEdgeLeft : UIRectEdgeRight;
     self.tvDrawer.tableFooterView = UIView.alloc.init;
-    if(self.parent != nil) {
-        [self.parent.view addGestureRecognizer:self.openGesture];
-    }
-    self.viewDidAppear = NO;
+    self.tvDrawer.estimatedSectionHeaderHeight = 144;
+    self.viewWillAppear = NO;
 }
 
-- (void)viewDidLayoutSubviews {
-    [super viewDidLayoutSubviews];
-    CGRect frame = self.tvDrawer.frame;
-    frame.size.width = frame.size.width * 0.85;
-    self.tvDrawer.frame = frame;
-}
-
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    if(!self.viewDidAppear) {
-        self.viewDidAppear = YES;
-        self.vScreen = UIView.alloc.init;
-        CGRect frame = self.view.frame;
-        frame.origin.y = self.tvDrawer.frame.origin.y;
-        self.vScreen.frame = frame;
-        self.vScreen.backgroundColor = UIColor.blackColor;
-        self.vScreen.alpha = 0;
-        self.vScreen.hidden = YES;
-        [self.parent.view addSubview:self.vScreen];
-        [self.parent.view bringSubviewToFront:self.view];
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    if(!self.viewWillAppear) {
+        self.viewWillAppear = YES;
+        self.openGesture.edges = self.position == DRAWER_POSITION_LEFT ? UIRectEdgeLeft : UIRectEdgeRight;
+        [self.view.superview.superview addGestureRecognizer:self.openGesture];
+        self.edge = (6.0f / 568) * UIScreen.mainScreen.bounds.size.height;
         self.originX = self.position == DRAWER_POSITION_LEFT ? 0 - self.view.frame.size.width : self.view.frame.size.width;
+        CGRect frame = self.view.superview.frame;
+        frame.origin.x = self.position == DRAWER_POSITION_LEFT ? self.originX + self.edge : self.originX - self.edge;
+        self.view.superview.frame = frame;
         frame = self.view.frame;
         frame.origin.x = self.originX;
+        frame.size.width = self.view.superview.frame.size.width * 0.8;
         self.view.frame = frame;
         [self onRefresh];
     }
@@ -65,17 +54,29 @@
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     DrawerHeaderTableViewCell *header = [tableView dequeueReusableCellWithIdentifier:@"header"];
-    header.vBackground.backgroundColor = self.headerBackgroundColor;
-    header.ivEmployeePhoto.image = [Image saveFromURL:[Image cachesPath:[NSString stringWithFormat:@"EMPLOYEE_PHOTO_%lld%@", self.employee.employeeID, @".png"]] url:self.employee.photoURL];
-    header.ivCompanyLogo.image = [Image saveFromURL:[Image cachesPath:[NSString stringWithFormat:@"COMPANY_LOGO_%lld%@", self.company.companyID, @".png"]] url:self.company.logoURL];
+    header.vBackground.backgroundColor = THEME_PRI;
+    header.ivEmployeePhoto.image = nil;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        UIImage *image = [File saveImageFromURL:[File cachesPath:[NSString stringWithFormat:@"EMPLOYEE_PHOTO_%lld%@", self.employee.employeeID, @".png"]] url:self.employee.photoURL];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            header.ivEmployeePhoto.image = image;
+        });
+    });
+    header.ivCompanyLogo.image = nil;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        UIImage *image = [File saveImageFromURL:[File cachesPath:[NSString stringWithFormat:@"COMPANY_LOGO_%lld%@", self.company.companyID, @".png"]] url:self.company.logoURL];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            header.ivCompanyLogo.image = image;
+        });
+    });
     header.lName.text = [NSString stringWithFormat:@"%@ %@", self.employee.firstName, self.employee.lastName];
     header.lDescription.text = self.employee.employeeNumber;
     CALayer *layer = header.ivEmployeePhoto.layer;
     layer.borderColor = UIColor.whiteColor.CGColor;
-    layer.borderWidth = (1.0f / 568) * UIScreen.mainScreen.bounds.size.height;
+    layer.borderWidth = (2.0f / 568) * UIScreen.mainScreen.bounds.size.height;
     layer = header.ivCompanyLogo.layer;
     layer.borderColor = UIColor.whiteColor.CGColor;
-    layer.borderWidth = (1.0f / 568) * UIScreen.mainScreen.bounds.size.height;
+    layer.borderWidth = (2.0f / 568) * UIScreen.mainScreen.bounds.size.height;
     return header;
 }
 
@@ -103,33 +104,38 @@
 }
 
 - (void)openDrawer {
-    if(!self.isOpening) {
-        self.isOpening = YES;
+    if(CGColorGetAlpha(self.view.superview.superview.subviews.lastObject.backgroundColor.CGColor) == CGColorGetAlpha([Color colorNamed:@"BlackTransThirty"].CGColor)) {
+        return;
+    }
+    if(!self.isOpen) {
+        self.isOpen = YES;
+        CGRect frame = self.view.superview.frame;
+        frame.origin.x = 0;
+        self.view.superview.frame = frame;
         [UIView animateWithDuration:0.5 animations:^{
-            self.vScreen.hidden = NO;
-            self.vScreen.alpha = 0.8;
+            self.view.superview.backgroundColor = [Color colorNamed:@"BlackTransSixty"];
             CGRect frame = self.view.frame;
-            frame.origin.x = self.position == DRAWER_POSITION_LEFT ? 0 : self.view.frame.size.width - self.tvDrawer.frame.size.width;
+            frame.origin.x = self.position == DRAWER_POSITION_LEFT ? 0 : self.view.superview.frame.size.width - self.view.frame.size.width;
             self.view.frame = frame;
         } completion:^(BOOL finished) {
-            [self.parent.view addGestureRecognizer:self.closeGesture];
-            self.isOpening = NO;
+            [self.view.superview.superview addGestureRecognizer:self.closeGesture];
         }];
     }
 }
 
 - (void)closeDrawer {
-    if(!self.isClosing) {
-        self.isClosing = YES;
+    if(self.isOpen) {
+        self.isOpen = NO;
         [UIView animateWithDuration:0.25 animations:^{
-            self.vScreen.alpha = 0;
+            self.view.superview.backgroundColor = UIColor.clearColor;
             CGRect frame = self.view.frame;
             frame.origin.x = self.originX;
             self.view.frame = frame;
         } completion:^(BOOL finished) {
-            self.vScreen.hidden = YES;
-            [self.parent.view removeGestureRecognizer:self.closeGesture];
-            self.isClosing = NO;
+            CGRect frame = self.view.superview.frame;
+            frame.origin.x = self.position == DRAWER_POSITION_LEFT ? self.originX + self.edge : self.originX - self.edge;
+            self.view.superview.frame = frame;
+            [self.view.superview.superview removeGestureRecognizer:self.closeGesture];
         }];
     }
 }

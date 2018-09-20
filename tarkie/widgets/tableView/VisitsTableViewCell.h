@@ -1,6 +1,6 @@
-#import "CustomTableViewCell.h"
+#import "TableViewCell.h"
 
-@interface VisitsTableViewCell : CustomTableViewCell
+@interface VisitsTableViewCell : TableViewCell
 
 @property (weak, nonatomic) IBOutlet UILabel *lName;
 @property (weak, nonatomic) IBOutlet UILabel *lStatus;

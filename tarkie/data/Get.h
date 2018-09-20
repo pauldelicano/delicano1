@@ -36,6 +36,7 @@
 #import "CheckOut+CoreDataClass.h"
 
 #import "GPS+CoreDataClass.h"
+#import "Tracking+CoreDataClass.h"
 
 @interface Get : NSObject
 
@@ -45,73 +46,74 @@
 + (Device *)device:(NSManagedObjectContext *)db;
 + (NSString *)apiKey:(NSManagedObjectContext *)db;
 + (Company *)company:(NSManagedObjectContext *)db;
-+ (Modules *)module:(NSManagedObjectContext *)db moduleID:(long)moduleID;
-+ (BOOL)isModuleEnabled:(NSManagedObjectContext *)db moduleID:(long)moduleID;
++ (Modules *)module:(NSManagedObjectContext *)db moduleID:(int64_t)moduleID;
++ (BOOL)isModuleEnabled:(NSManagedObjectContext *)db moduleID:(int64_t)moduleID;
 + (Users *)user:(NSManagedObjectContext *)db;
-+ (long)userID:(NSManagedObjectContext *)db;
-+ (Employees *)employee:(NSManagedObjectContext *)db employeeID:(long)employeeID;
-+ (long)teamID:(NSManagedObjectContext *)db employeeID:(long)employeeID;
-+ (Settings *)setting:(NSManagedObjectContext *)db settingID:(long)settingID;
-+ (SettingsTeams *)settingTeam:(NSManagedObjectContext *)db settingID:(long)settingID teamID:(long)teamID;
-+ (BOOL)isSettingEnabled:(NSManagedObjectContext *)db settingID:(long)settingID teamID:(long)teamID;
-+ (NSString *)settingCurrencySymbol:(NSManagedObjectContext *)db teamID:(long)teamID;
-+ (NSString *)settingDateFormat:(NSManagedObjectContext *)db teamID:(long)teamID;
-+ (NSString *)settingTimeFormat:(NSManagedObjectContext *)db teamID:(long)teamID;
-+ (Conventions *)convention:(NSManagedObjectContext *)db conventionID:(long)conventionID;
-+ (NSString *)conventionName:(NSManagedObjectContext *)db conventionID:(long)conventionID;
-+ (AlertTypes *)alertType:(NSManagedObjectContext *)db alertTypeID:(long)alertTypeID;
++ (int64_t)userID:(NSManagedObjectContext *)db;
++ (Employees *)employee:(NSManagedObjectContext *)db employeeID:(int64_t)employeeID;
++ (int64_t)teamID:(NSManagedObjectContext *)db employeeID:(int64_t)employeeID;
++ (Settings *)setting:(NSManagedObjectContext *)db settingID:(int64_t)settingID;
++ (int64_t)settingID:(NSManagedObjectContext *)db settingName:(NSString *)settingName;
++ (SettingsTeams *)settingTeam:(NSManagedObjectContext *)db settingID:(int64_t)settingID teamID:(int64_t)teamID;
++ (BOOL)isSettingEnabled:(NSManagedObjectContext *)db settingID:(int64_t)settingID teamID:(int64_t)teamID;
++ (NSString *)settingCurrencySymbol:(NSManagedObjectContext *)db teamID:(int64_t)teamID;
++ (NSString *)settingDateFormat:(NSManagedObjectContext *)db teamID:(int64_t)teamID;
++ (NSString *)settingTimeFormat:(NSManagedObjectContext *)db teamID:(int64_t)teamID;
++ (Conventions *)convention:(NSManagedObjectContext *)db conventionID:(int64_t)conventionID;
++ (NSString *)conventionName:(NSManagedObjectContext *)db conventionID:(int64_t)conventionID;
++ (AlertTypes *)alertType:(NSManagedObjectContext *)db alertTypeID:(int64_t)alertTypeID;
 + (TimeSecurity *)timeSecurity:(NSManagedObjectContext *)db;
 + (SyncBatch *)syncBatch:(NSManagedObjectContext *)db;
-+ (NSString *)syncBatchID:(NSManagedObjectContext *)db;
-+ (Announcements *)announcement:(NSManagedObjectContext *)db announcementID:(long)announcementID;
-+ (AnnouncementSeen *)announcementSeen:(NSManagedObjectContext *)db announcementID:(long)announcementID;
++ (Announcements *)announcement:(NSManagedObjectContext *)db announcementID:(int64_t)announcementID;
++ (AnnouncementSeen *)announcementSeen:(NSManagedObjectContext *)db announcementID:(int64_t)announcementID;
 + (long)unSeenAnnouncementsCount:(NSManagedObjectContext *)db;
 + (long)syncAnnouncementSeenCount:(NSManagedObjectContext *)db;
 
 //STORES
-+ (Stores *)store:(NSManagedObjectContext *)db webStoreID:(long)webStoreID;
-+ (Stores *)store:(NSManagedObjectContext *)db storeID:(long)storeID;
++ (Stores *)store:(NSManagedObjectContext *)db webStoreID:(int64_t)webStoreID;
++ (Stores *)store:(NSManagedObjectContext *)db storeID:(int64_t)storeID;
 + (long)syncStoresCount:(NSManagedObjectContext *)db;
-+ (StoreContacts *)storeContact:(NSManagedObjectContext *)db webStoreContactID:(long)webStoreContactID;
-+ (StoreContacts *)storeContact:(NSManagedObjectContext *)db storeContactID:(long)storeContactID;
++ (StoreContacts *)storeContact:(NSManagedObjectContext *)db webStoreContactID:(int64_t)webStoreContactID;
++ (StoreContacts *)storeContact:(NSManagedObjectContext *)db storeContactID:(int64_t)storeContactID;
 + (long)syncStoreContactsCount:(NSManagedObjectContext *)db;
 
 //ATTENDANCE
-+ (ScheduleTimes *)scheduleTime:(NSManagedObjectContext *)db scheduleTimeID:(long)scheduleTimeID;
-+ (Schedules *)schedule:(NSManagedObjectContext *)db webScheduleID:(long)webScheduleID scheduleDate:(NSString *)scheduleDate;
-+ (Schedules *)schedule:(NSManagedObjectContext *)db scheduleID:(long)scheduleID;
++ (ScheduleTimes *)scheduleTime:(NSManagedObjectContext *)db scheduleTimeID:(int64_t)scheduleTimeID;
++ (Schedules *)schedule:(NSManagedObjectContext *)db webScheduleID:(int64_t)webScheduleID scheduleDate:(NSString *)scheduleDate;
++ (Schedules *)schedule:(NSManagedObjectContext *)db scheduleID:(int64_t)scheduleID;
 + (long)syncSchedulesCount:(NSManagedObjectContext *)db;
 + (TimeIn *)timeIn:(NSManagedObjectContext *)db;
-+ (TimeIn *)timeIn:(NSManagedObjectContext *)db timeInID:(long)timeInID;
++ (TimeIn *)timeIn:(NSManagedObjectContext *)db timeInID:(int64_t)timeInID;
 + (BOOL)isTimeIn:(NSManagedObjectContext *)db;
 + (long)timeInCount:(NSManagedObjectContext *)db date:(NSString *)date;
 + (long)syncTimeInCount:(NSManagedObjectContext *)db;
 + (long)uploadTimeInPhotoCount:(NSManagedObjectContext *)db;
-+ (TimeOut *)timeOut:(NSManagedObjectContext *)db timeInID:(long)timeInID;
-+ (TimeOut *)timeOut:(NSManagedObjectContext *)db timeOutID:(long)timeOutID;
-+ (BOOL)isTimeOut:(NSManagedObjectContext *)db timeInID:(long)timeInID;
++ (TimeOut *)timeOut:(NSManagedObjectContext *)db timeInID:(int64_t)timeInID;
++ (TimeOut *)timeOut:(NSManagedObjectContext *)db timeOutID:(int64_t)timeOutID;
++ (BOOL)isTimeOut:(NSManagedObjectContext *)db timeInID:(int64_t)timeInID;
 + (long)syncTimeOutCount:(NSManagedObjectContext *)db;
 + (long)uploadTimeOutPhotoCount:(NSManagedObjectContext *)db;
 + (long)uploadTimeOutSignatureCount:(NSManagedObjectContext *)db;
-+ (BreakTypes *)breakType:(NSManagedObjectContext *)db breakTypeID:(long)breakTypeID;
-+ (OvertimeReasons *)overtimeReason:(NSManagedObjectContext *)db overtimeReasonID:(long)overtimeReasonID;
++ (long)syncOvertimeCount:(NSManagedObjectContext *)db;
++ (BreakTypes *)breakType:(NSManagedObjectContext *)db breakTypeID:(int64_t)breakTypeID;
++ (OvertimeReasons *)overtimeReason:(NSManagedObjectContext *)db overtimeReasonID:(int64_t)overtimeReasonID;
 
 //VISITS
-+ (Photos *)photo:(NSManagedObjectContext *)db photoID:(long)photoID;
++ (Photos *)photo:(NSManagedObjectContext *)db photoID:(int64_t)photoID;
 + (long)uploadVisitPhotosCount:(NSManagedObjectContext *)db;
-+ (Visits *)visit:(NSManagedObjectContext *)db visitID:(long)visitID;
-+ (Visits *)visit:(NSManagedObjectContext *)db webVisitID:(long)webVisitID;
++ (Visits *)visit:(NSManagedObjectContext *)db visitID:(int64_t)visitID;
++ (Visits *)visit:(NSManagedObjectContext *)db webVisitID:(int64_t)webVisitID;
 + (long)visitTodayCount:(NSManagedObjectContext *)db date:(NSString *)date;
 + (long)syncVisitsCount:(NSManagedObjectContext *)db;
-+ (VisitInventories *)visitInventory:(NSManagedObjectContext *)db visitID:(long)visitID inventoryID:(long)inventoryID;
-+ (VisitForms *)visitForm:(NSManagedObjectContext *)db visitID:(long)visitID formID:(long)formID;
++ (VisitInventories *)visitInventory:(NSManagedObjectContext *)db visitID:(int64_t)visitID inventoryID:(int64_t)inventoryID;
++ (VisitForms *)visitForm:(NSManagedObjectContext *)db visitID:(int64_t)visitID formID:(int64_t)formID;
 + (CheckIn *)checkIn:(NSManagedObjectContext *)db;
-+ (CheckIn *)checkIn:(NSManagedObjectContext *)db visitID:(long)visitID;
-+ (CheckIn *)checkIn:(NSManagedObjectContext *)db checkInID:(long)checkInID;
++ (CheckIn *)checkIn:(NSManagedObjectContext *)db visitID:(int64_t)visitID;
++ (CheckIn *)checkIn:(NSManagedObjectContext *)db checkInID:(int64_t)checkInID;
 + (BOOL)isCheckIn:(NSManagedObjectContext *)db;
 + (long)syncCheckInCount:(NSManagedObjectContext *)db;
 + (long)uploadCheckInPhotoCount:(NSManagedObjectContext *)db;
-+ (CheckOut *)checkOut:(NSManagedObjectContext *)db checkInID:(long)checkInID;
++ (CheckOut *)checkOut:(NSManagedObjectContext *)db checkInID:(int64_t)checkInID;
 + (long)syncCheckOutCount:(NSManagedObjectContext *)db;
 + (long)uploadCheckOutPhotoCount:(NSManagedObjectContext *)db;
 
@@ -123,7 +125,9 @@
 
 //FORMS
 
-+ (GPS *)gps:(NSManagedObjectContext *)db gpsID:(long)gpsID;
++ (GPS *)gps:(NSManagedObjectContext *)db gpsID:(int64_t)gpsID;
++ (long)syncTrackingCount:(NSManagedObjectContext *)db;
+
 + (long)syncTotalCount:(NSManagedObjectContext *)db;
 
 @end

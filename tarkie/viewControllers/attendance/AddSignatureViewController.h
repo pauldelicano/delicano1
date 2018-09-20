@@ -1,4 +1,4 @@
-#import "CustomViewController.h"
+#import "ViewController.h"
 #import "SignatureView.h"
 
 @protocol AddSignatureDelegate
@@ -8,7 +8,7 @@
 
 @end
 
-@interface AddSignatureViewController : CustomViewController
+@interface AddSignatureViewController : ViewController
 
 @property (weak, nonatomic) IBOutlet UIView *vStatusBar;
 @property (weak, nonatomic) IBOutlet UIView *vNavBar;

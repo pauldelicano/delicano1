@@ -1,4 +1,4 @@
-#import "CustomViewController.h"
+#import "ViewController.h"
 
 @protocol CameraDelegate
 @optional
@@ -8,7 +8,7 @@
 
 @end
 
-@interface CameraViewController : CustomViewController<UINavigationControllerDelegate, UIImagePickerControllerDelegate>
+@interface CameraViewController : ViewController<UINavigationControllerDelegate, UIImagePickerControllerDelegate>
 
 typedef enum {
     CAMERA_ACTION_TIME_IN,

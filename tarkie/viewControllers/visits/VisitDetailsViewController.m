@@ -4,7 +4,7 @@
 #import "Get.h"
 #import "Load.h"
 #import "Update.h"
-#import "Image.h"
+#import "File.h"
 #import "View.h"
 #import "Time.h"
 #import "HomeTableViewCell.h"
@@ -19,7 +19,6 @@
 @property (strong, nonatomic) NSMutableArray<VisitForms *> *forms;
 @property (strong, nonatomic) NSMutableArray<Photos *> *photos;
 @property (strong, nonatomic) NSMutableArray<UIImage *> *images;
-@property (nonatomic) UIEdgeInsets vInventoryLayoutMargins, vFormsLayoutMargins, lInvoiceValueLayoutMargins, lDeliveriesValueLayoutMargins;
 @property (strong, nonatomic) Stores *store;
 @property (strong, nonatomic) UIImage *photo;
 @property (strong, nonatomic) NSString *photoFilename, *visitStatus, *visitNotes;
@@ -64,13 +63,9 @@ static MessageDialogViewController *vcMessage;
         self.lPhotosBorder.backgroundColor = THEME_SEC;
         self.lNotesBorder.backgroundColor = THEME_SEC;
         [View setCornerRadiusByHeight:self.btnSave cornerRadius:0.3];
-        [View setCornerRadiusByHeight:self.btnInventory cornerRadius:0.3];
-        [View setCornerRadiusByHeight:self.btnForms cornerRadius:0.3];
-        [View setCornerRadiusByWidth:self.tfNotes cornerRadius:0.025];
-        self.vInventoryLayoutMargins = self.vInventory.layoutMargins;
-        self.vFormsLayoutMargins = self.vForms.layoutMargins;
-        self.lInvoiceValueLayoutMargins = self.lInvoiceValue.layoutMargins;
-        self.lDeliveriesValueLayoutMargins = self.lDeliveriesValue.layoutMargins;
+        [View setCornerRadiusByHeight:self.btnInventory cornerRadius:0.2];
+        [View setCornerRadiusByHeight:self.btnForms cornerRadius:0.2];
+        [View setCornerRadiusByHeight:self.tfNotes cornerRadius:0.125];
         [self onRefresh];
         [self applicationDidBecomeActive];
     }
@@ -79,7 +74,6 @@ static MessageDialogViewController *vcMessage;
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    self.vScroll.contentSize = CGSizeMake(self.vScroll.frame.size.width, self.vContent.frame.size.height);
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -104,7 +98,7 @@ static MessageDialogViewController *vcMessage;
     }
     [self.photos addObjectsFromArray:[Load visitPhotos:self.app.db visitID:self.visit.visitID]];
     for(int x = 0; x < self.photos.count; x++) {
-        [self.images addObject:[Image fromDocument:self.photos[x].filename]];
+        [self.images addObject:[File imageFromDocument:self.photos[x].filename]];
     }
     self.cvPhotos.photos = self.images;
     [self.tvInventory reloadData];
@@ -128,47 +122,39 @@ static MessageDialogViewController *vcMessage;
     }
     if(self.app.moduleInventory) {
         self.vInventory.hidden = NO;
-        self.vInventory.layoutMargins = self.vInventoryLayoutMargins;
         self.vInventoryHeight.active = NO;
         self.tvInventoryHeight.constant = self.tvInventory.contentSize.height;
     }
     else {
         self.vInventory.hidden = YES;
-        self.vInventory.layoutMargins = UIEdgeInsetsZero;
         self.vInventoryHeight.active = YES;
         self.tvInventoryHeight.constant = 0;
     }
     if(self.app.moduleForms) {
         self.vForms.hidden = NO;
-        self.vForms.layoutMargins = self.vFormsLayoutMargins;
         self.vFormsHeight.active = NO;
         self.tvFormsHeight.constant = self.tvForms.contentSize.height;
     }
     else {
         self.vForms.hidden = YES;
-        self.vForms.layoutMargins = UIEdgeInsetsZero;
         self.vFormsHeight.active = YES;
         self.tvFormsHeight.constant = 0;
     }
     if(self.app.settingVisitsInvoice) {
         self.lInvoice.text = self.app.conventionInvoice;
         self.lInvoiceValue.text = self.visit.invoice.length > 0 ? self.visit.invoice : @"N/A";
-        self.lInvoiceValue.layoutMargins = self.lInvoiceValueLayoutMargins;
     }
     else {
         self.lInvoice.text = nil;
         self.lInvoiceValue.text = nil;
-        self.lInvoiceValue.layoutMargins = UIEdgeInsetsZero;
     }
     if(self.app.settingVisitsDeliveries) {
         self.lDeliveries.text = self.app.conventionDeliveries;
         self.lDeliveriesValue.text = [NSString stringWithFormat:@"%@%.02f", self.app.settingDisplayCurrencySymbol, [self.visit.deliveries floatValue]];
-        self.lDeliveriesValue.layoutMargins = self.lDeliveriesValueLayoutMargins;
     }
     else {
         self.lDeliveries.text = nil;
         self.lDeliveriesValue.text = nil;
-        self.lDeliveriesValue.layoutMargins = UIEdgeInsetsZero;
     }
     self.tfNotes.value = self.visit.notes;
     if(!self.visit.isCheckOut || (self.visit.isCheckOut && self.app.settingVisitsEditAfterCheckOut)) {
@@ -182,7 +168,7 @@ static MessageDialogViewController *vcMessage;
         }
         self.tfNotes.editable = NO;
     }
-    [self.view layoutIfNeeded];
+    [self.vContent layoutIfNeeded];
 }
 
 - (void)applicationDidBecomeActive {
@@ -264,6 +250,20 @@ static MessageDialogViewController *vcMessage;
     }
     if([Update save:self.app.db]) {
         [self.navigationController popViewControllerAnimated:YES];
+    }
+}
+
+- (IBAction)openMap:(id)sender {
+    if(self.store.storeID == 0) {
+        return;
+    }
+    if(self.store.latitude != 0 && self.store.longitude != 0) {
+        [self openMapFromCoordinates:self.store.latitude longitude:self.store.longitude];
+        return;
+    }
+    if(self.store.address.length > 0) {
+        [self openMapFromAddress:self.store.address];
+        return;
     }
 }
 
@@ -417,17 +417,17 @@ static MessageDialogViewController *vcMessage;
         }
         case CAMERA_ACTION_VISIT_PHOTOS: {
             NSDate *currentDate = NSDate.date;
-            NSString *filename = [NSString stringWithFormat:@"%ld-%.0f%@", self.app.userID, [currentDate timeIntervalSince1970], @".png"];
-            if([Image saveFromImage:[Image documentPath:filename] image:image] != nil) {
+            NSString *filename = [NSString stringWithFormat:@"%lld-%.0f%@", self.app.employee.employeeID, [currentDate timeIntervalSince1970], @".png"];
+            if([File saveImageFromImage:[File documentPath:filename] image:image] != nil) {
                 Sequences *sequence = [Get sequence:self.app.db];
                 Photos *photo = [NSEntityDescription insertNewObjectForEntityForName:@"Photos" inManagedObjectContext:self.app.db];
                 sequence.photos += 1;
                 photo.photoID = sequence.photos;
-                photo.employeeID = self.app.userID;
+                photo.syncBatchID = self.app.syncBatchID;
+                photo.employeeID = self.app.employee.employeeID;
                 photo.date = [Time getFormattedDate:DATE_FORMAT date:currentDate];
                 photo.time = [Time getFormattedDate:TIME_FORMAT date:currentDate];
                 photo.filename = filename;
-                photo.syncBatchID = [Get syncBatchID:self.app.db];
                 photo.isSignature = NO;
                 photo.isUpload = NO;
                 photo.isDelete = NO;
@@ -437,11 +437,11 @@ static MessageDialogViewController *vcMessage;
                 visitPhoto.visitID = self.visit.visitID;
                 visitPhoto.photoID = photo.photoID;
                 if(![Update save:self.app.db]) {
-                    [Image deleteFromDocument:filename];
+                    [File deleteFromDocument:filename];
                     break;
                 }
                 [self.photos addObject:photo];
-                [self.images insertObject:[Image fromDocument:photo.filename] atIndex:[self.photos indexOfObject:photo]];
+                [self.images insertObject:[File imageFromDocument:photo.filename] atIndex:[self.photos indexOfObject:photo]];
                 self.cvPhotos.photos = self.images;
                 [self.cvPhotos reloadData];
             }
@@ -466,7 +466,7 @@ static MessageDialogViewController *vcMessage;
 - (void)onCameraPreviewDelete:(Photos *)image {
     image.isDelete = YES;
     if([Update save:self.app.db]) {
-        if([Image deleteFromDocument:image.filename]) {
+        if([File deleteFromDocument:image.filename]) {
             [self.images removeObjectAtIndex:[self.photos indexOfObject:image]];
             [self.photos removeObject:image];
             self.cvPhotos.photos = self.images;
@@ -556,8 +556,8 @@ static MessageDialogViewController *vcMessage;
             return;
         }
         if(self.photoFilename == nil) {
-            self.photoFilename = [NSString stringWithFormat:@"%ld-%.0f%@", self.app.userID, [NSDate.date timeIntervalSince1970], @".png"];
-            if([Image saveFromImage:[Image documentPath:self.photoFilename] image:self.photo] == nil) {
+            self.photoFilename = [NSString stringWithFormat:@"%lld-%.0f%@", self.app.employee.employeeID, [NSDate.date timeIntervalSince1970], @".png"];
+            if([File saveImageFromImage:[File documentPath:self.photoFilename] image:self.photo] == nil) {
                 self.photo = nil;
                 self.photoFilename = nil;
                 self.isCheckingIn = YES;
@@ -569,27 +569,22 @@ static MessageDialogViewController *vcMessage;
     self.currentDate = NSDate.date;
     NSString *date = [Time getFormattedDate:DATE_FORMAT date:self.currentDate];
     NSString *time = [Time getFormattedDate:TIME_FORMAT date:self.currentDate];
-    NSString *syncBatchID = [Get syncBatchID:self.app.db];
     Sequences *sequence = [Get sequence:self.app.db];
     CheckIn *checkIn = [NSEntityDescription insertNewObjectForEntityForName:@"CheckIn" inManagedObjectContext:self.app.db];
     if(self.app.location != nil) {
-        GPS *gps = [NSEntityDescription insertNewObjectForEntityForName:@"GPS" inManagedObjectContext:self.app.db];
-        sequence.gps += 1;
-        gps.gpsID = sequence.gps;
-        gps.date = [Time getFormattedDate:DATE_FORMAT date:self.app.location.timestamp];
-        gps.time = [Time getFormattedDate:TIME_FORMAT date:self.app.location.timestamp];
-        gps.latitude = self.app.location.coordinate.latitude;
-        gps.longitude = self.app.location.coordinate.longitude;
-        checkIn.gpsID = gps.gpsID;
+        int64_t gpsID = [Update gpsSave:self.app.db location:self.app.location];
+        if(gpsID != 0) {
+            checkIn.gpsID = gpsID;
+        }
     }
     sequence.checkIn += 1;
     checkIn.checkInID = sequence.checkIn;
+    checkIn.syncBatchID = self.app.syncBatchID;
     checkIn.timeInID = [Get timeIn:self.app.db].timeInID;
     checkIn.visitID = self.visit.visitID;
     checkIn.date = date;
     checkIn.time = time;
     checkIn.photo = self.photoFilename;
-    checkIn.syncBatchID = syncBatchID;
     checkIn.isSync = NO;
     checkIn.isPhotoUpload = NO;
     self.visit.isCheckIn = YES;
@@ -665,8 +660,8 @@ static MessageDialogViewController *vcMessage;
             return;
         }
         if(self.photoFilename == nil) {
-            self.photoFilename = [NSString stringWithFormat:@"%ld-%.0f%@", self.app.userID, [NSDate.date timeIntervalSince1970], @".png"];
-            if([Image saveFromImage:[Image documentPath:self.photoFilename] image:self.photo] == nil) {
+            self.photoFilename = [NSString stringWithFormat:@"%lld-%.0f%@", self.app.employee.employeeID, [NSDate.date timeIntervalSince1970], @".png"];
+            if([File saveImageFromImage:[File documentPath:self.photoFilename] image:self.photo] == nil) {
                 self.photo = nil;
                 self.photoFilename = nil;
                 self.isCheckingOut = YES;
@@ -694,26 +689,21 @@ static MessageDialogViewController *vcMessage;
     self.currentDate = NSDate.date;
     NSString *date = [Time getFormattedDate:DATE_FORMAT date:self.currentDate];
     NSString *time = [Time getFormattedDate:TIME_FORMAT date:self.currentDate];
-    NSString *syncBatchID = [Get syncBatchID:self.app.db];
     Sequences *sequence = [Get sequence:self.app.db];
     CheckOut *checkOut = [NSEntityDescription insertNewObjectForEntityForName:@"CheckOut" inManagedObjectContext:self.app.db];
     if(self.app.location != nil) {
-        GPS *gps = [NSEntityDescription insertNewObjectForEntityForName:@"GPS" inManagedObjectContext:self.app.db];
-        sequence.gps += 1;
-        gps.gpsID = sequence.gps;
-        gps.date = [Time getFormattedDate:DATE_FORMAT date:self.app.location.timestamp];
-        gps.time = [Time getFormattedDate:TIME_FORMAT date:self.app.location.timestamp];
-        gps.latitude = self.app.location.coordinate.latitude;
-        gps.longitude = self.app.location.coordinate.longitude;
-        checkOut.gpsID = gps.gpsID;
+        int64_t gpsID = [Update gpsSave:self.app.db location:self.app.location];
+        if(gpsID != 0) {
+            checkOut.gpsID = gpsID;
+        }
     }
     sequence.checkOut += 1;
     checkOut.checkOutID = sequence.checkOut;
+    checkOut.syncBatchID = self.app.syncBatchID;
     checkOut.checkInID = self.visitCheckIn.checkInID;
     checkOut.date = date;
     checkOut.time = time;
     checkOut.photo = self.photoFilename;
-    checkOut.syncBatchID = syncBatchID;
     checkOut.isSync = NO;
     checkOut.isPhotoUpload = NO;
     checkOut.isPhotoDelete = NO;
@@ -755,7 +745,7 @@ static MessageDialogViewController *vcMessage;
     if(self.visit.isCheckIn) {
         self.visitCheckIn = [Get checkIn:self.app.db visitID:self.visit.visitID];
         [self.btnCheckIn setTitle:[NSString stringWithFormat:@"IN - %@", [Time formatTime:self.app.settingDisplayTimeFormat time:self.visitCheckIn.time]] forState:UIControlStateNormal];
-        self.btnCheckIn.backgroundColor = [UIColor colorNamed:@"Grey700"];
+        self.btnCheckIn.backgroundColor = [Color colorNamed:@"Grey700"];
     }
     else {
         [self.btnCheckIn setTitle:@"Check-In" forState:UIControlStateNormal];
@@ -769,7 +759,7 @@ static MessageDialogViewController *vcMessage;
         if(self.visit.isCheckOut) {
             self.visitCheckOut = [Get checkOut:self.app.db checkInID:self.visitCheckIn.checkInID];
             [self.btnCheckOut setTitle:[NSString stringWithFormat:@"OUT - %@", [Time formatTime:self.app.settingDisplayTimeFormat time:self.visitCheckOut.time]] forState:UIControlStateNormal];
-            self.btnCheckOut.backgroundColor = [UIColor colorNamed:@"Grey600"];
+            self.btnCheckOut.backgroundColor = [Color colorNamed:@"Grey600"];
         }
         else {
             [self.btnCheckOut setTitle:@"Check-Out" forState:UIControlStateNormal];
@@ -778,8 +768,24 @@ static MessageDialogViewController *vcMessage;
     }
     else {
         [self.btnCheckOut setTitle:@"Check-Out" forState:UIControlStateNormal];
-        self.btnCheckOut.backgroundColor = [UIColor colorNamed:@"Grey700"];
+        self.btnCheckOut.backgroundColor = [Color colorNamed:@"Grey700"];
     }
+}
+
+- (void)openMapFromAddress:(NSString *)address {
+    [CLGeocoder.alloc.init geocodeAddressString:address completionHandler:^(NSArray<CLPlacemark *> * _Nullable placemarks, NSError * _Nullable error) {
+        [self openMapFromCoordinates:placemarks.firstObject.location.coordinate.latitude longitude:placemarks.firstObject.location.coordinate.longitude];
+    }];
+}
+- (void)openMapFromCoordinates:(double)latitude longitude:(double)longitude {
+    NSString *url;
+    if([UIApplication.sharedApplication canOpenURL:[NSURL URLWithString:@"waze://"]]) {
+        url = [NSString stringWithFormat:@"waze://?ll=%f,%f&navigate=yes", latitude, longitude];
+    }
+    else {
+        url = [NSString stringWithFormat:@"https://www.waze.com/ul?ll=%f,%f&navigate=yes", latitude, longitude];
+    }
+    [UIApplication.sharedApplication openURL:[NSURL URLWithString:url] options:@{} completionHandler:nil];
 }
 
 @end

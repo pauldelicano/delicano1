@@ -12,11 +12,13 @@
 typedef enum {
     GET,
     POST,
+    POST_IMAGE,
     POST_FILE
 } HTTP;
 
 + (NSDictionary *)get:(NSString *)url params:(NSDictionary *)params timeout:(int)timeout;
 + (NSDictionary *)post:(NSString *)url params:(NSDictionary *)params timeout:(int)timeout;
++ (NSDictionary *)postImage:(NSString *)url params:(NSDictionary *)params image:(NSString *)image timeout:(int)timeout;
 + (NSDictionary *)postFile:(NSString *)url params:(NSDictionary *)params file:(NSString *)file timeout:(int)timeout;
 
 @end

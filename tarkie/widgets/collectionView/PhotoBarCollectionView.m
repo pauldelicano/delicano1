@@ -58,7 +58,7 @@
         return [collectionView dequeueReusableCellWithReuseIdentifier:@"button" forIndexPath:indexPath];
     }
     PhotoBarItemCollectionViewCell *item = [collectionView dequeueReusableCellWithReuseIdentifier:@"item" forIndexPath:indexPath];
-    UIImage *image = [self.cache objectForKey:[NSString stringWithFormat:@"%ld", indexPath.row]];
+    UIImage *image = [self.cache objectForKey:[NSString stringWithFormat:@"%ld", (long)indexPath.row]];
     item.ivPhoto.image = image;
     if(image == nil) {
         CGSize size = [self collectionView:collectionView layout:collectionView.collectionViewLayout sizeForItemAtIndexPath:indexPath];
@@ -66,10 +66,10 @@
             UIImage *image = self.gallery[indexPath.row];
             UIGraphicsBeginImageContext(size);
             [image drawInRect:CGRectMake(0, 0, size.width, size.height)];
-            [self.cache setObject:UIGraphicsGetImageFromCurrentImageContext() forKey:[NSString stringWithFormat:@"%ld", indexPath.row]];
+            [self.cache setObject:UIGraphicsGetImageFromCurrentImageContext() forKey:[NSString stringWithFormat:@"%ld", (long)indexPath.row]];
             UIGraphicsEndImageContext();
             dispatch_async(dispatch_get_main_queue(), ^{
-                item.ivPhoto.image = [self.cache objectForKey:[NSString stringWithFormat:@"%ld", indexPath.row]];
+                item.ivPhoto.image = [self.cache objectForKey:[NSString stringWithFormat:@"%ld", (long)indexPath.row]];
             });
         });
     }
