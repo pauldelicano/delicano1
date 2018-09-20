@@ -1,4 +1,5 @@
 #import "File.h"
+#import "Time.h"
 
 @implementation File
 
@@ -91,6 +92,21 @@
         }
     }
     return directoryData;
+}
+
++ (BOOL)saveExceptionToBackup:(NSException *)exception {
+    return [self saveTextToBackup:[NSString stringWithFormat:@"EXCEPTION\n\nname: %@\n\nreason: %@\n\nuserInfo: %@\n\ncallStackReturnAddresses: %@\n\ncallStackSymbols: %@", exception.name, exception.reason, exception.userInfo, exception.callStackReturnAddresses, exception.callStackSymbols]];
+}
+
++ (BOOL)saveTextToBackup:(NSString *)text {
+    if(![NSFileManager.defaultManager createDirectoryAtPath:[File documentPath:@"Backup"] withIntermediateDirectories:YES attributes:nil error:nil]) {
+        return NO;
+    }
+    NSString *fileName = [Time getFormattedDate:[NSString stringWithFormat:@"%@ %@", DATE_FORMAT, TIME_FORMAT] date:NSDate.date];
+    fileName = [fileName stringByReplacingOccurrencesOfString:@" " withString:@"_"];
+    fileName = [fileName stringByReplacingOccurrencesOfString:@":" withString:@"-"];
+    NSString *file = [File documentPath:[NSString stringWithFormat:@"Backup/%@.txt", fileName]];
+    return [NSFileManager.defaultManager createFileAtPath:file contents:[text dataUsingEncoding:NSUTF8StringEncoding] attributes:nil];
 }
 
 @end

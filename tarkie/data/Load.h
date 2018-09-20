@@ -1,6 +1,8 @@
 #import <UIKit/UIKit.h>
 #import <CoreData/CoreData.h>
 
+#import "Patches+CoreDataClass.h"
+
 #import "Employees+CoreDataClass.h"
 #import "Announcements+CoreDataClass.h"
 #import "AnnouncementSeen+CoreDataClass.h"
@@ -29,6 +31,8 @@
 #import "Tracking+CoreDataClass.h"
 
 @interface Load : NSObject
+
++ (NSArray<Patches *> *)syncPatches:(NSManagedObjectContext *)db;
 
 //COMPANY
 + (NSArray<NSDictionary *> *)drawerMenus:(NSManagedObjectContext *)db;

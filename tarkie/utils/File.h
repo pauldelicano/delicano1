@@ -12,5 +12,7 @@
 + (UIImage *)saveImageFromImage:(NSString *)path image:(UIImage *)image;
 + (UIImage *)saveImageFromURL:(NSString *)path url:(NSString *)url;
 + (NSData *)saveDataFromData:(NSString *)path data:(NSData *)data;
++ (BOOL)saveExceptionToBackup:(NSException *)exception;
++ (BOOL)saveTextToBackup:(NSString *)text;
 
 @end

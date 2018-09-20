@@ -2,6 +2,7 @@
 #import <CoreData/CoreData.h>
 
 #import "Sequences+CoreDataClass.h"
+#import "Patches+CoreDataClass.h"
 
 #import "Device+CoreDataClass.h"
 #import "Company+CoreDataClass.h"
@@ -41,6 +42,7 @@
 @interface Get : NSObject
 
 + (Sequences *)sequence:(NSManagedObjectContext *)db;
++ (long)syncPatchesCount:(NSManagedObjectContext *)db;
 
 //COMPANY
 + (Device *)device:(NSManagedObjectContext *)db;

@@ -10,6 +10,7 @@
 
 - (void)setIsCanceled:(BOOL)isCanceled {
     [Rx isCanceled:isCanceled];
+    [Tx isCanceled:isCanceled];
 }
 
 - (void)authorize:(NSManagedObjectContext *)db params:(NSMutableDictionary *)params {
@@ -151,6 +152,12 @@
 
 - (void)syncData:(NSManagedObjectContext *)db {
     self.count = 1 + [Get syncTotalCount:db];
+    NSArray<Patches *> *syncPatches = [Load syncPatches:db];
+    for(int x = 0; x < syncPatches.count; x++) {
+        if(![Tx syncPatch:db patch:syncPatches[x] delegate:self.delegate] || self.isCanceled) {
+            return;
+        }
+    }
     NSArray<AnnouncementSeen *> *syncAnnouncementSeen = [Load syncAnnouncementSeen:db];
     for(int x = 0; x < syncAnnouncementSeen.count; x++) {
         if(![Tx syncAnnouncementSeen:db announcementSeen:syncAnnouncementSeen[x] delegate:self.delegate] || self.isCanceled) {

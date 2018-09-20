@@ -1,6 +1,8 @@
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
 
+#import "Patches+CoreDataClass.h"
+
 #import "AnnouncementSeen+CoreDataClass.h"
 
 #import "Stores+CoreDataClass.h"
@@ -19,6 +21,8 @@
 #import "Tracking+CoreDataClass.h"
 
 @interface Tx : NSObject
+
++ (BOOL)syncPatch:(NSManagedObjectContext *)db patch:(Patches *)patch delegate:(id)delegate;
 
 //COMPANY
 + (BOOL)authorize:(NSManagedObjectContext *)db params:(NSDictionary *)params delegate:(id)delegate;

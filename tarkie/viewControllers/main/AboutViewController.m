@@ -66,7 +66,7 @@
         if([APP_NAME isEqualToString:@"Tarkie"]) {
             self.lFacebookURL.text = @"www.facebook.com/tarkieapp";
             self.facebookURL = @"fb://profile/830853863618267";
-        } 
+        }
         if([APP_NAME isEqualToString:@"Timsie"]) {
             self.lFacebookURL.text = @"www.facebook.com/timsieapp";
             self.facebookURL = @"fb://profile/272139232947051";

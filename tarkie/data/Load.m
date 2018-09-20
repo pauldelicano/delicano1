@@ -5,6 +5,13 @@
 
 @implementation Load
 
++ (NSArray<Patches *> *)syncPatches:(NSManagedObjectContext *)db {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"status == %@", @"done"]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
+    return [self execute:db entity:@"Patches" predicates:predicates];
+}
+
 + (NSArray<NSDictionary *> *)drawerMenus:(NSManagedObjectContext *)db {
     NSMutableArray *menus = NSMutableArray.alloc.init;
     for(int x = 1; x <= MENU_LOGOUT; x++) {
@@ -84,17 +91,17 @@
                         break;
                     }
                     case MODULE_EXPENSE: {
-                        name = @"Expense";
+//                        name = @"Expense";
                         icon = @"\uf155";
                         break;
                     }
                     case MODULE_INVENTORY: {
-                        name = @"Inventory";
+//                        name = @"Inventory";
                         icon = @"\uf494";
                         break;
                     }
                     case MODULE_FORMS: {
-                        name = @"Forms";
+//                        name = @"Forms";
                         icon = @"\uf07c";
                         break;
                     }

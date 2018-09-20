@@ -1,6 +1,7 @@
 #import "AppDelegate.h"
 #import "Get.h"
 #import "Update.h"
+#import "File.h"
 #import "Time.h"
 #import "MainViewController.h"
 
@@ -22,7 +23,12 @@
     self.dbTracking = [self managedObjectContextInit:self.psc councurrencyType:NSPrivateQueueConcurrencyType];
     self.locationManager = [self locationManagerInit:self];
     self.userNotificationCenter = [self userNotificationCenterInit:self];
+    NSSetUncaughtExceptionHandler(&uncaughtExceptionHandler);
     return YES;
+}
+
+void uncaughtExceptionHandler(NSException *exception) {
+    [File saveExceptionToBackup:exception];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
@@ -112,7 +118,6 @@
         }
     }
 }
-
 
 - (BOOL)application:(UIApplication *)application shouldSaveApplicationState:(NSCoder *)coder {
     return YES;

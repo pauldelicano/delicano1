@@ -13,6 +13,38 @@
 
 static BOOL isCanceled;
 
++ (BOOL)syncPatch:(NSManagedObjectContext *)db patch:(Patches *)patch delegate:(id)delegate {
+    BOOL result = NO;
+    NSMutableDictionary *params = NSMutableDictionary.alloc.init;
+    [params setObject:[Get apiKey:db] forKey:@"api_key"];
+    [params setObject:[NSString stringWithFormat:@"%lld", [Get userID:db]] forKey:@"employee_id"];
+    [params setObject:[NSString stringWithFormat:@"%lld", patch.patchID] forKey:@"patch_id"];
+    [params setObject:@"done" forKey:@"status"];
+    NSDictionary *response = [Http post:[NSString stringWithFormat:@"%@%@", WEB_API, @"edit-adminpanel-patch"] params:params timeout:HTTP_TIMEOUT_TX];
+    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
+    NSString *status = [init objectForKey:@"status"];
+    NSString *message = nil;
+    if([status isEqualToString:@"error"]) {
+        message = [init objectForKey:@"message"];
+    }
+    if(message == nil) {
+        patch.isSync = YES;
+        if(![Update save:db]) {
+            message = @"";
+        }
+    }
+    if(message == nil) {
+        message = @"ok";
+        result = YES;
+    }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
+    }
+    [delegate onProcessResult:message];
+    return result;
+}
+
 + (BOOL)authorize:(NSManagedObjectContext *)db params:(NSDictionary *)params delegate:(id)delegate {
     BOOL result = NO;
     NSDictionary *response = [Http post:[NSString stringWithFormat:@"%@%@", WEB_API, @"authorization-request"] params:params timeout:HTTP_TIMEOUT_TX];
@@ -1007,13 +1039,19 @@ static BOOL isCanceled;
     NSString *fileName = [NSString stringWithFormat:@"%@_%@_%@_%@_%@.zip", [Get company:db].name, employee.lastName, employee.firstName, [Time getFormattedDate:[NSString stringWithFormat:@"%@_%@", DATE_FORMAT, TIME_FORMAT] date:NSDate.date], [NSBundle.mainBundle.infoDictionary objectForKey:@"CFBundleShortVersionString"]];
     fileName = [fileName stringByReplacingOccurrencesOfString:@" " withString:@"_"];
     fileName = [fileName stringByReplacingOccurrencesOfString:@":" withString:@"-"];
-    NSData *file = [NSData.alloc initWithContentsOfFile:[File documentPath:fileName]];
-    if(file == nil) {
-        NSMutableArray *files = NSMutableArray.alloc.init;
-        [files addObject:[File documentPath:@"tarkie.db"]];
-        if([SSZipArchive createZipFileAtPath:[File documentPath:fileName] withFilesAtPaths:files]) {
-            file = [NSData.alloc initWithContentsOfFile:[File documentPath:fileName]];
-        }
+    NSString *backup = [File documentPath:@"Backup"];
+    if(![NSFileManager.defaultManager createDirectoryAtPath:backup withIntermediateDirectories:YES attributes:nil error:nil]) {
+        [delegate onProcessResult:@""];
+        return NO;
+    }
+    [File deleteFromDocument:@"Backup/tarkie.db"];
+    if(![NSFileManager.defaultManager copyItemAtPath:[File documentPath:@"tarkie.db"] toPath:[File documentPath:@"Backup/tarkie.db"] error:nil]) {
+        [delegate onProcessResult:@""];
+        return NO;
+    }
+    if(![SSZipArchive createZipFileAtPath:[File documentPath:fileName] withContentsOfDirectory:backup]) {
+        [delegate onProcessResult:@""];
+        return NO;
     }
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
     [params setObject:@"upload-backup" forKey:@"action"];
@@ -1026,7 +1064,9 @@ static BOOL isCanceled;
     if([status isEqualToString:@"error"]) {
         message = [init objectForKey:@"message"];
     }
+    [File deleteFromDocument:fileName];
     if(message == nil) {
+        [File deleteFromDocument:@"Backup"];
         message = @"ok";
         result = YES;
     }
@@ -1034,7 +1074,6 @@ static BOOL isCanceled;
         message = nil;
         result = NO;
     }
-    [File deleteFromDocument:fileName];
     [delegate onProcessResult:message];
     return result;
 }

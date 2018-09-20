@@ -547,9 +547,6 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
             break;
         }
         case MENU_BREAKS: {
-            UITextField *tfTest = UITextField.alloc.init;
-            [self.view addSubview:tfTest];
-            [tfTest becomeFirstResponder];
             break;
         }
         case MENU_STORES: {
