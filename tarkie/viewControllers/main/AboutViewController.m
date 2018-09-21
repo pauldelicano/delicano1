@@ -86,6 +86,7 @@
             self.facebookURL = @"https://www.facebook.com/272139232947051";
         }
     }
+    self.vScroll.contentInset = UIEdgeInsetsMake(0 - self.vStatus.frame.size.height + self.ivAbout.frame.size.height, 0, 0, 0);
 }
 
 - (IBAction)back:(id)sender {

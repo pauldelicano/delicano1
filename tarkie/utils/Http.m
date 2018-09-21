@@ -99,12 +99,14 @@
         NSLog(@"info: start\n\turl: %@\n\tparams: %@\n\tresponse: %@\nend", url, [NSString.alloc initWithData:paramsData encoding:NSUTF8StringEncoding], [NSString.alloc initWithData:sessionData encoding:NSUTF8StringEncoding]);
         if(sessionError != nil) {
             result = [self createErrorResult:sessionError];
+            [File saveTextToBackup:[NSString stringWithFormat:@"HTTP\n\nurl: %@\n\nparams: %@\n\nresult: %@", url, [NSString.alloc initWithData:paramsData encoding:NSUTF8StringEncoding], result]];
         }
         if(result == nil) {
             result = [NSJSONSerialization JSONObjectWithData:sessionData options:kNilOptions error:&error];
         }
         if(error != nil) {
             result = [self createErrorResult:error];
+            [File saveTextToBackup:[NSString stringWithFormat:@"HTTP\n\nurl: %@\n\nparams: %@\n\nresult: %@", url, [NSString.alloc initWithData:paramsData encoding:NSUTF8StringEncoding], result]];
         }
         dispatch_semaphore_signal(semaphore);
     }] resume];

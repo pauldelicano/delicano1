@@ -3,6 +3,8 @@
 
 @interface Rx : NSObject
 
++ (BOOL)patches:(NSManagedObjectContext *)db delegate:(id)delegate;
+
 //COMPANY
 + (BOOL)company:(NSManagedObjectContext *)db delegate:(id)delegate;
 + (BOOL)employees:(NSManagedObjectContext *)db delegate:(id)delegate;

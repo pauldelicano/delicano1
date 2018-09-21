@@ -30,7 +30,7 @@
         self.viewWillAppear = YES;
         self.openGesture.edges = self.position == DRAWER_POSITION_LEFT ? UIRectEdgeLeft : UIRectEdgeRight;
         [self.view.superview.superview addGestureRecognizer:self.openGesture];
-        self.edge = (6.0f / 568) * UIScreen.mainScreen.bounds.size.height;
+        self.edge = (12.0f / 568) * UIScreen.mainScreen.bounds.size.height;
         self.originX = self.position == DRAWER_POSITION_LEFT ? 0 - self.view.frame.size.width : self.view.frame.size.width;
         CGRect frame = self.view.superview.frame;
         frame.origin.x = self.position == DRAWER_POSITION_LEFT ? self.originX + self.edge : self.originX - self.edge;

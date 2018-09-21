@@ -106,7 +106,7 @@
     fileName = [fileName stringByReplacingOccurrencesOfString:@" " withString:@"_"];
     fileName = [fileName stringByReplacingOccurrencesOfString:@":" withString:@"-"];
     NSString *file = [File documentPath:[NSString stringWithFormat:@"Backup/%@.txt", fileName]];
-    return [NSFileManager.defaultManager createFileAtPath:file contents:[text dataUsingEncoding:NSUTF8StringEncoding] attributes:nil];
+    return [NSFileManager.defaultManager createFileAtPath:file contents:[text dataUsingEncoding:NSUnicodeStringEncoding] attributes:nil];
 }
 
 @end

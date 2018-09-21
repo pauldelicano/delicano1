@@ -5,9 +5,16 @@
 
 @implementation Load
 
++ (NSArray<Patches *> *)patches:(NSManagedObjectContext *)db {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isDone == %@", @NO]];
+    return [self execute:db entity:@"Patches" predicates:predicates];
+}
+
 + (NSArray<Patches *> *)syncPatches:(NSManagedObjectContext *)db {
     NSMutableArray *predicates = NSMutableArray.alloc.init;
-    [predicates addObject:[NSPredicate predicateWithFormat:@"status == %@", @"done"]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isDone == %@", @YES]];
     [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
     return [self execute:db entity:@"Patches" predicates:predicates];
 }
@@ -44,7 +51,7 @@
                 break;
             }
             case MENU_BACKUP_DATA: {
-//                name = @"Backup Data";
+                name = @"Backup Data";
                 icon = @"\uf019";
                 break;
             }
@@ -64,6 +71,9 @@
             [menu setObject:[NSString stringWithFormat:@"%d", x] forKey:@"ID"];
             icon = nil;
             [menu setObject:icon == nil ? [UIImage imageNamed:[NSString stringWithFormat:@"%@%@", @"Menu", [name stringByReplacingOccurrencesOfString:@" " withString:@""]]] : icon forKey:@"icon"];
+            if([name isEqualToString:@"Backup Data"]) {
+                name = @"Patch Data";
+            }
             [menu setObject:name forKey:@"name"];
             [menus addObject:menu];
         }
@@ -91,17 +101,17 @@
                         break;
                     }
                     case MODULE_EXPENSE: {
-//                        name = @"Expense";
+                        name = @"Expense";
                         icon = @"\uf155";
                         break;
                     }
                     case MODULE_INVENTORY: {
-//                        name = @"Inventory";
+                        name = @"Inventory";
                         icon = @"\uf494";
                         break;
                     }
                     case MODULE_FORMS: {
-//                        name = @"Forms";
+                        name = @"Forms";
                         icon = @"\uf07c";
                         break;
                     }
@@ -109,7 +119,7 @@
             }
         }
         if(x == MODULE_FORMS + 1 && isAttendance) {
-            name = @"History";
+//            name = @"History";
             icon = @"\uf252";
         }
         if(name != nil) {

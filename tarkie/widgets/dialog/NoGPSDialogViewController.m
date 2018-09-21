@@ -23,6 +23,17 @@ static MessageDialogViewController *vcMessage;
     self.viewDidAppear = NO;
 }
 
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    if(self.vContent.frame.size.height < self.vScroll.frame.size.height) {
+        CGFloat inset = self.vScroll.frame.size.height - self.vContent.frame.size.height;
+        self.vScroll.contentInset = UIEdgeInsetsMake(inset * 0.5, 0, inset * 0.5, 0);
+    }
+    else {
+        self.vScroll.contentInset = UIEdgeInsetsZero;
+    }
+}
+
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     if(!self.viewDidAppear) {
@@ -34,6 +45,13 @@ static MessageDialogViewController *vcMessage;
         [self onRefresh];
         [self startTimer];
         [self spin];
+        if(self.vContent.frame.size.height < self.vScroll.frame.size.height) {
+            CGFloat inset = self.vScroll.frame.size.height - self.vContent.frame.size.height;
+            self.vScroll.contentInset = UIEdgeInsetsMake(inset * 0.5, 0, inset * 0.5, 0);
+        }
+        else {
+            self.vScroll.contentInset = UIEdgeInsetsZero;
+        }
     }
 }
 
@@ -81,13 +99,6 @@ static MessageDialogViewController *vcMessage;
             [self.delegate onNoGPSAcquired];
         };
         [View addSubview:self.view.superview subview:vcMessage.view animated:YES];
-    }
-    if(self.vContent.frame.size.height < self.vScroll.frame.size.height) {
-        CGFloat inset = self.vScroll.frame.size.height - self.vContent.frame.size.height;
-        self.vScroll.contentInset = UIEdgeInsetsMake(inset * 0.5, 0, inset * 0.5, 0);
-    }
-    else {
-        self.vScroll.contentInset = UIEdgeInsetsZero;
     }
 }
 

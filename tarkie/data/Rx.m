@@ -6,10 +6,64 @@
 #import "Http.h"
 #import "File.h"
 #import "Time.h"
+#import "Sqlite.h"
 
 @implementation Rx
 
 static BOOL isCanceled;
+
++ (BOOL)patches:(NSManagedObjectContext *)db delegate:(id)delegate {
+    BOOL result = NO;
+    int64_t userID = [Get userID:db];
+    NSMutableDictionary *params = NSMutableDictionary.alloc.init;
+    [params setObject:[Get apiKey:db] forKey:@"api_key"];
+    [params setObject:[NSString stringWithFormat:@"%lld", userID] forKey:@"employee_id"];
+    [params setObject:@"pending" forKey:@"get_by"];
+    NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @"get-adminpanel-patch"] params:params timeout:HTTP_TIMEOUT_RX];
+    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
+    NSString *status = [init objectForKey:@"status"];
+    NSString *message = nil;
+    if([status isEqualToString:@"error"]) {
+        message = [init objectForKey:@"message"];
+    }
+    if(message == nil) {
+        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        if(data != nil) {
+            Sqlite *sqlite = Sqlite.alloc.init;
+            [sqlite openConnection];
+            for(int x = 0; x < data.count && !isCanceled; x++) {
+                int64_t patchID = [[data[x] objectForKey:@"patch_id"] intValue];
+                NSString *query = [data[x] objectForKey:@"query"];
+                Patches *patch = [Get patch:db patchID:patchID];
+                if(patch == nil) {
+                    patch = [NSEntityDescription insertNewObjectForEntityForName:@"Patches" inManagedObjectContext:db];
+                    patch.patchID = patchID;
+                }
+                patch.date = [data[x] objectForKey:@"date_created"];
+                patch.time = [data[x] objectForKey:@"time_created"];
+                patch.employeeID = userID;
+                patch.query = query;
+                patch.isDone = [[data[x] objectForKey:@"is_done"] intValue] == 1;
+                patch.isDone = [sqlite executeQuery:[data[x] objectForKey:@"query"]];
+                patch.isSync = NO;
+            }
+            [sqlite closeConnection];
+            if(![Update save:db]) {
+                message = @"";
+            }
+        }
+    }
+    if(message == nil) {
+        message = @"ok";
+        result = YES;
+    }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
+    }
+    [delegate onProcessResult:message];
+    return result;
+}
 
 + (BOOL)company:(NSManagedObjectContext *)db delegate:(id)delegate {
     BOOL result = NO;

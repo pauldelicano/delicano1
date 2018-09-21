@@ -179,6 +179,13 @@ static MessageDialogViewController *vcMessage;
     else {
         self.btnExpense.hidden = YES;
     }
+    if(self.vContent.frame.size.height < self.vScroll.frame.size.height) {
+        CGFloat inset = self.vScroll.frame.size.height - self.vContent.frame.size.height;
+        self.vScroll.contentInset = UIEdgeInsetsMake(inset * 0.4, 0, inset * 0.6, 0);
+    }
+    else {
+        self.vScroll.contentInset = UIEdgeInsetsZero;
+    }
 }
 
 - (IBAction)timeInOut:(id)sender {

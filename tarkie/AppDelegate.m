@@ -110,9 +110,13 @@ void uncaughtExceptionHandler(NSException *exception) {
         if(self.timer == nil) {
             if([Get isTimeIn:self.db]) {
                 self.interval = self.settingLocationGPSTrackingInterval;
-                [self saveTracking];
+                if([self saveTracking]) {
+                    [NSNotificationCenter.defaultCenter postNotificationName:@"UserNotificationCenterDidUpdateLocations" object:nil userInfo:nil];
+                }
                 self.timer = [NSTimer scheduledTimerWithTimeInterval:self.interval * 60 target:^{
-                    [self saveTracking];
+                    if([self saveTracking]) {
+                        [NSNotificationCenter.defaultCenter postNotificationName:@"UserNotificationCenterDidUpdateLocations" object:nil userInfo:nil];
+                    }
                 } selector:@selector(invoke) userInfo:nil repeats:YES];
             }
         }

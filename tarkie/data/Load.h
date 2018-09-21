@@ -32,6 +32,7 @@
 
 @interface Load : NSObject
 
++ (NSArray<Patches *> *)patches:(NSManagedObjectContext *)db;
 + (NSArray<Patches *> *)syncPatches:(NSManagedObjectContext *)db;
 
 //COMPANY

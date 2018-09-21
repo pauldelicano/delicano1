@@ -30,6 +30,17 @@ static MessageDialogViewController *vcMessage;
     self.viewDidAppear = NO;
 }
 
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    if(self.vContent.frame.size.height < self.vScroll.frame.size.height) {
+        CGFloat inset = self.vScroll.frame.size.height - self.vContent.frame.size.height;
+        self.vScroll.contentInset = UIEdgeInsetsMake(inset * 0.5, 0, inset * 0.5, 0);
+    }
+    else {
+        self.vScroll.contentInset = UIEdgeInsetsZero;
+    }
+}
+
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     if(!self.viewDidAppear) {
@@ -91,6 +102,30 @@ static MessageDialogViewController *vcMessage;
             }];
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 [self.process updateMasterFile:self.app.db isAttendance:self.app.moduleAttendance isVisits:self.app.moduleVisits isExpense:self.app.moduleExpense isInventory:self.app.moduleInventory isForms:self.app.moduleForms];
+            });
+            break;
+        }
+        case LOADING_ACTION_GET_PATCH: {
+            self.loadingSubject = @"Patching Data";
+            self.loadingMessage = @"Patch Data";
+            self.background = [self.application beginBackgroundTaskWithExpirationHandler:^{
+                [self.application endBackgroundTask:self.background];
+                self.background = UIBackgroundTaskInvalid;
+            }];
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                [self.process patch:self.app.db];
+            });
+            break;
+        }
+        case LOADING_ACTION_SYNC_PATCH: {
+            self.loadingSubject = @"Patching Data";
+            self.loadingMessage = @"Patch Data";
+            self.background = [self.application beginBackgroundTaskWithExpirationHandler:^{
+                [self.application endBackgroundTask:self.background];
+                self.background = UIBackgroundTaskInvalid;
+            }];
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                [self.process syncPatch:self.app.db];
             });
             break;
         }

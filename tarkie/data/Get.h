@@ -42,6 +42,7 @@
 @interface Get : NSObject
 
 + (Sequences *)sequence:(NSManagedObjectContext *)db;
++ (Patches *)patch:(NSManagedObjectContext *)db patchID:(int64_t)patchID;
 + (long)syncPatchesCount:(NSManagedObjectContext *)db;
 
 //COMPANY

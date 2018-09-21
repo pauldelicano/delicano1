@@ -36,7 +36,6 @@
 @property (strong, nonatomic) NSString *photoFilename, *signatureFilename;
 @property (strong, nonatomic) NSDate *currentDate;
 @property (nonatomic) long currentPage, nextPage, syncDataCount;
-@property (nonatomic) float syncDataCountFontSize;
 @property (nonatomic) BOOL viewWillAppear, isLoading, isGPSRequest, isCameraRequest, proceedWithoutGPS, isTimingIn, isTimingOut;
 
 @end
@@ -98,16 +97,17 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
         [self.btnNavBarButtonsVisitsAddVisit setTitleColor:THEME_PRI forState:UIControlStateNormal];
         [self.btnNavBarButtonsExpenseNewReport setTitleColor:THEME_PRI forState:UIControlStateNormal];
         [self.btnNavBarButtonsFormsSelect setTitleColor:THEME_PRI forState:UIControlStateNormal];
+        [View setCornerRadiusByHeight:self.lNavBarButtonsHomeAnnouncementsCount cornerRadius:1];
         [View setCornerRadiusByHeight:self.lNavBarButtonsHomeSyncCount cornerRadius:1];
         [View setCornerRadiusByHeight:self.btnNavBarButtonsVisitsAddVisit cornerRadius:0.3];
         [View setCornerRadiusByHeight:self.btnNavBarButtonsExpenseNewReport cornerRadius:0.3];
         [View setCornerRadiusByHeight:self.btnNavBarButtonsFormsSelect cornerRadius:0.3];
-        self.syncDataCountFontSize = self.lNavBarButtonsHomeSyncCount.font.pointSize;
         [self onRefresh];
         [self updateTimeInOut];
         [self applicationDidBecomeActive];
         [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(willPresentNotification:) name:@"UserNotificationCenterWillPresentNotification" object:nil];
         [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(didReceiveNotificationResponse:) name:@"UserNotificationCenterDidReceiveNotificationResponse" object:nil];
+        [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(didUpdateLocations) name:@"UserNotificationCenterDidUpdateLocations" object:nil];
     }
     [self updateUnSeenAnnouncementsCount];
     [self updateSyncDataCount];
@@ -116,6 +116,9 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
+    [NSNotificationCenter.defaultCenter removeObserver:self name:@"UserNotificationCenterWillPresentNotification" object:nil];
+    [NSNotificationCenter.defaultCenter removeObserver:self name:@"UserNotificationCenterDidReceiveNotificationResponse" object:nil];
+    [NSNotificationCenter.defaultCenter removeObserver:self name:@"UserNotificationCenterDidUpdateLocations" object:nil];
     [NSNotificationCenter.defaultCenter removeObserver:self name:UIApplicationDidBecomeActiveNotification object:nil];
 }
 
@@ -292,32 +295,12 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
     long unSeenAnnouncementsCount = [Get unSeenAnnouncementsCount:self.app.db];
     self.lNavBarButtonsHomeAnnouncementsCount.text = [NSString stringWithFormat:@"%ld", unSeenAnnouncementsCount];
     self.lNavBarButtonsHomeAnnouncementsCount.hidden = unSeenAnnouncementsCount == 0;
-    CGFloat pointSize = self.syncDataCountFontSize;
-    for(int x = 0; x < self.lNavBarButtonsHomeAnnouncementsCount.text.length; x++) {
-        if(x > 1) {
-            pointSize *= 0.7;
-        }
-    }
-    self.lNavBarButtonsHomeAnnouncementsCount.font = [UIFont fontWithName:self.lNavBarButtonsHomeAnnouncementsCount.font.fontName size:pointSize];
-    [self.lNavBarButtonsHomeAnnouncementsCount setNeedsLayout];
-    [self.lNavBarButtonsHomeAnnouncementsCount layoutIfNeeded];
-    [View setCornerRadiusByHeight:self.lNavBarButtonsHomeAnnouncementsCount cornerRadius:1];
 }
 
 - (void)updateSyncDataCount {
     self.syncDataCount = [Get syncTotalCount:self.app.db];
     self.lNavBarButtonsHomeSyncCount.text = [NSString stringWithFormat:@"%ld", self.syncDataCount];
     self.lNavBarButtonsHomeSyncCount.hidden = self.syncDataCount == 0;
-    CGFloat pointSize = self.syncDataCountFontSize;
-    for(int x = 0; x < self.lNavBarButtonsHomeSyncCount.text.length; x++) {
-        if(x > 1) {
-            pointSize *= 0.7;
-        }
-    }
-    self.lNavBarButtonsHomeSyncCount.font = [UIFont fontWithName:self.lNavBarButtonsHomeSyncCount.font.fontName size:pointSize];
-    [self.lNavBarButtonsHomeSyncCount setNeedsLayout];
-    [self.lNavBarButtonsHomeSyncCount layoutIfNeeded];
-    [View setCornerRadiusByHeight:self.lNavBarButtonsHomeSyncCount cornerRadius:1];
 }
 
 - (BOOL)applicationDidBecomeActive {
@@ -376,6 +359,10 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
         vcAnnouncementDetails.announcement = [Get announcement:self.app.db announcementID:[[userInfo objectForKey:@"NOTIFICATION_ID"] intValue]];
         [self.navigationController pushViewController:vcAnnouncementDetails animated:YES];
     }
+}
+
+- (void)didUpdateLocations {
+    [self updateSyncDataCount];
 }
 
 - (IBAction)drawer:(id)sender {
@@ -596,18 +583,24 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
             break;
         }
         case MENU_BACKUP_DATA: {
-            vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
-            vcMessage.subject = @"Backup Data";
-            vcMessage.message = @"Backup your data to your storage. This data will be restored once you clear data/uninstall your app. Are you sure you want to backup your data?";
-            vcMessage.negativeTitle = @"Cancel";
-            vcMessage.negativeTarget = ^{
-                [View removeView:vcMessage.view animated:YES];
-            };
-            vcMessage.positiveTitle = @"Yes";
-            vcMessage.positiveTarget = ^{
-                [View removeView:vcMessage.view animated:YES];
-            };
-            [View addSubview:self.view subview:vcMessage.view animated:YES];
+            vcLoading = [self.storyboard instantiateViewControllerWithIdentifier:@"vcLoading"];
+            vcLoading.delegate = self;
+            vcLoading.action = LOADING_ACTION_GET_PATCH;
+            [View addSubview:self.view subview:vcLoading.view animated:YES];
+            self.isLoading = YES;
+            return;
+//            vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
+//            vcMessage.subject = @"Backup Data";
+//            vcMessage.message = @"Backup your data to your storage. This data will be restored once you clear data/uninstall your app. Are you sure you want to backup your data?";
+//            vcMessage.negativeTitle = @"Cancel";
+//            vcMessage.negativeTarget = ^{
+//                [View removeView:vcMessage.view animated:YES];
+//            };
+//            vcMessage.positiveTitle = @"Yes";
+//            vcMessage.positiveTarget = ^{
+//                [View removeView:vcMessage.view animated:YES];
+//            };
+//            [View addSubview:self.view subview:vcMessage.view animated:YES];
             break;
         }
         case MENU_ABOUT: {
@@ -693,6 +686,26 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
             }
             [self onRefresh];
             [self.vcDrawer onRefresh];
+            break;
+        }
+        case LOADING_ACTION_GET_PATCH: {
+            self.isLoading = NO;
+            if([Get syncPatchesCount:self.app.db] > 0) {
+                vcLoading = [self.storyboard instantiateViewControllerWithIdentifier:@"vcLoading"];
+                vcLoading.delegate = self;
+                vcLoading.action = LOADING_ACTION_SYNC_PATCH;
+                [View addSubview:self.view subview:vcLoading.view animated:NO];
+                self.isLoading = YES;
+                break;
+            }
+            [self applicationDidBecomeActive];
+            [self onRefresh];
+            break;
+        }
+        case LOADING_ACTION_SYNC_PATCH: {
+            self.isLoading = NO;
+            [self applicationDidBecomeActive];
+            [self onRefresh];
             break;
         }
         case LOADING_ACTION_SYNC_DATA: {

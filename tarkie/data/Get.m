@@ -26,9 +26,15 @@
     return sequence;
 }
 
++ (Patches *)patch:(NSManagedObjectContext *)db patchID:(int64_t)patchID {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"patchID == %ld", patchID]];
+    return [self execute:db entity:@"Patches" predicates:predicates];
+}
+
 + (long)syncPatchesCount:(NSManagedObjectContext *)db {
     NSMutableArray *predicates = NSMutableArray.alloc.init;
-    [predicates addObject:[NSPredicate predicateWithFormat:@"status == %@", @"done"]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isDone == %@", @YES]];
     [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
     return [self count:db entity:@"Patches" predicates:predicates];
 }
@@ -53,7 +59,7 @@
 
 + (BOOL)isModuleEnabled:(NSManagedObjectContext *)db moduleID:(int64_t)moduleID {
     if(moduleID == 3 || moduleID == 4 || moduleID == 5) {
-//        return NO;//paul
+        return NO;//paul
     }
     return [self module:db moduleID:moduleID].isEnabled;
 }
@@ -684,7 +690,7 @@
 }
 
 + (long)syncTotalCount:(NSManagedObjectContext *)db {
-    return [self syncPatchesCount:db] + [self syncAnnouncementSeenCount:db] + [self syncStoresCount:db] + [self syncStoreContactsCount:db] + [self syncSchedulesCount:db] + [self syncTimeInCount:db] + [self uploadTimeInPhotoCount:db] + [self syncTimeOutCount:db] + [self uploadTimeOutPhotoCount:db] + [self uploadTimeOutSignatureCount:db] + [self syncOvertimeCount:db] + [self syncVisitsCount:db] + [self uploadVisitPhotosCount:db] + [self syncCheckInCount:db] + [self uploadCheckInPhotoCount:db] + [self syncCheckOutCount:db] + [self uploadCheckOutPhotoCount:db] + [self syncTrackingCount:db];
+    return [self syncAnnouncementSeenCount:db] + [self syncStoresCount:db] + [self syncStoreContactsCount:db] + [self syncSchedulesCount:db] + [self syncTimeInCount:db] + [self uploadTimeInPhotoCount:db] + [self syncTimeOutCount:db] + [self uploadTimeOutPhotoCount:db] + [self uploadTimeOutSignatureCount:db] + [self syncOvertimeCount:db] + [self syncVisitsCount:db] + [self uploadVisitPhotosCount:db] + [self syncCheckInCount:db] + [self uploadCheckInPhotoCount:db] + [self syncCheckOutCount:db] + [self uploadCheckOutPhotoCount:db] + [self syncTrackingCount:db];
 }
 
 + (GPS *)gps:(NSManagedObjectContext *)db gpsID:(int64_t)gpsID {

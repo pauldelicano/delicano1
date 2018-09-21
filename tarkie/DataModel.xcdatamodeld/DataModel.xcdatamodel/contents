@@ -120,10 +120,11 @@
     </entity>
     <entity name="Patches" representedClassName="Patches" syncable="YES" codeGenerationType="class">
         <attribute name="date" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="employeeID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isDone" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isSync" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="patchID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="query" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="status" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="time" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <entity name="Photos" representedClassName="Photos" syncable="YES" codeGenerationType="class">
@@ -371,6 +372,6 @@
         <element name="VisitInventories" positionX="-18" positionY="144" width="128" height="135"/>
         <element name="VisitPhotos" positionX="54" positionY="144" width="128" height="90"/>
         <element name="Visits" positionX="-54" positionY="90" width="128" height="30"/>
-        <element name="Patches" positionX="45" positionY="135" width="128" height="135"/>
+        <element name="Patches" positionX="45" positionY="135" width="128" height="150"/>
     </elements>
 </model>

@@ -150,14 +150,25 @@
     }
 }
 
-- (void)syncData:(NSManagedObjectContext *)db {
-    self.count = 1 + [Get syncTotalCount:db];
+- (void)patch:(NSManagedObjectContext *)db {
+    self.count = 1;
+    if(![Rx patches:db delegate:self.delegate] || self.isCanceled) {
+        return;
+    }
+}
+
+- (void)syncPatch:(NSManagedObjectContext *)db {
+    self.count = [Get syncPatchesCount:db];
     NSArray<Patches *> *syncPatches = [Load syncPatches:db];
     for(int x = 0; x < syncPatches.count; x++) {
         if(![Tx syncPatch:db patch:syncPatches[x] delegate:self.delegate] || self.isCanceled) {
             return;
         }
     }
+}
+
+- (void)syncData:(NSManagedObjectContext *)db {
+    self.count = 1 + [Get syncTotalCount:db];
     NSArray<AnnouncementSeen *> *syncAnnouncementSeen = [Load syncAnnouncementSeen:db];
     for(int x = 0; x < syncAnnouncementSeen.count; x++) {
         if(![Tx syncAnnouncementSeen:db announcementSeen:syncAnnouncementSeen[x] delegate:self.delegate] || self.isCanceled) {

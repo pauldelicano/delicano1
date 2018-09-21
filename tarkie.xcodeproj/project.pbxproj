@@ -10,6 +10,7 @@
 		4717DB0C21478A54006A2FF6 /* ScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4717DB0B21478A54006A2FF6 /* ScrollView.m */; };
 		4731BF3F2124555A00473261 /* LayoutConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = 4731BF3E2124555A00473261 /* LayoutConstraint.m */; };
 		47591A66211D6C2000E21A44 /* OvertimeFormViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 47591A65211D6C2000E21A44 /* OvertimeFormViewController.m */; };
+		47A057EE215490D2003C9EFE /* Sqlite.m in Sources */ = {isa = PBXBuildFile; fileRef = 47A057ED215490D2003C9EFE /* Sqlite.m */; };
 		47AC039D21180538002CEFA8 /* Color.m in Sources */ = {isa = PBXBuildFile; fileRef = 47AC039C21180538002CEFA8 /* Color.m */; };
 		47B6382621463171009914F2 /* CircularProgressBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 47B6382521463171009914F2 /* CircularProgressBar.m */; };
 		47C6CA7821213C8A0000B03D /* OvertimeFormTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 47C6CA7721213C8A0000B03D /* OvertimeFormTableViewCell.m */; };
@@ -97,6 +98,9 @@
 		47591A64211D6C2000E21A44 /* OvertimeFormViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OvertimeFormViewController.h; sourceTree = "<group>"; };
 		47591A65211D6C2000E21A44 /* OvertimeFormViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OvertimeFormViewController.m; sourceTree = "<group>"; };
 		478C8CD3211979EA00B5BBF9 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Main.strings; sourceTree = "<group>"; };
+		47A057EC215490D2003C9EFE /* Sqlite.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Sqlite.h; sourceTree = "<group>"; };
+		47A057ED215490D2003C9EFE /* Sqlite.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Sqlite.m; sourceTree = "<group>"; };
+		47A057EF2154E6B9003C9EFE /* Sevie-Debug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Sevie-Debug.entitlements"; sourceTree = "<group>"; };
 		47AC039B21180538002CEFA8 /* Color.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Color.h; sourceTree = "<group>"; };
 		47AC039C21180538002CEFA8 /* Color.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Color.m; sourceTree = "<group>"; };
 		47B6382421463171009914F2 /* CircularProgressBar.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CircularProgressBar.h; sourceTree = "<group>"; };
@@ -309,6 +313,8 @@
 				DAC869E32047C4C000C21D23 /* Time.m */,
 				47AC039B21180538002CEFA8 /* Color.h */,
 				47AC039C21180538002CEFA8 /* Color.m */,
+				47A057EC215490D2003C9EFE /* Sqlite.h */,
+				47A057ED215490D2003C9EFE /* Sqlite.m */,
 			);
 			path = utils;
 			sourceTree = "<group>";
@@ -349,6 +355,7 @@
 		DA1532C91FCE9A80003FD977 /* tarkie */ = {
 			isa = PBXGroup;
 			children = (
+				47A057EF2154E6B9003C9EFE /* Sevie-Debug.entitlements */,
 				DA8A5C7720E09D3100C7BE6E /* Sevie.entitlements */,
 				DA8A5C7620E09CEC00C7BE6E /* Timsie.entitlements */,
 				DA1532D81FCE9A80003FD977 /* Info.plist */,
@@ -611,7 +618,7 @@
 								enabled = 1;
 							};
 							com.apple.Push = {
-								enabled = 0;
+								enabled = 1;
 							};
 						};
 					};
@@ -720,6 +727,7 @@
 				DA73ADA920DCD2AD0031D48F /* AnnouncementsViewController.m in Sources */,
 				DAF9094A1FE905B400348650 /* App.m in Sources */,
 				DA0FA285204D1C6000397051 /* PageBarItemCollectionViewCell.m in Sources */,
+				47A057EE215490D2003C9EFE /* Sqlite.m in Sources */,
 				DA0B7CF3203A89F400844221 /* Tx.m in Sources */,
 				DA26F0751FD250F3009074CB /* MainViewController.m in Sources */,
 				DA0B7CF1203A89F400844221 /* Update.m in Sources */,
@@ -830,8 +838,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 14840DEEFCDCCE914EDDC146 /* Pods-tarkie.tarkie debug.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon.$(FLAVOR:lower)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon$(PRODUCT_BUNDLE_IDENTIFIER_SUFFIX)";
 				BUILD_TYPE = DEBUG;
+				CODE_SIGN_ENTITLEMENTS = "tarkie/Sevie-Debug.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = E26F49V7U6;
 				FLAVOR = TARKIE;
@@ -906,8 +915,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7722A72D704B4C9374172CFD /* Pods-tarkie.tarkie release.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon.$(FLAVOR:lower)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon$(PRODUCT_BUNDLE_IDENTIFIER_SUFFIX)";
 				BUILD_TYPE = RELEASE;
+				CODE_SIGN_ENTITLEMENTS = "tarkie/Sevie-Debug.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = E26F49V7U6;
 				FLAVOR = TARKIE;
@@ -1037,8 +1047,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 85E3731E89DC93C596E8C8DB /* Pods-tarkie.sevie debug.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon.$(FLAVOR:lower)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon$(PRODUCT_BUNDLE_IDENTIFIER_SUFFIX)";
 				BUILD_TYPE = DEBUG;
+				CODE_SIGN_ENTITLEMENTS = "tarkie/Sevie-Debug.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = E26F49V7U6;
 				FLAVOR = SEVIE;
@@ -1062,8 +1073,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 28CDBEA7A8ED9A48F91A5338 /* Pods-tarkie.sevie release.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon.$(FLAVOR:lower)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon$(PRODUCT_BUNDLE_IDENTIFIER_SUFFIX)";
 				BUILD_TYPE = RELEASE;
+				CODE_SIGN_ENTITLEMENTS = "tarkie/Sevie-Debug.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = E26F49V7U6;
 				FLAVOR = SEVIE;
@@ -1142,8 +1154,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3D576833A30E7C71E3C393D9 /* Pods-tarkie.timsie debug.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon.$(FLAVOR:lower)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon$(PRODUCT_BUNDLE_IDENTIFIER_SUFFIX)";
 				BUILD_TYPE = DEBUG;
+				CODE_SIGN_ENTITLEMENTS = "tarkie/Sevie-Debug.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = E26F49V7U6;
 				FLAVOR = TIMSIE;
@@ -1218,8 +1231,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = B8C772CBFB7C80AFC9A1070E /* Pods-tarkie.timsie release.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon.$(FLAVOR:lower)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon$(PRODUCT_BUNDLE_IDENTIFIER_SUFFIX)";
 				BUILD_TYPE = RELEASE;
+				CODE_SIGN_ENTITLEMENTS = "tarkie/Sevie-Debug.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = E26F49V7U6;
 				FLAVOR = TIMSIE;
