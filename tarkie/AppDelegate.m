@@ -1,4 +1,5 @@
 #import "AppDelegate.h"
+#import "App.h"
 #import "Get.h"
 #import "Update.h"
 #import "File.h"
@@ -17,10 +18,11 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    [UIDevice.currentDevice setBatteryMonitoringEnabled:YES];
     self.psc = [self persistentStoreCoordinatorInit:@"tarkie.db"];
     self.db = [self managedObjectContextInit:self.psc councurrencyType:NSPrivateQueueConcurrencyType];
-    self.dbSync = [self managedObjectContextInit:self.psc councurrencyType:NSPrivateQueueConcurrencyType];
     self.dbTracking = [self managedObjectContextInit:self.psc councurrencyType:NSPrivateQueueConcurrencyType];
+    self.dbAlerts = [self managedObjectContextInit:self.psc councurrencyType:NSPrivateQueueConcurrencyType];
     self.locationManager = [self locationManagerInit:self];
     self.userNotificationCenter = [self userNotificationCenterInit:self];
     NSSetUncaughtExceptionHandler(&uncaughtExceptionHandler);
@@ -52,7 +54,11 @@ void uncaughtExceptionHandler(NSException *exception) {
 - (NSPersistentStoreCoordinator *)persistentStoreCoordinatorInit:(NSString *)dbName {
     NSPersistentStoreCoordinator *persistentStoreCoordinator = [NSPersistentStoreCoordinator.alloc initWithManagedObjectModel:[NSManagedObjectModel.alloc initWithContentsOfURL:[NSBundle.mainBundle URLForResource:@"DataModel" withExtension:@"momd"]]];
     NSError *error = nil;
-    [persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:[[NSFileManager.defaultManager URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask].lastObject URLByAppendingPathComponent:dbName] options:[NSDictionary dictionaryWithObjectsAndKeys:@(YES), NSMigratePersistentStoresAutomaticallyOption, @(YES), NSInferMappingModelAutomaticallyOption, nil] error:&error];
+    NSMutableDictionary *options = NSMutableDictionary.alloc.init;
+    [options setObject:@YES forKey:NSMigratePersistentStoresAutomaticallyOption];
+    [options setObject:@YES forKey:NSInferMappingModelAutomaticallyOption];
+    [options setObject:@{@"journal_mode":@"DELETE"} forKey:NSSQLitePragmasOption];
+    [persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:[[NSFileManager.defaultManager URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask].lastObject URLByAppendingPathComponent:dbName] options:options error:&error];
     if(error != nil) {
         NSLog(@"error: appDelegate persistentStoreCoordinatorInit - %@", error.localizedDescription);
     }
@@ -91,13 +97,23 @@ void uncaughtExceptionHandler(NSException *exception) {
 }
 
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
-    self.authorizationStatus = status;
     if(self.isUpdatingLocation) {
+        if(self.authorizationStatus != 0 && self.authorizationStatus != status) {
+            if(status == kCLAuthorizationStatusAuthorizedAlways) {
+                NSLog(@"alert: ALERT_TYPE_TURNED_ON_GPS");
+                [Update alertSave:self.dbAlerts alertTypeID:ALERT_TYPE_TURNED_ON_GPS gpsID:[Update gpsSave:self.dbTracking location:self.location] value:nil];
+            }
+            else {
+                NSLog(@"alert: ALERT_TYPE_TURNED_OFF_GPS");
+                [Update alertSave:self.dbAlerts alertTypeID:ALERT_TYPE_TURNED_OFF_GPS gpsID:[Update gpsSave:self.dbTracking location:self.location] value:nil];
+            }
+        }
         [self.locationManager startUpdatingLocation];
     }
-    if(self.applicationDidEnterBackground && self.isUpdatingLocation && self.authorizationStatus != kCLAuthorizationStatusAuthorizedAlways) {
+    if(self.applicationDidEnterBackground && self.isUpdatingLocation && status != kCLAuthorizationStatusAuthorizedAlways) {
         [self.locationManager stopUpdatingLocation];
     }
+    self.authorizationStatus = status;
 }
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations {
@@ -108,7 +124,7 @@ void uncaughtExceptionHandler(NSException *exception) {
             self.timer = nil;
         }
         if(self.timer == nil) {
-            if([Get isTimeIn:self.db]) {
+            if([Get isTimeIn:self.dbTracking]) {
                 self.interval = self.settingLocationGPSTrackingInterval;
                 if([self saveTracking]) {
                     [NSNotificationCenter.defaultCenter postNotificationName:@"UserNotificationCenterDidUpdateLocations" object:nil userInfo:nil];
@@ -156,24 +172,29 @@ void uncaughtExceptionHandler(NSException *exception) {
 }
 
 - (BOOL)saveTracking {
-    if(self.location == nil || (self.location.coordinate.latitude == 0 && self.location.coordinate.longitude == 0)) {
-        return NO;
-    }
     int64_t gpsID = [Update gpsSave:self.dbTracking location:self.location];
     if(gpsID == 0) {
+        Alerts *alert = [Get alert:self.dbAlerts alertTypeID:ALERT_TYPE_NO_GPS_SIGNAL];
+        if(alert == nil || alert.alertTypeID != ALERT_TYPE_NO_GPS_SIGNAL) {
+            NSLog(@"alert: ALERT_TYPE_NO_GPS_SIGNAL");
+            [Update alertSave:self.dbAlerts alertTypeID:ALERT_TYPE_NO_GPS_SIGNAL gpsID:gpsID value:nil];
+        }
         return NO;
     }
-    Sequences *sequence = [Get sequence:self.dbTracking];
+    Alerts *alert = [Get alert:self.dbAlerts alertTypeID:ALERT_TYPE_GPS_ACQUIRED];
+    if(alert == nil || alert.alertTypeID != ALERT_TYPE_GPS_ACQUIRED) {
+        NSLog(@"alert: ALERT_TYPE_GPS_ACQUIRED");
+        [Update alertSave:self.dbAlerts alertTypeID:ALERT_TYPE_GPS_ACQUIRED gpsID:gpsID value:nil];
+    }
     Tracking *tracking = [NSEntityDescription insertNewObjectForEntityForName:@"Tracking" inManagedObjectContext:self.dbTracking];
-    sequence.tracking += 1;
-    tracking.trackingID = sequence.tracking;
+    tracking.trackingID = [Get sequenceID:self.dbTracking entity:@"Tracking" attribute:@"trackingID"] + 1;
     tracking.syncBatchID = self.syncBatchID;
     tracking.employeeID = self.employee.employeeID;
     NSDate *currentDate = NSDate.date;
     tracking.date = [Time getFormattedDate:DATE_FORMAT date:currentDate];
     tracking.time = [Time getFormattedDate:TIME_FORMAT date:currentDate];
     tracking.isSync = NO;
-    tracking.timeInID = [Get timeIn:self.db].timeInID;
+    tracking.timeInID = [Get timeIn:self.dbTracking].timeInID;
     tracking.gpsID = gpsID;
     return [Update save:self.dbTracking];
 }

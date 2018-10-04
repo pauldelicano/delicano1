@@ -4,10 +4,12 @@
 #import "LoadingDialogViewController.h"
 #import "NoGPSDialogViewController.h"
 #import "DropDownDialogViewController.h"
+#import "ListDialogViewController.h"
+#import "BreakViewController.h"
 #import "CameraViewController.h"
 #import "AttendanceSummaryViewController.h"
 
-@interface MainViewController : ViewController<UIPageViewControllerDataSource, UIPageViewControllerDelegate, UIScrollViewDelegate, DrawerDelegate, PageBarDelegate, LoadingDelegate, NoGPSDelegate, DropDownDelegate, CameraDelegate, AttendanceSummaryDelegate>
+@interface MainViewController : ViewController<UIPageViewControllerDataSource, UIPageViewControllerDelegate, UIScrollViewDelegate, DrawerDelegate, PageBarDelegate, LoadingDelegate, NoGPSDelegate, DropDownDelegate, ListDelegate, BreakDelegate, CameraDelegate, AttendanceSummaryDelegate>
 
 @property (weak, nonatomic) IBOutlet UIView *vStatusBar;
 @property (weak, nonatomic) IBOutlet UIView *vNavBar;

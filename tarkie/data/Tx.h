@@ -2,7 +2,7 @@
 #import <CoreData/CoreData.h>
 
 #import "Patches+CoreDataClass.h"
-
+#import "Alerts+CoreDataClass.h"
 #import "AnnouncementSeen+CoreDataClass.h"
 
 #import "Stores+CoreDataClass.h"
@@ -11,22 +11,23 @@
 #import "Schedules+CoreDataClass.h"
 #import "TimeIn+CoreDataClass.h"
 #import "TimeOut+CoreDataClass.h"
+#import "BreakIn+CoreDataClass.h"
+#import "BreakOut+CoreDataClass.h"
 #import "Overtime+CoreDataClass.h"
+#import "Tracking+CoreDataClass.h"
 
 #import "Photos+CoreDataClass.h"
 #import "Visits+CoreDataClass.h"
 #import "CheckIn+CoreDataClass.h"
 #import "CheckOut+CoreDataClass.h"
 
-#import "Tracking+CoreDataClass.h"
-
 @interface Tx : NSObject
 
-+ (BOOL)syncPatch:(NSManagedObjectContext *)db patch:(Patches *)patch delegate:(id)delegate;
-
-//COMPANY
 + (BOOL)authorize:(NSManagedObjectContext *)db params:(NSDictionary *)params delegate:(id)delegate;
 + (BOOL)login:(NSManagedObjectContext *)db params:(NSDictionary *)params delegate:(id)delegate;
++ (BOOL)sendBackupData:(NSManagedObjectContext *)db delegate:(id)delegate;
++ (BOOL)patchData:(NSManagedObjectContext *)db patch:(Patches *)patch delegate:(id)delegate;
++ (BOOL)syncAlert:(NSManagedObjectContext *)db alert:(Alerts *)alert delegate:(id)delegate;
 + (BOOL)syncAnnouncementSeen:(NSManagedObjectContext *)db announcementSeen:(AnnouncementSeen *)announcementSeen delegate:(id)delegate;
 
 //STORE
@@ -43,7 +44,10 @@
 + (BOOL)syncTimeOut:(NSManagedObjectContext *)db timeOut:(TimeOut *)timeOut delegate:(id)delegate;
 + (BOOL)uploadTimeOutPhoto:(NSManagedObjectContext *)db timeOut:(TimeOut *)timeOut delegate:(id)delegate;
 + (BOOL)uploadTimeOutSignature:(NSManagedObjectContext *)db timeOut:(TimeOut *)timeOut delegate:(id)delegate;
++ (BOOL)syncBreakIn:(NSManagedObjectContext *)db breakIn:(BreakIn *)breakIn delegate:(id)delegate;
++ (BOOL)syncBreakOut:(NSManagedObjectContext *)db breakOut:(BreakOut *)breakOut delegate:(id)delegate;
 + (BOOL)syncOvertime:(NSManagedObjectContext *)db overtime:(Overtime *)overtime delegate:(id)delegate;
++ (BOOL)syncTracking:(NSManagedObjectContext *)db tracking:(Tracking *)tracking delegate:(id)delegate;
 
 //VISITS
 + (BOOL)uploadVisitPhoto:(NSManagedObjectContext *)db photo:(Photos *)photo delegate:(id)delegate;
@@ -63,9 +67,6 @@
 
 //FORMS
 
-
-+ (BOOL)syncTracking:(NSManagedObjectContext *)db tracking:(Tracking *)tracking delegate:(id)delegate;
-+ (BOOL)sendBackupData:(NSManagedObjectContext *)db delegate:(id)delegate;
 
 + (void)isCanceled:(BOOL)canceled;
 

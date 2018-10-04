@@ -49,10 +49,6 @@ static MessageDialogViewController *vcMessage;
     }
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-}
-
 - (void)onRefresh {
     [super onRefresh];
     [self.overtimeReasons removeAllObjects];
@@ -79,18 +75,18 @@ static MessageDialogViewController *vcMessage;
     vcMessage.message = @"Are you sure you want to cancel overtime?";
     vcMessage.negativeTitle = @"No";
     vcMessage.negativeTarget = ^{
-        [View removeView:vcMessage.view animated:YES];
+        [View removeChildViewController:vcMessage animated:YES];
     };
     vcMessage.positiveTitle = @"Yes";
     vcMessage.positiveTarget = ^{
-        [View removeView:vcMessage.view animated:YES];
+        [View removeChildViewController:vcMessage animated:YES];
         TimeIn *timeIn = [Get timeIn:self.app.db timeInID:self.timeInID];
         timeIn.isOvertime = NO;
         if([Update save:self.app.db]) {
             [self.navigationController popViewControllerAnimated:YES];
         }
     };
-    [View addSubview:self.view subview:vcMessage.view animated:YES];
+    [View addChildViewController:self childViewController:vcMessage animated:YES];
 }
 
 - (IBAction)save:(id)sender {
@@ -100,9 +96,9 @@ static MessageDialogViewController *vcMessage;
         vcMessage.message = @"Please choose reasons.";
         vcMessage.positiveTitle = @"OK";
         vcMessage.positiveTarget = ^{
-            [View removeView:vcMessage.view animated:YES];
+            [View removeChildViewController:vcMessage animated:YES];
         };
-        [View addSubview:self.view subview:vcMessage.view animated:YES];
+        [View addChildViewController:self childViewController:vcMessage animated:YES];
         return;
     }
     NSString *remarks = self.tfRemarks.text;
@@ -112,18 +108,16 @@ static MessageDialogViewController *vcMessage;
     if(remarks.length == 0) {
         vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
         vcMessage.subject = @"Overtime Remarks Required";
-        vcMessage.message = @"Please input remarks..";
+        vcMessage.message = @"Please input remarks.";
         vcMessage.positiveTitle = @"OK";
         vcMessage.positiveTarget = ^{
-            [View removeView:vcMessage.view animated:YES];
+            [View removeChildViewController:vcMessage animated:YES];
         };
-        [View addSubview:self.view subview:vcMessage.view animated:YES];
+        [View addChildViewController:self childViewController:vcMessage animated:YES];
         return;
     }
-    Sequences *sequence = [Get sequence:self.app.db];
     Overtime *overtime = [NSEntityDescription insertNewObjectForEntityForName:@"Overtime" inManagedObjectContext:self.app.db];
-    sequence.overtime += 1;
-    overtime.overtimeID = sequence.overtime;
+    overtime.overtimeID = [Get sequenceID:self.app.db entity:@"Overtime" attribute:@"overtimeID"] + 1;
     overtime.syncBatchID = self.app.syncBatchID;
     overtime.employeeID = self.app.employee.employeeID;
     overtime.timeInID = self.timeInID;

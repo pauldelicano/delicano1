@@ -13,38 +13,6 @@
 
 static BOOL isCanceled;
 
-+ (BOOL)syncPatch:(NSManagedObjectContext *)db patch:(Patches *)patch delegate:(id)delegate {
-    BOOL result = NO;
-    NSMutableDictionary *params = NSMutableDictionary.alloc.init;
-    [params setObject:[Get apiKey:db] forKey:@"api_key"];
-    [params setObject:[NSString stringWithFormat:@"%lld", patch.patchID] forKey:@"patch_id"];
-    [params setObject:[NSString stringWithFormat:@"%lld", patch.employeeID] forKey:@"employee_id"];
-    [params setObject:@"done" forKey:@"status"];
-    NSDictionary *response = [Http post:[NSString stringWithFormat:@"%@%@", WEB_API, @"edit-adminpanel-patch"] params:params timeout:HTTP_TIMEOUT_TX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
-    NSString *message = nil;
-    if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
-    }
-    if(message == nil) {
-        patch.isSync = YES;
-        if(![Update save:db]) {
-            message = @"";
-        }
-    }
-    if(message == nil) {
-        message = @"ok";
-        result = YES;
-    }
-    if(isCanceled) {
-        message = nil;
-        result = NO;
-    }
-    [delegate onProcessResult:message];
-    return result;
-}
-
 + (BOOL)authorize:(NSManagedObjectContext *)db params:(NSDictionary *)params delegate:(id)delegate {
     BOOL result = NO;
     NSDictionary *response = [Http post:[NSString stringWithFormat:@"%@%@", WEB_API, @"authorization-request"] params:params timeout:HTTP_TIMEOUT_TX];
@@ -145,6 +113,128 @@ static BOOL isCanceled;
     return result;
 }
 
++ (BOOL)sendBackupData:(NSManagedObjectContext *)db delegate:(id)delegate {
+    BOOL result = NO;
+    Employees *employee = [Get employee:db employeeID:[Get userID:db]];
+    NSString *fileName = [NSString stringWithFormat:@"%@_%@_%@_%@_%@.zip", [Get company:db].name, employee.lastName, employee.firstName, [Time getFormattedDate:[NSString stringWithFormat:@"%@_%@", DATE_FORMAT, TIME_FORMAT] date:NSDate.date], [NSBundle.mainBundle.infoDictionary objectForKey:@"CFBundleShortVersionString"]];
+    fileName = [fileName stringByReplacingOccurrencesOfString:@" " withString:@"_"];
+    fileName = [fileName stringByReplacingOccurrencesOfString:@":" withString:@"-"];
+    NSString *backup = [File documentPath:@"Backup"];
+    if(![NSFileManager.defaultManager createDirectoryAtPath:backup withIntermediateDirectories:YES attributes:nil error:nil]) {
+        [delegate onProcessResult:@""];
+        return NO;
+    }
+    [File deleteFromDocument:@"Backup/tarkie.db"];
+    if(![NSFileManager.defaultManager copyItemAtPath:[File documentPath:@"tarkie.db"] toPath:[File documentPath:@"Backup/tarkie.db"] error:nil]) {
+        [delegate onProcessResult:@""];
+        return NO;
+    }
+    if(![SSZipArchive createZipFileAtPath:[File documentPath:fileName] withContentsOfDirectory:backup]) {
+        [delegate onProcessResult:@""];
+        return NO;
+    }
+    NSMutableDictionary *params = NSMutableDictionary.alloc.init;
+    [params setObject:@"upload-backup" forKey:@"action"];
+    [params setObject:@"75TvNCip314ts6l1Q1N9i2F3BcRWr090y31W54G279UxaoQx5Z" forKey:@"api_key"];
+    [params setObject:[NSString stringWithFormat:@"%lld", employee.employeeID] forKey:@"employee_id"];
+    NSDictionary *response = [Http postFile:@"https://www.tarkie.com/API/2.3/backup.php" params:params file:fileName timeout:HTTP_TIMEOUT_TX];
+    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
+    NSString *status = [init objectForKey:@"status"];
+    NSString *message = nil;
+    if([status isEqualToString:@"error"]) {
+        message = [init objectForKey:@"message"];
+    }
+    [File deleteFromDocument:fileName];
+    if(message == nil) {
+        [File deleteFromDocument:@"Backup"];
+        message = @"ok";
+        result = YES;
+    }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
+    }
+    [delegate onProcessResult:message];
+    return result;
+}
+
++ (BOOL)patchData:(NSManagedObjectContext *)db patch:(Patches *)patch delegate:(id)delegate {
+    BOOL result = NO;
+    NSMutableDictionary *params = NSMutableDictionary.alloc.init;
+    [params setObject:[Get apiKey:db] forKey:@"api_key"];
+    [params setObject:[NSString stringWithFormat:@"%lld", patch.patchID] forKey:@"patch_id"];
+    [params setObject:[NSString stringWithFormat:@"%lld", patch.employeeID] forKey:@"employee_id"];
+    [params setObject:@"done" forKey:@"status"];
+    NSDictionary *response = [Http post:[NSString stringWithFormat:@"%@%@", WEB_API, @"edit-adminpanel-patch"] params:params timeout:HTTP_TIMEOUT_TX];
+    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
+    NSString *status = [init objectForKey:@"status"];
+    NSString *message = nil;
+    if([status isEqualToString:@"error"]) {
+        message = [init objectForKey:@"message"];
+    }
+    if(message == nil) {
+        patch.isSync = YES;
+        if(![Update save:db]) {
+            message = @"";
+        }
+    }
+    if(message == nil) {
+        message = @"ok";
+        result = YES;
+    }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
+    }
+    [delegate onProcessResult:message];
+    return result;
+}
+
++ (BOOL)syncAlert:(NSManagedObjectContext *)db alert:(Alerts *)alert delegate:(id)delegate {
+    BOOL result = NO;
+    NSMutableDictionary *params = NSMutableDictionary.alloc.init;
+    [params setObject:[Get apiKey:db] forKey:@"api_key"];
+    [params setObject:[NSString stringWithFormat:@"%lld", alert.alertID] forKey:@"local_record_id"];
+    [params setObject:alert.syncBatchID forKey:@"sync_batch_id"];
+    [params setObject:[NSString stringWithFormat:@"%lld", alert.employeeID] forKey:@"employee_id"];
+    [params setObject:alert.date forKey:@"date"];
+    [params setObject:alert.time forKey:@"time"];
+    [params setObject:[NSString stringWithFormat:@"%lld", alert.alertTypeID] forKey:@"alert_type_id"];
+    [params setObject:alert.value forKey:@"value"];
+    TimeIn *timeIn = [Get timeIn:db timeInID:alert.timeInID];
+    [params setObject:[NSString stringWithFormat:@"%lld", timeIn.timeInID] forKey:@"local_record_id_in"];
+    [params setObject:timeIn.syncBatchID forKey:@"sync_batch_id_in"];
+    GPS *gps = [Get gps:db gpsID:alert.gpsID];
+    [params setObject:gps.date != nil ? gps.date : @"0000-00-00" forKey:@"gps_date"];
+    [params setObject:gps.time != nil ? gps.time : @"00:00:00" forKey:@"gps_time"];
+    [params setObject:[NSString stringWithFormat:@"%f", gps.latitude] forKey:@"latitude"];
+    [params setObject:[NSString stringWithFormat:@"%f", gps.longitude] forKey:@"longitude"];
+    [params setObject:gps.isValid ? @"yes" : @"no" forKey:@"is_valid"];
+    NSDictionary *response = [Http post:[NSString stringWithFormat:@"%@%@", WEB_API, @"add-alert"] params:params timeout:HTTP_TIMEOUT_TX];
+    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
+    NSString *status = [init objectForKey:@"status"];
+    NSString *message = nil;
+    if([status isEqualToString:@"error"]) {
+        message = [init objectForKey:@"message"];
+    }
+    if(message == nil) {
+        alert.isSync = YES;
+        if(![Update save:db]) {
+            message = @"";
+        }
+    }
+    if(message == nil) {
+        message = @"ok";
+        result = YES;
+    }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
+    }
+    [delegate onProcessResult:message];
+    return result;
+}
+
 + (BOOL)syncAnnouncementSeen:(NSManagedObjectContext *)db announcementSeen:(AnnouncementSeen *)announcementSeen delegate:(id)delegate {
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
@@ -197,9 +287,8 @@ static BOOL isCanceled;
     NSMutableArray *employeeIDs = NSMutableArray.alloc.init;
     if([store.shareWith isEqualToString:@"my-team"]) {
         int64_t teamID = [Get employee:db employeeID:store.employeeID].teamID;
-        NSArray<Employees *> *employees = [Load employeeIDs:db teamID:teamID];
-        for(int x = 0; x < employees.count; x++) {
-            [employeeIDs addObject:[NSString stringWithFormat:@"%lld", employees[x].employeeID]];
+        for(Employees *employee in [Load employeeIDs:db teamID:teamID]) {
+            [employeeIDs addObject:[NSString stringWithFormat:@"%lld", employee.employeeID]];
         }
         [params setObject:[NSArray.alloc initWithObjects:[NSString stringWithFormat:@"%lld", teamID], nil] forKey:@"team"];
     }
@@ -251,9 +340,8 @@ static BOOL isCanceled;
     NSMutableArray *employeeIDs = NSMutableArray.alloc.init;
     if([store.shareWith isEqualToString:@"my-team"]) {
         int64_t teamID = [Get employee:db employeeID:store.employeeID].teamID;
-        NSArray<Employees *> *employees = [Load employeeIDs:db teamID:teamID];
-        for(int x = 0; x < employees.count; x++) {
-            [employeeIDs addObject:[NSString stringWithFormat:@"%lld", employees[x].employeeID]];
+        for(Employees *employee in [Load employeeIDs:db teamID:teamID]) {
+            [employeeIDs addObject:[NSString stringWithFormat:@"%lld", employee.employeeID]];
         }
         [params setObject:[NSArray.alloc initWithObjects:[NSString stringWithFormat:@"%lld", teamID], nil] forKey:@"team"];
     }
@@ -470,7 +558,6 @@ static BOOL isCanceled;
     [params setObject:gps.isValid ? @"yes" : @"no" forKey:@"is_valid"];
     [params setObject:[NSString stringWithFormat:@"%lld", [Get store:db storeID:timeIn.storeID].webStoreID] forKey:@"store_id"];
     [params setObject:[NSString stringWithFormat:@"%lld", [Get schedule:db scheduleID:timeIn.scheduleID].webScheduleID] forKey:@"schedule_id"];
-    [params setObject:timeIn.batteryLevel forKey:@"batery_level"];
     NSDictionary *response = [Http post:[NSString stringWithFormat:@"%@%@", WEB_API, @"time-in"] params:params timeout:HTTP_TIMEOUT_TX];
     NSDictionary *init = [[response objectForKey:@"init"] lastObject];
     NSString *status = [init objectForKey:@"status"];
@@ -534,11 +621,12 @@ static BOOL isCanceled;
     [params setObject:[Get apiKey:db] forKey:@"api_key"];
     [params setObject:[NSString stringWithFormat:@"%lld", timeOut.timeOutID] forKey:@"local_record_id"];
     [params setObject:timeOut.syncBatchID forKey:@"sync_batch_id"];
-    [params setObject:[NSString stringWithFormat:@"%lld", timeOut.timeInID] forKey:@"local_record_id_in"];
-    [params setObject:[Get timeIn:db timeInID:timeOut.timeInID].syncBatchID forKey:@"sync_batch_id_in"];
-    [params setObject:[NSString stringWithFormat:@"%lld", timeOut.employeeID] forKey:@"employee_id"];
     [params setObject:timeOut.date forKey:@"date_out"];
     [params setObject:timeOut.time forKey:@"time_out"];
+    TimeIn *timeIn = [Get timeIn:db timeInID:timeOut.timeInID];
+    [params setObject:[NSString stringWithFormat:@"%lld", timeIn.timeInID] forKey:@"local_record_id_in"];
+    [params setObject:timeIn.syncBatchID forKey:@"sync_batch_id_in"];
+    [params setObject:[NSString stringWithFormat:@"%lld", timeIn.employeeID] forKey:@"employee_id"];
     GPS *gps = [Get gps:db gpsID:timeOut.gpsID];
     [params setObject:gps.date != nil ? gps.date : @"0000-00-00" forKey:@"gps_date"];
     [params setObject:gps.time != nil ? gps.time : @"00:00:00" forKey:@"gps_time"];
@@ -577,7 +665,8 @@ static BOOL isCanceled;
     [params setObject:[Get apiKey:db] forKey:@"api_key"];
     [params setObject:[NSString stringWithFormat:@"%lld", timeOut.timeOutID] forKey:@"local_record_id"];
     [params setObject:timeOut.syncBatchID forKey:@"sync_batch_id"];
-    [params setObject:[NSString stringWithFormat:@"%lld", timeOut.employeeID] forKey:@"employee_id"];
+    TimeIn *timeIn = [Get timeIn:db timeInID:timeOut.timeInID];
+    [params setObject:[NSString stringWithFormat:@"%lld", timeIn.employeeID] forKey:@"employee_id"];
     NSDictionary *response = [Http postImage:[NSString stringWithFormat:@"%@%@", WEB_FILES, @"upload-time-out-photo"] params:params image:timeOut.photo timeout:HTTP_TIMEOUT_RX];
     NSDictionary *init = [[response objectForKey:@"init"] lastObject];
     NSString *status = [init objectForKey:@"status"];
@@ -609,7 +698,8 @@ static BOOL isCanceled;
     [params setObject:[Get apiKey:db] forKey:@"api_key"];
     [params setObject:[NSString stringWithFormat:@"%lld", timeOut.timeOutID] forKey:@"local_record_id"];
     [params setObject:timeOut.syncBatchID forKey:@"sync_batch_id"];
-    [params setObject:[NSString stringWithFormat:@"%lld", timeOut.employeeID] forKey:@"employee_id"];
+    TimeIn *timeIn = [Get timeIn:db timeInID:timeOut.timeInID];
+    [params setObject:[NSString stringWithFormat:@"%lld", timeIn.employeeID] forKey:@"employee_id"];
     NSDictionary *response = [Http postImage:[NSString stringWithFormat:@"%@%@", WEB_FILES, @"upload-signature-photo"] params:params image:timeOut.photo timeout:HTTP_TIMEOUT_RX];
     NSDictionary *init = [[response objectForKey:@"init"] lastObject];
     NSString *status = [init objectForKey:@"status"];
@@ -619,6 +709,89 @@ static BOOL isCanceled;
     }
     if(message == nil) {
         timeOut.isSignatureUpload = YES;
+        if(![Update save:db]) {
+            message = @"";
+        }
+    }
+    if(message == nil) {
+        message = @"ok";
+        result = YES;
+    }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
+    }
+    [delegate onProcessResult:message];
+    return result;
+}
+
++ (BOOL)syncBreakIn:(NSManagedObjectContext *)db breakIn:(BreakIn *)breakIn delegate:(id)delegate {
+    BOOL result = NO;
+    NSMutableDictionary *params = NSMutableDictionary.alloc.init;
+    [params setObject:[Get apiKey:db] forKey:@"api_key"];
+    [params setObject:[NSString stringWithFormat:@"%lld", breakIn.breakInID] forKey:@"local_record_id"];
+    [params setObject:breakIn.syncBatchID forKey:@"sync_batch_id"];
+    [params setObject:[NSString stringWithFormat:@"%lld", breakIn.employeeID] forKey:@"employee_id"];
+    [params setObject:breakIn.date forKey:@"date_in"];
+    [params setObject:breakIn.time forKey:@"time_in"];
+    GPS *gps = [Get gps:db gpsID:breakIn.gpsID];
+    [params setObject:gps.date != nil ? gps.date : @"0000-00-00" forKey:@"gps_date"];
+    [params setObject:gps.time != nil ? gps.time : @"00:00:00" forKey:@"gps_time"];
+    [params setObject:[NSString stringWithFormat:@"%f", gps.latitude] forKey:@"latitude"];
+    [params setObject:[NSString stringWithFormat:@"%f", gps.longitude] forKey:@"longitude"];
+    [params setObject:gps.isValid ? @"yes" : @"no" forKey:@"is_valid"];
+    NSDictionary *response = [Http post:[NSString stringWithFormat:@"%@%@", WEB_API, @"break-in"] params:params timeout:HTTP_TIMEOUT_TX];
+    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
+    NSString *status = [init objectForKey:@"status"];
+    NSString *message = nil;
+    if([status isEqualToString:@"error"]) {
+        message = [init objectForKey:@"message"];
+    }
+    if(message == nil) {
+        breakIn.isSync = YES;
+        if(![Update save:db]) {
+            message = @"";
+        }
+    }
+    if(message == nil) {
+        message = @"ok";
+        result = YES;
+    }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
+    }
+    [delegate onProcessResult:message];
+    return result;
+}
+
++ (BOOL)syncBreakOut:(NSManagedObjectContext *)db breakOut:(BreakOut *)breakOut delegate:(id)delegate {
+    BOOL result = NO;
+    NSMutableDictionary *params = NSMutableDictionary.alloc.init;
+    [params setObject:[Get apiKey:db] forKey:@"api_key"];
+    [params setObject:[NSString stringWithFormat:@"%lld", breakOut.breakOutID] forKey:@"local_record_id"];
+    [params setObject:breakOut.syncBatchID forKey:@"sync_batch_id"];
+    [params setObject:breakOut.date forKey:@"date_out"];
+    [params setObject:breakOut.time forKey:@"time_out"];
+    BreakIn *breakIn = [Get breakIn:db breakInID:breakOut.breakInID];
+    [params setObject:[NSString stringWithFormat:@"%lld", breakIn.breakInID] forKey:@"local_record_id_in"];
+    [params setObject:breakIn.syncBatchID forKey:@"sync_batch_id_in"];
+    [params setObject:[NSString stringWithFormat:@"%lld", breakIn.employeeID] forKey:@"employee_id"];
+    GPS *gps = [Get gps:db gpsID:breakOut.gpsID];
+    [params setObject:gps.date != nil ? gps.date : @"0000-00-00" forKey:@"gps_date"];
+    [params setObject:gps.time != nil ? gps.time : @"00:00:00" forKey:@"gps_time"];
+    [params setObject:[NSString stringWithFormat:@"%f", gps.latitude] forKey:@"latitude"];
+    [params setObject:[NSString stringWithFormat:@"%f", gps.longitude] forKey:@"longitude"];
+    [params setObject:gps.isValid ? @"yes" : @"no" forKey:@"is_valid"];
+    NSDictionary *response = [Http post:[NSString stringWithFormat:@"%@%@", WEB_API, @"break-out"] params:params timeout:HTTP_TIMEOUT_TX];
+    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
+    NSString *status = [init objectForKey:@"status"];
+    NSString *message = nil;
+    if([status isEqualToString:@"error"]) {
+        message = [init objectForKey:@"message"];
+    }
+    if(message == nil) {
+        breakOut.isSync = YES;
         if(![Update save:db]) {
             message = @"";
         }
@@ -657,6 +830,48 @@ static BOOL isCanceled;
     }
     if(message == nil) {
         overtime.isSync = YES;
+        if(![Update save:db]) {
+            message = @"";
+        }
+    }
+    if(message == nil) {
+        message = @"ok";
+        result = YES;
+    }
+    if(isCanceled) {
+        message = nil;
+        result = NO;
+    }
+    [delegate onProcessResult:message];
+    return result;
+}
+
++ (BOOL)syncTracking:(NSManagedObjectContext *)db tracking:(Tracking *)tracking delegate:(id)delegate {
+    BOOL result = NO;
+    NSMutableDictionary *params = NSMutableDictionary.alloc.init;
+    [params setObject:[Get apiKey:db] forKey:@"api_key"];
+    [params setObject:[NSString stringWithFormat:@"%lld", tracking.trackingID] forKey:@"local_record_id"];
+    [params setObject:tracking.syncBatchID forKey:@"sync_batch_id"];
+    [params setObject:[NSString stringWithFormat:@"%lld", tracking.timeInID] forKey:@"time_in_local_record_id"];
+    [params setObject:[Get timeIn:db timeInID:tracking.timeInID].syncBatchID forKey:@"time_in_sync_batch_id"];
+    [params setObject:[NSString stringWithFormat:@"%lld", tracking.employeeID] forKey:@"employee_id"];
+    [params setObject:tracking.date forKey:@"date"];
+    [params setObject:tracking.time forKey:@"time"];
+    GPS *gps = [Get gps:db gpsID:tracking.gpsID];
+    [params setObject:gps.date != nil ? gps.date : @"0000-00-00" forKey:@"gps_date"];
+    [params setObject:gps.time != nil ? gps.time : @"00:00:00" forKey:@"gps_time"];
+    [params setObject:[NSString stringWithFormat:@"%f", gps.latitude] forKey:@"latitude"];
+    [params setObject:[NSString stringWithFormat:@"%f", gps.longitude] forKey:@"longitude"];
+    [params setObject:gps.isValid ? @"yes" : @"no" forKey:@"is_valid"];
+    NSDictionary *response = [Http post:[NSString stringWithFormat:@"%@%@", WEB_API, @"add-gps-location"] params:params timeout:HTTP_TIMEOUT_TX];
+    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
+    NSString *status = [init objectForKey:@"status"];
+    NSString *message = nil;
+    if([status isEqualToString:@"error"]) {
+        message = [init objectForKey:@"message"];
+    }
+    if(message == nil) {
+        tracking.isSync = YES;
         if(![Update save:db]) {
             message = @"";
         }
@@ -730,10 +945,9 @@ static BOOL isCanceled;
     [params setObject:[NSString stringWithFormat:@"%lld", visit.webVisitID] forKey:@"itinerary_id"];
     [params setObject:[NSString stringWithFormat:@"%lld", [Get store:db storeID:visit.storeID].webStoreID] forKey:@"store_id"];
     [params setObject:visit.notes forKey:@"notes"];
-    NSArray<Photos *> *visitPhotos = [Load visitPhotos:db visitID:visit.visitID];
     NSMutableArray *webPhotoIDs = NSMutableArray.alloc.init;
-    for(int x = 0; x < visitPhotos.count; x++) {
-        [webPhotoIDs addObject:[NSString stringWithFormat:@"%lld", visitPhotos[x].webPhotoID]];
+    for(Photos *visitPhoto in [Load visitPhotos:db visitID:visit.visitID]) {
+        [webPhotoIDs addObject:[NSString stringWithFormat:@"%lld", visitPhoto.webPhotoID]];
     }
     [params setObject:webPhotoIDs forKey:@"photos"];
 //    paramsObj.put("forms", formArray);
@@ -780,10 +994,9 @@ static BOOL isCanceled;
     [params setObject:[NSString stringWithFormat:@"%lld", visit.webVisitID] forKey:@"itinerary_id"];
     [params setObject:[NSString stringWithFormat:@"%lld", [Get store:db storeID:visit.storeID].webStoreID] forKey:@"store_id"];
     [params setObject:visit.notes forKey:@"notes"];
-    NSArray<Photos *> *visitPhotos = [Load visitPhotos:db visitID:visit.visitID];
     NSMutableArray *webPhotoIDs = NSMutableArray.alloc.init;
-    for(int x = 0; x < visitPhotos.count; x++) {
-        [webPhotoIDs addObject:[NSString stringWithFormat:@"%lld", visitPhotos[x].webPhotoID]];
+    for(Photos *visitPhoto in [Load visitPhotos:db visitID:visit.visitID]) {
+        [webPhotoIDs addObject:[NSString stringWithFormat:@"%lld", visitPhoto.webPhotoID]];
     }
     [params setObject:webPhotoIDs forKey:@"photos"];
 //    paramsObj.put("forms", formArray);
@@ -980,93 +1193,6 @@ static BOOL isCanceled;
         }
     }
     if(message == nil) {
-        message = @"ok";
-        result = YES;
-    }
-    if(isCanceled) {
-        message = nil;
-        result = NO;
-    }
-    [delegate onProcessResult:message];
-    return result;
-}
-
-+ (BOOL)syncTracking:(NSManagedObjectContext *)db tracking:(Tracking *)tracking delegate:(id)delegate {
-    BOOL result = NO;
-    NSMutableDictionary *params = NSMutableDictionary.alloc.init;
-    [params setObject:[Get apiKey:db] forKey:@"api_key"];
-    [params setObject:[NSString stringWithFormat:@"%lld", tracking.trackingID] forKey:@"local_record_id"];
-    [params setObject:tracking.syncBatchID forKey:@"sync_batch_id"];
-    [params setObject:[NSString stringWithFormat:@"%lld", tracking.timeInID] forKey:@"time_in_local_record_id"];
-    [params setObject:[Get timeIn:db timeInID:tracking.timeInID].syncBatchID forKey:@"time_in_sync_batch_id"];
-    [params setObject:[NSString stringWithFormat:@"%lld", tracking.employeeID] forKey:@"employee_id"];
-    [params setObject:tracking.date forKey:@"date"];
-    [params setObject:tracking.time forKey:@"time"];
-    GPS *gps = [Get gps:db gpsID:tracking.gpsID];
-    [params setObject:gps.date != nil ? gps.date : @"0000-00-00" forKey:@"gps_date"];
-    [params setObject:gps.time != nil ? gps.time : @"00:00:00" forKey:@"gps_time"];
-    [params setObject:[NSString stringWithFormat:@"%f", gps.latitude] forKey:@"latitude"];
-    [params setObject:[NSString stringWithFormat:@"%f", gps.longitude] forKey:@"longitude"];
-    [params setObject:gps.isValid ? @"yes" : @"no" forKey:@"is_valid"];
-    NSDictionary *response = [Http post:[NSString stringWithFormat:@"%@%@", WEB_API, @"add-gps-location"] params:params timeout:HTTP_TIMEOUT_TX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
-    NSString *message = nil;
-    if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
-    }
-    if(message == nil) {
-        tracking.isSync = YES;
-        if(![Update save:db]) {
-            message = @"";
-        }
-    }
-    if(message == nil) {
-        message = @"ok";
-        result = YES;
-    }
-    if(isCanceled) {
-        message = nil;
-        result = NO;
-    }
-    [delegate onProcessResult:message];
-    return result;
-}
-
-+ (BOOL)sendBackupData:(NSManagedObjectContext *)db delegate:(id)delegate {
-    BOOL result = NO;
-    Employees *employee = [Get employee:db employeeID:[Get userID:db]];
-    NSString *fileName = [NSString stringWithFormat:@"%@_%@_%@_%@_%@.zip", [Get company:db].name, employee.lastName, employee.firstName, [Time getFormattedDate:[NSString stringWithFormat:@"%@_%@", DATE_FORMAT, TIME_FORMAT] date:NSDate.date], [NSBundle.mainBundle.infoDictionary objectForKey:@"CFBundleShortVersionString"]];
-    fileName = [fileName stringByReplacingOccurrencesOfString:@" " withString:@"_"];
-    fileName = [fileName stringByReplacingOccurrencesOfString:@":" withString:@"-"];
-    NSString *backup = [File documentPath:@"Backup"];
-    if(![NSFileManager.defaultManager createDirectoryAtPath:backup withIntermediateDirectories:YES attributes:nil error:nil]) {
-        [delegate onProcessResult:@""];
-        return NO;
-    }
-    [File deleteFromDocument:@"Backup/tarkie.db"];
-    if(![NSFileManager.defaultManager copyItemAtPath:[File documentPath:@"tarkie.db"] toPath:[File documentPath:@"Backup/tarkie.db"] error:nil]) {
-        [delegate onProcessResult:@""];
-        return NO;
-    }
-    if(![SSZipArchive createZipFileAtPath:[File documentPath:fileName] withContentsOfDirectory:backup]) {
-        [delegate onProcessResult:@""];
-        return NO;
-    }
-    NSMutableDictionary *params = NSMutableDictionary.alloc.init;
-    [params setObject:@"upload-backup" forKey:@"action"];
-    [params setObject:@"75TvNCip314ts6l1Q1N9i2F3BcRWr090y31W54G279UxaoQx5Z" forKey:@"api_key"];
-    [params setObject:[NSString stringWithFormat:@"%lld", employee.employeeID] forKey:@"employee_id"];
-    NSDictionary *response = [Http postFile:@"https://www.tarkie.com/API/2.3/backup.php" params:params file:fileName timeout:HTTP_TIMEOUT_TX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
-    NSString *message = nil;
-    if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
-    }
-    [File deleteFromDocument:fileName];
-    if(message == nil) {
-        [File deleteFromDocument:@"Backup"];
         message = @"ok";
         result = YES;
     }

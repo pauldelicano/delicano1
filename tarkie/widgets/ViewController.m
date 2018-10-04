@@ -32,7 +32,7 @@
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
-    [super viewDidDisappear:animated];
+    [super viewWillDisappear:animated];
     [self.view removeGestureRecognizer:self.tapGesture];
 }
 

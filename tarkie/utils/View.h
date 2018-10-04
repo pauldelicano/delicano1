@@ -2,8 +2,8 @@
 
 @interface View : NSObject
 
-+ (void)addSubview:(UIView *)view subview:(UIView *)subview animated:(BOOL)animated;
-+ (void)removeView:(UIView *)view animated:(BOOL)animated;
++ (void)addChildViewController:(UIViewController *)parentViewController childViewController:(UIViewController *)childViewController animated:(BOOL)animated;
++ (void)removeChildViewController:(UIViewController *)childViewController animated:(BOOL)animated;
 + (void)scaleFontSize:(id)view;
 + (void)scaleViewSize:(UIView *)view;
 + (void)setCornerRadiusByWidth:(UIView *)view cornerRadius:(CGFloat)cornerRadius;

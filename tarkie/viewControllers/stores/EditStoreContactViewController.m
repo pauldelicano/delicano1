@@ -69,10 +69,8 @@
 
 - (IBAction)save:(id)sender {
     if(self.storeContact == nil) {
-        Sequences *sequence = [Get sequence:self.app.db];
         self.storeContact = [NSEntityDescription insertNewObjectForEntityForName:@"StoreContacts" inManagedObjectContext:self.app.db];
-        sequence.storeContacts += 1;
-        self.storeContact.storeContactID = sequence.storeContacts;
+        self.storeContact.storeContactID = [Get sequenceID:self.app.db entity:@"StoreContacts" attribute:@"storeContactID"] + 1;
         self.storeContact.isFromWeb = NO;
         self.storeContact.isSync = NO;
         self.storeContact.isUpdate = NO;

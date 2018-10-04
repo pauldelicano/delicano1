@@ -87,9 +87,9 @@ static LoadingDialogViewController *vcLoading;
         vcMessage.message = @"Please input username and password.";
         vcMessage.positiveTitle = @"OK";
         vcMessage.positiveTarget = ^{
-            [View removeView:vcMessage.view animated:YES];
+            [View removeChildViewController:vcMessage animated:YES];
         };
-        [View addSubview:self.view subview:vcMessage.view animated:YES];
+        [View addChildViewController:self childViewController:vcMessage animated:YES];
         return;
     }
     self.app.moduleAttendance = [Get isModuleEnabled:self.app.db moduleID:MODULE_ATTENDANCE];
@@ -105,7 +105,7 @@ static LoadingDialogViewController *vcLoading;
     vcLoading.delegate = self;
     vcLoading.action = LOADING_ACTION_LOGIN;
     vcLoading.params = params;
-    [View addSubview:self.view subview:vcLoading.view animated:YES];
+    [View addChildViewController:self childViewController:vcLoading animated:YES];
 }
 
 - (void)onLoadingUpdate:(int)action {
@@ -121,22 +121,22 @@ static LoadingDialogViewController *vcLoading;
                 vcMessage.message = @"Failed to login.";
                 vcMessage.positiveTitle = @"OK";
                 vcMessage.positiveTarget = ^{
-                    [View removeView:vcMessage.view animated:YES];
+                    [View removeChildViewController:vcMessage animated:YES];
                 };
-                [View addSubview:self.view subview:vcMessage.view animated:NO];
+                [View addChildViewController:self childViewController:vcMessage animated:NO];
                 break;
             }
             vcLoading = [self.storyboard instantiateViewControllerWithIdentifier:@"vcLoading"];
             vcLoading.delegate = self;
             vcLoading.action = LOADING_ACTION_TIME_SECURITY;
-            [View addSubview:self.view subview:vcLoading.view animated:NO];
+            [View addChildViewController:self childViewController:vcLoading animated:NO];
             break;
         }
         case LOADING_ACTION_TIME_SECURITY: {
             vcLoading = [self.storyboard instantiateViewControllerWithIdentifier:@"vcLoading"];
             vcLoading.delegate = self;
             vcLoading.action = LOADING_ACTION_UPDATE_MASTER_FILE;
-            [View addSubview:self.view subview:vcLoading.view animated:NO];
+            [View addChildViewController:self childViewController:vcLoading animated:NO];
             break;
         }
         case LOADING_ACTION_UPDATE_MASTER_FILE: {

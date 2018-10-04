@@ -1,9 +1,9 @@
 #import <UIKit/UIKit.h>
 #import <CoreData/CoreData.h>
 
-#import "Patches+CoreDataClass.h"
-
 #import "Employees+CoreDataClass.h"
+#import "Patches+CoreDataClass.h"
+#import "Alerts+CoreDataClass.h"
 #import "Announcements+CoreDataClass.h"
 #import "AnnouncementSeen+CoreDataClass.h"
 
@@ -14,13 +14,17 @@
 #import "Schedules+CoreDataClass.h"
 #import "TimeIn+CoreDataClass.h"
 #import "TimeOut+CoreDataClass.h"
+#import "BreakTypes+CoreDataClass.h"
+#import "BreakIn+CoreDataClass.h"
+#import "BreakOut+CoreDataClass.h"
 #import "OvertimeReasons+CoreDataClass.h"
 #import "Overtime+CoreDataClass.h"
+#import "Tracking+CoreDataClass.h"
 
+#import "Photos+CoreDataClass.h"
 #import "Visits+CoreDataClass.h"
 #import "VisitInventories+CoreDataClass.h"
 #import "VisitForms+CoreDataClass.h"
-#import "Photos+CoreDataClass.h"
 #import "CheckIn+CoreDataClass.h"
 #import "CheckOut+CoreDataClass.h"
 
@@ -28,17 +32,14 @@
 
 #import "Forms+CoreDataClass.h"
 
-#import "Tracking+CoreDataClass.h"
-
 @interface Load : NSObject
 
-+ (NSArray<Patches *> *)patches:(NSManagedObjectContext *)db;
-+ (NSArray<Patches *> *)syncPatches:(NSManagedObjectContext *)db;
-
-//COMPANY
 + (NSArray<NSDictionary *> *)drawerMenus:(NSManagedObjectContext *)db;
 + (NSArray<NSDictionary *> *)modulePages:(NSManagedObjectContext *)db;
 + (NSArray<Employees *> *)employeeIDs:(NSManagedObjectContext *)db teamID:(int64_t)teamID;
++ (NSArray<Patches *> *)patches:(NSManagedObjectContext *)db;
++ (NSArray<Patches *> *)syncPatches:(NSManagedObjectContext *)db;
++ (NSArray<Alerts *> *)syncAlerts:(NSManagedObjectContext *)db;
 + (NSArray<Announcements *> *)announcements:(NSManagedObjectContext *)db searchFilter:(NSString *)searchFilter isScheduled:(BOOL)isScheduled;
 + (NSArray<AnnouncementSeen *> *)syncAnnouncementSeen:(NSManagedObjectContext *)db;
 
@@ -59,8 +60,13 @@
 + (NSArray<TimeOut *> *)syncTimeOut:(NSManagedObjectContext *)db;
 + (NSArray<TimeOut *> *)uploadTimeOutPhoto:(NSManagedObjectContext *)db;
 + (NSArray<TimeOut *> *)uploadTimeOutSignature:(NSManagedObjectContext *)db;
++ (NSArray<BreakTypes *> *)breakTypes:(NSManagedObjectContext *)db;
++ (NSArray<BreakIn *> *)breakIn:(NSManagedObjectContext *)db timeInID:(int64_t)timeInID;
++ (NSArray<BreakIn *> *)syncBreakIn:(NSManagedObjectContext *)db;
++ (NSArray<BreakOut *> *)syncBreakOut:(NSManagedObjectContext *)db;
 + (NSArray<OvertimeReasons *> *)overtimeReasons:(NSManagedObjectContext *)db;
 + (NSArray<Overtime *> *)syncOvertime:(NSManagedObjectContext *)db;
++ (NSArray<Tracking *> *)syncTracking:(NSManagedObjectContext *)db;
 
 //VISITS
 + (NSArray<Photos *> *)visitPhotos:(NSManagedObjectContext *)db visitID:(int64_t)visitID;
@@ -84,7 +90,5 @@
 
 //FORMS
 + (NSArray<Forms *> *)forms:(NSManagedObjectContext *)db date:(NSDate *)date;
-
-+ (NSArray<Tracking *> *)syncTracking:(NSManagedObjectContext *)db;
 
 @end

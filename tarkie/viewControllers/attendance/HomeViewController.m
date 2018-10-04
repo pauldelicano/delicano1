@@ -78,6 +78,14 @@ static MessageDialogViewController *vcMessage;
     [self onRefresh];
 }
 
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    if(self.timer != nil) {
+        [self.timer invalidate];
+        self.timer = nil;
+    }
+}
+
 - (void)onRefresh {
     [super onRefresh];
     [self.btnVisits setTitle:[NSString stringWithFormat:@"NEW %@", self.app.conventionVisits.uppercaseString] forState:UIControlStateNormal];
@@ -199,9 +207,9 @@ static MessageDialogViewController *vcMessage;
         vcMessage.message = [NSString stringWithFormat:@"You are not allowed to add new %@.", self.app.conventionVisits.lowercaseString];
         vcMessage.positiveTitle = @"OK";
         vcMessage.positiveTarget = ^{
-            [View removeView:vcMessage.view animated:YES];
+            [View removeChildViewController:vcMessage animated:YES];
         };
-        [View addSubview:self.main.view subview:vcMessage.view animated:YES];
+        [View addChildViewController:self.main childViewController:vcMessage animated:YES];
         return;
     }
     vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
@@ -209,14 +217,12 @@ static MessageDialogViewController *vcMessage;
     vcMessage.message = [NSString stringWithFormat:@"Are you sure you want to add new %@?", self.app.conventionVisits];
     vcMessage.negativeTitle = @"No";
     vcMessage.negativeTarget = ^{
-        [View removeView:vcMessage.view animated:YES];
+        [View removeChildViewController:vcMessage animated:YES];
     };
     vcMessage.positiveTitle = @"Yes";
     vcMessage.positiveTarget = ^{
-        Sequences *sequence = [Get sequence:self.app.db];
         Visits *visit = [NSEntityDescription insertNewObjectForEntityForName:@"Visits" inManagedObjectContext:self.app.db];
-        sequence.visits += 1;
-        visit.visitID = sequence.visits;
+        visit.visitID = [Get sequenceID:self.app.db entity:@"Visits" attribute:@"visitID"] + 1;
         visit.syncBatchID = self.app.syncBatchID;
         visit.employeeID = self.app.employee.employeeID;
         visit.webVisitID = 0;
@@ -237,12 +243,12 @@ static MessageDialogViewController *vcMessage;
         visit.isDelete = NO;
         visit.isWebDelete = NO;
         if([Update save:self.app.db]) {
-            [View removeView:vcMessage.view animated:YES];
+            [View removeChildViewController:vcMessage animated:YES];
             [self onRefresh];
             [self.main updateSyncDataCount];
         }
     };
-    [View addSubview:self.main.view subview:vcMessage.view animated:YES];
+    [View addChildViewController:self.main childViewController:vcMessage animated:YES];
 }
 
 - (IBAction)addExpense:(id)sender {
@@ -270,9 +276,9 @@ static MessageDialogViewController *vcMessage;
             vcMessage.message = [NSString stringWithFormat:@"This %@ has already been checked-in. You're not allowed to delete it.", self.app.conventionVisits];
             vcMessage.positiveTitle = @"OK";
             vcMessage.positiveTarget = ^{
-                [View removeView:vcMessage.view animated:YES];
+                [View removeChildViewController:vcMessage animated:YES];
             };
-            [View addSubview:self.main.view subview:vcMessage.view animated:YES];
+            [View addChildViewController:self.main childViewController:vcMessage animated:YES];
             return;
         }
         vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
@@ -280,18 +286,18 @@ static MessageDialogViewController *vcMessage;
         vcMessage.message = [NSString stringWithFormat:@"Are you sure you want to delete this %@?", self.app.conventionVisits];
         vcMessage.negativeTitle = @"No";
         vcMessage.negativeTarget = ^{
-            [View removeView:vcMessage.view animated:YES];
+            [View removeChildViewController:vcMessage animated:YES];
         };
         vcMessage.positiveTitle = @"Yes";
         vcMessage.positiveTarget = ^{
             self.visits[indexPath.row].isDelete = YES;
             if([Update save:self.app.db]) {
-                [View removeView:vcMessage.view animated:YES];
+                [View removeChildViewController:vcMessage animated:YES];
                 [self onRefresh];
                 [self.main updateSyncDataCount];
             }
         };
-        [View addSubview:self.main.view subview:vcMessage.view animated:YES];
+        [View addChildViewController:self.main childViewController:vcMessage animated:YES];
     }
 }
 

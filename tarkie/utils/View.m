@@ -2,15 +2,25 @@
 
 @implementation View
 
-+ (void)addSubview:(UIView *)view subview:(UIView *)subview animated:(BOOL)animated {
-    subview.alpha = 0;
-    [view addSubview:subview];
-    [view bringSubviewToFront:subview];
-    [UIView animateWithDuration:animated ? 0.25 : 0.125 animations:^{subview.alpha = 1;} completion:^(BOOL finished) {}];
++ (void)addChildViewController:(UIViewController *)parentViewController childViewController:(UIViewController *)childViewController animated:(BOOL)animated {
+    [parentViewController addChildViewController:childViewController];
+    [parentViewController.view addSubview:childViewController.view];
+    [parentViewController.view bringSubviewToFront:childViewController.view];
+    childViewController.view.alpha = 0;
+    [UIView animateWithDuration:animated ? 0.25 : 0.125 animations:^{
+        childViewController.view.alpha = 1;
+    } completion:^(BOOL finished) {
+    }];
 }
 
-+ (void)removeView:(UIView *)view animated:(BOOL)animated {
-    [UIView animateWithDuration:animated ? 0.25 : 0.125 animations:^{view.alpha = 0;} completion:^(BOOL finished) {[view removeFromSuperview];}];
++ (void)removeChildViewController:(UIViewController *)childViewController animated:(BOOL)animated {
+    childViewController.view.alpha = 1;
+    [UIView animateWithDuration:animated ? 0.25 : 0.125 animations:^{
+        childViewController.view.alpha = 0;
+    } completion:^(BOOL finished) {
+        [childViewController.view removeFromSuperview];
+        [childViewController removeFromParentViewController];
+    }];
 }
 
 + (void)scaleFontSize:(id)view {

@@ -10,7 +10,6 @@
 + (BOOL)employees:(NSManagedObjectContext *)db delegate:(id)delegate;
 + (BOOL)settings:(NSManagedObjectContext *)db delegate:(id)delegate;
 + (BOOL)conventions:(NSManagedObjectContext *)db delegate:(id)delegate;
-+ (BOOL)alertTypes:(NSManagedObjectContext *)db delegate:(id)delegate;
 + (BOOL)serverTime:(NSManagedObjectContext *)db delegate:(id)delegate;
 + (BOOL)syncBatchID:(NSManagedObjectContext *)db delegate:(id)delegate;
 + (BOOL)announcements:(NSManagedObjectContext *)db delegate:(id)delegate;

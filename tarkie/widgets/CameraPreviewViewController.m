@@ -51,15 +51,15 @@ static MessageDialogViewController *vcMessage;
     vcMessage.message = @"Are you sure you want to delete photo?";
     vcMessage.negativeTitle = @"No";
     vcMessage.negativeTarget = ^{
-        [View removeView:vcMessage.view animated:YES];
+        [View removeChildViewController:vcMessage animated:YES];
     };
     vcMessage.positiveTitle = @"Yes";
     vcMessage.positiveTarget = ^{
-        [View removeView:vcMessage.view animated:YES];
+        [View removeChildViewController:vcMessage animated:YES];
         [self back:self];
         [self.cameraPreviewDelegate onCameraPreviewDelete:self.photos[self.selectedPhoto]];
     };
-    [View addSubview:self.view subview:vcMessage.view animated:YES];
+    [View addChildViewController:self childViewController:vcMessage animated:YES];
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {

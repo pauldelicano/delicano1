@@ -171,17 +171,17 @@ static MessageDialogViewController *vcMessage;
     vcMessage.message = [NSString stringWithFormat:@"Are you sure you want to cancel %@?", self.loadingMessage];
     vcMessage.negativeTitle = @"No";
     vcMessage.negativeTarget = ^{
-        [View removeView:vcMessage.view animated:YES];
+        [View removeChildViewController:vcMessage animated:YES];
     };
     vcMessage.positiveTitle = @"Yes";
     vcMessage.positiveTarget = ^{
         self.process.isCanceled = YES;
-        [View removeView:vcMessage.view animated:YES];
-        [View removeView:self.view animated:NO];
+        [View removeChildViewController:vcMessage animated:YES];
+        [View removeChildViewController:self animated:NO];
         [self.application endBackgroundTask:self.background];
         self.background = UIBackgroundTaskInvalid;
     };
-    [View addSubview:self.view subview:vcMessage.view animated:YES];
+    [View addChildViewController:self childViewController:vcMessage animated:YES];
 }
 
 - (void)onProcessResult:(NSString *)result {
@@ -197,7 +197,7 @@ static MessageDialogViewController *vcMessage;
             [self.delegate onLoadingUpdate:self.action];
         }
         if(self.progress >= self.process.count || ![result isEqualToString:@"ok"]) {
-            [View removeView:self.view animated:NO];
+            [View removeChildViewController:self animated:NO];
             [self.delegate onLoadingFinish:self.action result:result];
             [self.application endBackgroundTask:self.background];
             self.background = UIBackgroundTaskInvalid;

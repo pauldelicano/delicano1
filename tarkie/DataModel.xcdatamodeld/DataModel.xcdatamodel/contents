@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14296.2" systemVersion="18A384a" minimumToolsVersion="Automatic" sourceLanguage="Objective-C" userDefinedModelVersionIdentifier="">
-    <entity name="AlertTypes" representedClassName="AlertTypes" syncable="YES" codeGenerationType="class">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14315.18" systemVersion="18A384a" minimumToolsVersion="Automatic" sourceLanguage="Objective-C" userDefinedModelVersionIdentifier="1.0.0">
+    <entity name="Alerts" representedClassName="Alerts" syncable="YES" codeGenerationType="class">
+        <attribute name="alertID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="alertTypeID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="date" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="employeeID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="gpsID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isSync" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="syncBatchID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="time" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="timeInID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="value" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <entity name="Announcements" representedClassName="Announcements" syncable="YES" codeGenerationType="class">
         <attribute name="announcementID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
@@ -22,10 +30,35 @@
         <attribute name="date" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="isSync" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="time" optional="YES" attributeType="String" syncable="YES"/>
+        <fetchIndex name="byPropertyIndex">
+            <fetchIndexElement property="announcementID" type="Binary" order="ascending"/>
+        </fetchIndex>
+    </entity>
+    <entity name="BreakIn" representedClassName="BreakIn" syncable="YES" codeGenerationType="class">
+        <attribute name="breakInID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="breakTypeID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="date" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="employeeID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="gpsID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isBreakOut" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isSync" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="syncBatchID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="time" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="timeInID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+    </entity>
+    <entity name="BreakOut" representedClassName="BreakOut" syncable="YES" codeGenerationType="class">
+        <attribute name="breakInID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="breakOutID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="date" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="gpsID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isSync" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="syncBatchID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="time" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <entity name="BreakTypes" representedClassName="BreakTypes" syncable="YES" codeGenerationType="class">
         <attribute name="breakTypeID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="duration" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isActive" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <entity name="CheckIn" representedClassName="CheckIn" syncable="YES" codeGenerationType="class">
@@ -48,7 +81,7 @@
         <attribute name="gpsID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isPhotoDelete" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isPhotoUpload" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="isSync" optional="YES" attributeType="Boolean" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isSync" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="photo" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="syncBatchID" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="time" optional="YES" attributeType="String" syncable="YES"/>
@@ -81,6 +114,9 @@
         <attribute name="teamID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="withLate" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="withOvertime" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+    </entity>
+    <entity name="Expense" representedClassName="Expense" syncable="YES" codeGenerationType="class">
+        <attribute name="expenseID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
     </entity>
     <entity name="Forms" representedClassName="Forms" syncable="YES" codeGenerationType="class">
         <attribute name="formID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
@@ -161,31 +197,21 @@
         <attribute name="timeIn" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="timeOut" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
-    <entity name="Sequences" representedClassName="Sequences" syncable="YES" codeGenerationType="class">
-        <attribute name="checkIn" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="checkOut" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="gps" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="overtime" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="photos" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="schedules" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="storeContacts" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="stores" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="timeIn" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="timeOut" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="tracking" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="visitForms" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="visitInventories" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="visitPhotos" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="visits" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-    </entity>
     <entity name="Settings" representedClassName="Settings" syncable="YES" codeGenerationType="class">
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="settingID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <fetchIndex name="byPropertyIndex">
+            <fetchIndexElement property="name" type="Binary" order="ascending"/>
+        </fetchIndex>
     </entity>
     <entity name="SettingsTeams" representedClassName="SettingsTeams" syncable="YES" codeGenerationType="class">
         <attribute name="settingID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="teamID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="value" optional="YES" attributeType="String" syncable="YES"/>
+        <fetchIndex name="byPropertyIndex">
+            <fetchIndexElement property="settingID" type="Binary" order="ascending"/>
+            <fetchIndexElement property="teamID" type="Binary" order="ascending"/>
+        </fetchIndex>
     </entity>
     <entity name="StoreContacts" representedClassName="StoreContacts" syncable="YES" codeGenerationType="class">
         <attribute name="birthdate" optional="YES" attributeType="String" syncable="YES"/>
@@ -205,6 +231,10 @@
         <attribute name="storeID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="syncBatchID" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="webStoreContactID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <fetchIndex name="byPropertyIndex">
+            <fetchIndexElement property="storeID" type="Binary" order="ascending"/>
+            <fetchIndexElement property="webStoreContactID" type="Binary" order="ascending"/>
+        </fetchIndex>
     </entity>
     <entity name="Stores" representedClassName="Stores" syncable="YES" codeGenerationType="class">
         <attribute name="address" optional="YES" attributeType="String" syncable="YES"/>
@@ -230,6 +260,13 @@
         <attribute name="storeID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="syncBatchID" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="webStoreID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <fetchIndex name="byPropertyIndex">
+            <fetchIndexElement property="name" type="Binary" order="ascending"/>
+            <fetchIndexElement property="webStoreID" type="Binary" order="ascending"/>
+            <fetchIndexElement property="class1ID" type="Binary" order="ascending"/>
+            <fetchIndexElement property="class2ID" type="Binary" order="ascending"/>
+            <fetchIndexElement property="class3ID" type="Binary" order="ascending"/>
+        </fetchIndex>
     </entity>
     <entity name="SyncBatch" representedClassName="SyncBatch" syncable="YES" codeGenerationType="class">
         <attribute name="date" optional="YES" attributeType="String" syncable="YES"/>
@@ -241,9 +278,10 @@
         <attribute name="date" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="employeeID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="gpsID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isBreak" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isOvertime" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="isPhotoDelete" optional="YES" attributeType="Boolean" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="isPhotoExists" optional="YES" attributeType="Boolean" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isPhotoDelete" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isPhotoExists" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isPhotoUpload" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isSync" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="photo" optional="YES" attributeType="String" syncable="YES"/>
@@ -254,8 +292,8 @@
         <attribute name="timeInID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
     </entity>
     <entity name="TimeOut" representedClassName="TimeOut" syncable="YES" codeGenerationType="class">
+        <attribute name="batteryLevel" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="date" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="employeeID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="gpsID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isPhotoDelete" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isPhotoExists" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
@@ -271,6 +309,7 @@
         <attribute name="timeOutID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
     </entity>
     <entity name="TimeSecurity" representedClassName="TimeSecurity" syncable="YES" codeGenerationType="class">
+        <attribute name="didChange" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="serverDate" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="serverTime" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="upTime" optional="YES" attributeType="Double" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
@@ -293,11 +332,15 @@
     </entity>
     <entity name="VisitForms" representedClassName="VisitForms" syncable="YES" codeGenerationType="class">
         <attribute name="formID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="isActive" optional="YES" attributeType="Boolean" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isActive" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isFromWeb" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="visitFormID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="visitID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <fetchIndex name="byPropertyIndex">
+            <fetchIndexElement property="visitID" type="Binary" order="ascending"/>
+            <fetchIndexElement property="formID" type="Binary" order="ascending"/>
+        </fetchIndex>
     </entity>
     <entity name="VisitInventories" representedClassName="VisitInventories" syncable="YES" codeGenerationType="class">
         <attribute name="inventoryID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
@@ -306,6 +349,10 @@
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="visitID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="visitInventoryID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <fetchIndex name="byPropertyIndex">
+            <fetchIndexElement property="visitID" type="Binary" order="ascending"/>
+            <fetchIndexElement property="inventoryID" type="Binary" order="ascending"/>
+        </fetchIndex>
     </entity>
     <entity name="VisitPhotos" representedClassName="VisitPhotos" syncable="YES" codeGenerationType="class">
         <attribute name="photoID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
@@ -336,12 +383,20 @@
         <attribute name="syncBatchID" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="visitID" optional="YES" attributeType="Integer 64" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="webVisitID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <fetchIndex name="byPropertyIndex">
+            <fetchIndexElement property="storeID" type="Binary" order="ascending"/>
+            <fetchIndexElement property="webVisitID" type="Binary" order="ascending"/>
+            <fetchIndexElement property="startDate" type="Binary" order="ascending"/>
+            <fetchIndexElement property="endDate" type="Binary" order="ascending"/>
+        </fetchIndex>
     </entity>
     <elements>
-        <element name="AlertTypes" positionX="-27" positionY="144" width="128" height="75"/>
+        <element name="Alerts" positionX="45" positionY="135" width="128" height="195"/>
         <element name="Announcements" positionX="-18" positionY="153" width="128" height="210"/>
         <element name="AnnouncementSeen" positionX="45" positionY="135" width="128" height="105"/>
-        <element name="BreakTypes" positionX="45" positionY="135" width="128" height="90"/>
+        <element name="BreakIn" positionX="45" positionY="135" width="128" height="195"/>
+        <element name="BreakOut" positionX="54" positionY="144" width="128" height="150"/>
+        <element name="BreakTypes" positionX="45" positionY="135" width="128" height="105"/>
         <element name="CheckIn" positionX="63" positionY="153" width="128" height="210"/>
         <element name="CheckOut" positionX="72" positionY="162" width="128" height="195"/>
         <element name="Company" positionX="-54" positionY="9" width="128" height="105"/>
@@ -354,24 +409,24 @@
         <element name="Modules" positionX="-54" positionY="90" width="128" height="90"/>
         <element name="Overtime" positionX="45" positionY="135" width="128" height="165"/>
         <element name="OvertimeReasons" positionX="54" positionY="144" width="128" height="90"/>
+        <element name="Patches" positionX="45" positionY="135" width="128" height="150"/>
         <element name="Photos" positionX="45" positionY="135" width="128" height="195"/>
         <element name="Schedules" positionX="72" positionY="162" width="128" height="255"/>
         <element name="ScheduleTimes" positionX="45" positionY="135" width="128" height="105"/>
-        <element name="Sequences" positionX="-27" positionY="135" width="128" height="270"/>
         <element name="Settings" positionX="-9" positionY="162" width="128" height="75"/>
         <element name="SettingsTeams" positionX="0" positionY="171" width="128" height="90"/>
         <element name="StoreContacts" positionX="160" positionY="192" width="128" height="300"/>
         <element name="Stores" positionX="-18" positionY="162" width="128" height="390"/>
         <element name="SyncBatch" positionX="-54" positionY="54" width="128" height="90"/>
-        <element name="TimeIn" positionX="45" positionY="135" width="128" height="270"/>
+        <element name="TimeIn" positionX="45" positionY="135" width="128" height="285"/>
         <element name="TimeOut" positionX="54" positionY="144" width="128" height="270"/>
-        <element name="TimeSecurity" positionX="-36" positionY="135" width="128" height="90"/>
+        <element name="TimeSecurity" positionX="-36" positionY="135" width="128" height="105"/>
         <element name="Tracking" positionX="54" positionY="144" width="128" height="165"/>
         <element name="Users" positionX="-54" positionY="0" width="128" height="105"/>
         <element name="VisitForms" positionX="-27" positionY="135" width="128" height="135"/>
         <element name="VisitInventories" positionX="-18" positionY="144" width="128" height="135"/>
         <element name="VisitPhotos" positionX="54" positionY="144" width="128" height="90"/>
-        <element name="Visits" positionX="-54" positionY="90" width="128" height="30"/>
-        <element name="Patches" positionX="45" positionY="135" width="128" height="150"/>
+        <element name="Visits" positionX="-54" positionY="90" width="128" height="390"/>
+        <element name="Expense" positionX="45" positionY="135" width="128" height="60"/>
     </elements>
 </model>

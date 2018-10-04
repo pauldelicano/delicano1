@@ -103,26 +103,6 @@
     }
 }
 
-- (IBAction)dropDownButton:(id)sender {
-    switch(self.type) {
-        case DROP_DOWN_TYPE_STORE: {
-            StoresViewController *vcStores = [self.storyboard instantiateViewControllerWithIdentifier:@"vcStores"];
-            vcStores.delegate = self;
-            vcStores.action = STORE_ACTION_SELECT;
-            [self.parent.navigationController pushViewController:vcStores animated:YES];
-            break;
-        }
-        case DROP_DOWN_TYPE_SCHEDULE: {
-            self.tvItems.hidden = !self.tvItems.hidden;
-            break;
-        }
-        case DROP_DOWN_TYPE_CHECK_OUT_STATUS: {
-            self.tvItems.hidden = !self.tvItems.hidden;
-            break;
-        }
-    }
-}
-
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return self.items.count;
 }
@@ -182,9 +162,28 @@
     }
 }
 
+- (IBAction)dropDownButton:(id)sender {
+    switch(self.type) {
+        case DROP_DOWN_TYPE_STORE: {
+            StoresViewController *vcStores = [self.storyboard instantiateViewControllerWithIdentifier:@"vcStores"];
+            vcStores.delegate = self;
+            vcStores.action = STORE_ACTION_SELECT;
+            [self.parent.navigationController pushViewController:vcStores animated:YES];
+            break;
+        }
+        case DROP_DOWN_TYPE_SCHEDULE: {
+            self.tvItems.hidden = !self.tvItems.hidden;
+            break;
+        }
+        case DROP_DOWN_TYPE_CHECK_OUT_STATUS: {
+            self.tvItems.hidden = !self.tvItems.hidden;
+            break;
+        }
+    }
+}
 
 - (IBAction)negativeButton:(id)sender {
-    [View removeView:self.view animated:YES];
+    [View removeChildViewController:self animated:YES];
     [self.delegate onDropDownCancel:self.type action:self.action];
     self.item = nil;
 }
@@ -226,7 +225,7 @@
                 break;
             }
         }
-        [View removeView:self.view animated:YES];
+        [View removeChildViewController:self animated:YES];
         [self.delegate onDropDownSelect:self.type action:self.action item:self.item];
         self.item = nil;
     }

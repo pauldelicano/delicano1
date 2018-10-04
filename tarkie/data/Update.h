@@ -4,9 +4,10 @@
 
 @interface Update : NSObject
 
-//COMPANY
 + (BOOL)usersLogout:(NSManagedObjectContext *)db;
 + (void)employeesDeactivate:(NSManagedObjectContext *)db;
++ (int64_t)gpsSave:(NSManagedObjectContext *)db location:(CLLocation *)location;
++ (BOOL)alertSave:(NSManagedObjectContext *)db alertTypeID:(int64_t)alertTypeID gpsID:(int64_t)gpsID value:(NSString *)value;
 + (void)announcementsDeactivate:(NSManagedObjectContext *)db;
 
 //STORES
@@ -16,6 +17,7 @@
 //ATTENDANCE
 + (void)scheduleTimesDeactivate:(NSManagedObjectContext *)db;
 + (void)schedulesDeactivate:(NSManagedObjectContext *)db;
++ (void)breakTypesDeactivate:(NSManagedObjectContext *)db;
 + (void)overtimeReasonsDeactivate:(NSManagedObjectContext *)db;
 
 //VISITS
@@ -29,7 +31,6 @@
 
 //FORMS
 
-+ (int64_t)gpsSave:(NSManagedObjectContext *)db location:(CLLocation *)location;
 
 + (BOOL)save:(NSManagedObjectContext *)db;
 

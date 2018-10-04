@@ -353,46 +353,6 @@ static BOOL isCanceled;
     return result;
 }
 
-+ (BOOL)alertTypes:(NSManagedObjectContext *)db delegate:(id)delegate {
-    BOOL result = NO;
-    NSMutableDictionary *params = NSMutableDictionary.alloc.init;
-    [params setObject:[Get apiKey:db] forKey:@"api_key"];
-    NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @"get-alert-types"] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
-    NSString *message = nil;
-    if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
-    }
-    if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
-        if(data != nil) {
-            for(int x = 0; x < data.count && !isCanceled; x++) {
-                int64_t alertTypeID = [[data[x] objectForKey:@"alert_type_id"] intValue];
-                AlertTypes *alertType = [Get alertType:db alertTypeID:alertTypeID];
-                if(alertType == nil) {
-                    alertType = [NSEntityDescription insertNewObjectForEntityForName:@"AlertTypes" inManagedObjectContext:db];
-                    alertType.alertTypeID = alertTypeID;
-                }
-                alertType.name = [data[x] objectForKey:@"alert_type"];
-            }
-            if(![Update save:db]) {
-                message = @"";
-            }
-        }
-    }
-    if(message == nil) {
-        message = @"ok";
-        result = YES;
-    }
-    if(isCanceled) {
-        message = nil;
-        result = NO;
-    }
-    [delegate onProcessResult:message];
-    return result;
-}
-
 + (BOOL)serverTime:(NSManagedObjectContext *)db delegate:(id)delegate {
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
@@ -415,7 +375,7 @@ static BOOL isCanceled;
                 NSDate *server = [Time getDateFromString:[data[x] objectForKey:@"date_time"]];
                 timeSecurity.serverDate = [Time getFormattedDate:DATE_FORMAT date:server];
                 timeSecurity.serverTime = [Time getFormattedDate:TIME_FORMAT date:server];
-                timeSecurity.upTime = NSProcessInfo.processInfo.systemUptime;
+                timeSecurity.upTime = [Time getUptime];
             }
             if(![Update save:db]) {
                 message = @"";
@@ -551,14 +511,12 @@ static BOOL isCanceled;
         NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
         if(data != nil) {
             [Update storesDeactivate:db];
-            Sequences *sequence = [Get sequence:db];
             for(int x = 0; x < data.count && !isCanceled; x++) {
                 int64_t webStoreID = [[data[x] objectForKey:@"store_id"] intValue];
                 Stores *store = [Get store:db webStoreID:webStoreID];
                 if(store == nil) {
                     store = [NSEntityDescription insertNewObjectForEntityForName:@"Stores" inManagedObjectContext:db];
-                    sequence.stores += 1;
-                    store.storeID = sequence.stores;
+                    store.storeID = [Get sequenceID:db entity:@"Stores" attribute:@"storeID"] + 1;
                     store.webStoreID = webStoreID;
                     store.employeeID = userID;
                     store.isFromWeb = YES;
@@ -612,14 +570,12 @@ static BOOL isCanceled;
         NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
         if(data != nil) {
             [Update storeContactsDeactivate:db];
-            Sequences *sequence = [Get sequence:db];
             for(int x = 0; x < data.count && !isCanceled; x++) {
                 int64_t webStoreContactID = [[data[x] objectForKey:@"contact_id"] intValue];
                 StoreContacts *storeContact = [Get storeContact:db webStoreContactID:webStoreContactID];
                 if(storeContact == nil) {
                     storeContact = [NSEntityDescription insertNewObjectForEntityForName:@"StoreContacts" inManagedObjectContext:db];
-                    sequence.storeContacts += 1;
-                    storeContact.storeContactID = sequence.stores;
+                    storeContact.storeContactID = [Get sequenceID:db entity:@"StoreContacts" attribute:@"storeContactID"] + 1;
                     storeContact.webStoreContactID = webStoreContactID;
                     storeContact.employeeID = [Get userID:db];
                     storeContact.isFromWeb = YES;
@@ -785,15 +741,13 @@ static BOOL isCanceled;
             if(!isToday) {
                 [Update schedulesDeactivate:db];
             }
-            Sequences *sequence = [Get sequence:db];
             for(int x = 0; x < data.count && !isCanceled; x++) {
                 int64_t webScheduleID = [[data[x] objectForKey:@"schedule_id"] intValue];
                 NSString *scheduleDate = [data[x] objectForKey:@"date"];
                 Schedules *schedule = [Get schedule:db webScheduleID:webScheduleID scheduleDate:scheduleDate];
                 if(schedule == nil) {
                     schedule = [NSEntityDescription insertNewObjectForEntityForName:@"Schedules" inManagedObjectContext:db];
-                    sequence.schedules += 1;
-                    schedule.scheduleID = sequence.schedules;
+                    schedule.scheduleID = [Get sequenceID:db entity:@"Schedules" attribute:@"scheduleID"] + 1;
                     NSDate *currentDate = NSDate.date;
                     schedule.date = [Time getFormattedDate:DATE_FORMAT date:currentDate];
                     schedule.time = [Time getFormattedDate:TIME_FORMAT date:currentDate];
@@ -842,6 +796,7 @@ static BOOL isCanceled;
     if(message == nil) {
         NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
         if(data != nil) {
+            [Update breakTypesDeactivate:db];
             for(int x = 0; x < data.count && !isCanceled; x++) {
                 int64_t breakTypeID = [[data[x] objectForKey:@"break_id"] intValue];
                 BreakTypes *breakType = [Get breakType:db breakTypeID:breakTypeID];
@@ -849,8 +804,9 @@ static BOOL isCanceled;
                     breakType = [NSEntityDescription insertNewObjectForEntityForName:@"BreakTypes" inManagedObjectContext:db];
                     breakType.breakTypeID = breakTypeID;
                 }
-                breakType.name = [data[x] objectForKey:@"name"];
+                breakType.name = [data[x] objectForKey:@"break_name"];
                 breakType.duration = [[data[x] objectForKey:@"duration"] intValue];
+                breakType.isActive = YES;
             }
             if(![Update save:db]) {
                 message = @"";
@@ -931,14 +887,12 @@ static BOOL isCanceled;
     if(message == nil) {
         NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
         if(data != nil) {
-            Sequences *sequence = [Get sequence:db];
             for(int x = 0; x < data.count && !isCanceled; x++) {
                 int64_t webVisitID = [[data[x] objectForKey:@"itinerary_id"] intValue];
                 Visits *visit = [Get visit:db webVisitID:webVisitID];
                 if(visit == nil) {
                     visit = [NSEntityDescription insertNewObjectForEntityForName:@"Visits" inManagedObjectContext:db];
-                    sequence.visits += 1;
-                    visit.visitID = sequence.visits;
+                    visit.visitID = [Get sequenceID:db entity:@"Visits" attribute:@"visitID"] + 1;
                     visit.webVisitID = webVisitID;
                 }
 
@@ -955,8 +909,7 @@ static BOOL isCanceled;
                 Stores *store = [Get store:db webStoreID:webStoreID];
                 if(store == nil) {
                     store = [NSEntityDescription insertNewObjectForEntityForName:@"Stores" inManagedObjectContext:db];
-                    sequence.stores += 1;
-                    store.storeID = sequence.stores;
+                    store.storeID = [Get sequenceID:db entity:@"Stores" attribute:@"storeID"] + 1;
                     store.webStoreID = webStoreID;
                     store.isFromTask = YES;
                     store.isFromWeb = YES;
@@ -989,35 +942,31 @@ static BOOL isCanceled;
                 visit.isCheckIn = ![[data[x] objectForKey:@"date_in"] isEqualToString:@"0000-00-00"];
                 visit.isCheckOut = ![[data[x] objectForKey:@"date_out"] isEqualToString:@"0000-00-00"];
                 
-                NSArray *inventories = [data[x] objectForKey:@"inventory"];
-                for(int x = 0; x < inventories.count; x++) {
-                    int64_t inventoryID = [[inventories[x] objectForKey:@"inventory_id"] intValue];
+                for(NSDictionary *dictionary in [data[x] objectForKey:@"inventory"]) {
+                    int64_t inventoryID = [[dictionary objectForKey:@"inventory_id"] intValue];
                     VisitInventories *inventory = [Get visitInventory:db visitID:visit.visitID inventoryID:inventoryID];
                     if(inventory == nil) {
                         inventory = [NSEntityDescription insertNewObjectForEntityForName:@"VisitInventories" inManagedObjectContext:db];
-                        sequence.visitInventories += 1;
-                        inventory.visitInventoryID = sequence.visitInventories;
+                        inventory.visitInventoryID = [Get sequenceID:db entity:@"VisitInventories" attribute:@"visitInventoryID"] + 1;
                         inventory.visitID = visit.visitID;
                         inventory.inventoryID = inventoryID;
                         inventory.isFromWeb = YES;
                     }
-                    inventory.name = [inventories[x] objectForKey:@"inventory_type_name"];
+                    inventory.name = [dictionary objectForKey:@"inventory_type_name"];
                     inventory.isActive = YES;
                 }
                 
-                NSArray<NSDictionary *> *forms = [data[x] objectForKey:@"forms"];
-                for(int x = 0; x < forms.count; x++) {
-                    int64_t formID = [[forms[x] objectForKey:@"form_id"] intValue];
+                for(NSDictionary *dictionary in [data[x] objectForKey:@"forms"]) {
+                    int64_t formID = [[dictionary objectForKey:@"form_id"] intValue];
                     VisitForms *form = [Get visitForm:db visitID:visit.visitID formID:formID];
                     if(form == nil) {
                         form = [NSEntityDescription insertNewObjectForEntityForName:@"VisitForms" inManagedObjectContext:db];
-                        sequence.visitForms += 1;
-                        form.visitFormID = sequence.visitForms;
+                        form.visitFormID = [Get sequenceID:db entity:@"VisitForms" attribute:@"visitFormID"] + 1;
                         form.visitID = visit.visitID;
                         form.formID = formID;
                         form.isFromWeb = YES;
                     }
-                    form.name = [forms[x] objectForKey:@"form_name"];
+                    form.name = [dictionary objectForKey:@"form_name"];
                     form.isActive = YES;
                 }
             }

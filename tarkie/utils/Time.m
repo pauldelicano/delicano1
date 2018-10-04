@@ -1,4 +1,5 @@
 #import "Time.h"
+#include <sys/sysctl.h>
 
 @implementation Time
 
@@ -35,8 +36,8 @@
 }
 
 + (NSString *)secondsToHoursMinutes:(NSTimeInterval)totalSeconds {
-    if(totalSeconds == 0) {
-        return @"0";
+    if(totalSeconds < 1) {
+        return @"0s";
     }
     int days = totalSeconds / 86400;
     totalSeconds -= days * 86400;
@@ -45,7 +46,20 @@
     int minutes = totalSeconds / 60;
     totalSeconds -= minutes * 60;
     int seconds = totalSeconds;
-    return [NSString stringWithFormat:@"%@%@%@%@", days > 0 ? [NSString stringWithFormat:@" %dd", days] : @"", hours > 0 ? [NSString stringWithFormat:@" %dh", hours] : @"", minutes > 0 ? [NSString stringWithFormat:@" %dm", minutes] : @"", seconds > 0 ? [NSString stringWithFormat:@" %ds", seconds] : @""];
+    return [[NSString stringWithFormat:@"%@%@%@%@", days > 0 ? [NSString stringWithFormat:@" %dd", days] : @"", hours > 0 ? [NSString stringWithFormat:@" %dh", hours] : @"", minutes > 0 ? [NSString stringWithFormat:@" %dm", minutes] : @"", seconds > 0 ? [NSString stringWithFormat:@" %ds", seconds] : @""] stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
+}
+
++ (time_t)getUptime {
+    struct timeval boottime;
+    int mib[2] = {CTL_KERN, KERN_BOOTTIME};
+    size_t size = sizeof(boottime);
+    time_t now;
+    time_t uptime = -1;
+    (void)time(&now);
+    if(sysctl(mib, 2, &boottime, &size, NULL, 0) != -1 && boottime.tv_sec != 0) {
+        uptime = now - boottime.tv_sec;
+    }
+    return uptime;
 }
 
 @end

@@ -41,7 +41,7 @@
 }
 
 - (void)updateMasterFile:(NSManagedObjectContext *)db isAttendance:(BOOL)isAttendance isVisits:(BOOL)isVisits isExpense:(BOOL)isExpense isInventory:(BOOL)isInventory isForms:(BOOL)isForms {
-    self.count = 8 + (isAttendance ? 4 : 0) + (isVisits ? 1 : 0) + (isExpense ? 0 : 0) + (isInventory ? 0 : 0) + (isForms ? 0 : 0);
+    self.count = 7 + (isAttendance ? 4 : 0) + (isVisits ? 1 : 0) + (isExpense ? 0 : 0) + (isInventory ? 0 : 0) + (isForms ? 0 : 0);
     if(![Rx company:db delegate:self.delegate] || self.isCanceled) {
         return;
     }
@@ -52,9 +52,6 @@
         return;
     }
     if(![Rx conventions:db delegate:self.delegate] || self.isCanceled) {
-        return;
-    }
-    if(![Rx alertTypes:db delegate:self.delegate] || self.isCanceled) {
         return;
     }
     if(![Rx announcements:db delegate:self.delegate] || self.isCanceled) {
@@ -150,157 +147,133 @@
     }
 }
 
-- (void)patch:(NSManagedObjectContext *)db {
-    self.count = 1;
-    if(![Rx patches:db delegate:self.delegate] || self.isCanceled) {
-        return;
-    }
-}
-
-- (void)syncPatch:(NSManagedObjectContext *)db {
-    self.count = [Get syncPatchesCount:db];
-    NSArray<Patches *> *syncPatches = [Load syncPatches:db];
-    for(int x = 0; x < syncPatches.count; x++) {
-        if(![Tx syncPatch:db patch:syncPatches[x] delegate:self.delegate] || self.isCanceled) {
-            return;
-        }
-    }
-}
-
 - (void)syncData:(NSManagedObjectContext *)db {
     self.count = 1 + [Get syncTotalCount:db];
-    NSArray<AnnouncementSeen *> *syncAnnouncementSeen = [Load syncAnnouncementSeen:db];
-    for(int x = 0; x < syncAnnouncementSeen.count; x++) {
-        if(![Tx syncAnnouncementSeen:db announcementSeen:syncAnnouncementSeen[x] delegate:self.delegate] || self.isCanceled) {
+    for(AnnouncementSeen *syncAnnouncementSeen in [Load syncAnnouncementSeen:db]) {
+        if(![Tx syncAnnouncementSeen:db announcementSeen:syncAnnouncementSeen delegate:self.delegate] || self.isCanceled) {
             return;
         }
     }
-    NSArray<Stores *> *syncStores = [Load syncStores:db];
-    for(int x = 0; x < syncStores.count; x++) {
-        if(![Tx syncStore:db store:syncStores[x] delegate:self.delegate] || self.isCanceled) {
+    for(Stores *syncStore in [Load syncStores:db]) {
+        if(![Tx syncStore:db store:syncStore delegate:self.delegate] || self.isCanceled) {
             return;
         }
     }
-    NSArray<Stores *> *updateStores = [Load updateStores:db];
-    for(int x = 0; x < updateStores.count; x++) {
-        if(![Tx updateStore:db store:updateStores[x] delegate:self.delegate] || self.isCanceled) {
+    for(Stores *updateStore in [Load updateStores:db]) {
+        if(![Tx updateStore:db store:updateStore delegate:self.delegate] || self.isCanceled) {
             return;
         }
     }
-    NSArray<StoreContacts *> *syncStoreContacts = [Load syncStoreContacts:db];
-    for(int x = 0; x < syncStoreContacts.count; x++) {
-        if(![Tx syncStoreContact:db storeContact:syncStoreContacts[x] delegate:self.delegate] || self.isCanceled) {
+    for(StoreContacts *syncStoreContact in [Load syncStoreContacts:db]) {
+        if(![Tx syncStoreContact:db storeContact:syncStoreContact delegate:self.delegate] || self.isCanceled) {
             return;
         }
     }
-    NSArray<StoreContacts *> *updateStoreContacts = [Load updateStoreContacts:db];
-    for(int x = 0; x < updateStoreContacts.count; x++) {
-        if(![Tx updateStoreContact:db storeContact:updateStoreContacts[x] delegate:self.delegate] || self.isCanceled) {
+    for(StoreContacts *updateStoreContact in [Load updateStoreContacts:db]) {
+        if(![Tx updateStoreContact:db storeContact:updateStoreContact delegate:self.delegate] || self.isCanceled) {
             return;
         }
     }
     if(![Rx schedules:db isToday:YES delegate:self.delegate] || self.isCanceled) {
         return;
     }
-    NSArray<Schedules *> *syncSchedules = [Load syncSchedules:db];
-    for(int x = 0; x < syncSchedules.count; x++) {
-        if(![Tx syncSchedule:db schedule:syncSchedules[x] delegate:self.delegate] || self.isCanceled) {
+    for(Schedules *syncSchedule in [Load syncSchedules:db]) {
+        if(![Tx syncSchedule:db schedule:syncSchedule delegate:self.delegate] || self.isCanceled) {
             return;
         }
     }
-    NSArray<Schedules *> *updateSchedules = [Load updateSchedules:db];
-    for(int x = 0; x < updateSchedules.count; x++) {
-        if(![Tx updateSchedule:db schedule:updateSchedules[x] delegate:self.delegate] || self.isCanceled) {
+    for(Schedules *updateSchedule in [Load updateSchedules:db]) {
+        if(![Tx updateSchedule:db schedule:updateSchedule delegate:self.delegate] || self.isCanceled) {
             return;
         }
     }
-    NSArray<TimeIn *> *syncTimeIn = [Load syncTimeIn:db];
-    for(int x = 0; x < syncTimeIn.count; x++) {
-        if(![Tx syncTimeIn:db timeIn:syncTimeIn[x] delegate:self.delegate] || self.isCanceled) {
+    for(TimeIn *syncTimeIn in [Load syncTimeIn:db]) {
+        if(![Tx syncTimeIn:db timeIn:syncTimeIn delegate:self.delegate] || self.isCanceled) {
             return;
         }
     }
-    NSArray<TimeIn *> *uploadTimeInPhoto = [Load uploadTimeInPhoto:db];
-    for(int x = 0; x < uploadTimeInPhoto.count; x++) {
-        if(![Tx uploadTimeInPhoto:db timeIn:uploadTimeInPhoto[x] delegate:self.delegate] || self.isCanceled) {
+    for(TimeIn *uploadTimeInPhoto in [Load uploadTimeInPhoto:db]) {
+        if(![Tx uploadTimeInPhoto:db timeIn:uploadTimeInPhoto delegate:self.delegate] || self.isCanceled) {
             return;
         }
     }
-    NSArray<TimeOut *> *syncTimeOut = [Load syncTimeOut:db];
-    for(int x = 0; x < syncTimeOut.count; x++) {
-        if(![Tx syncTimeOut:db timeOut:syncTimeOut[x] delegate:self.delegate] || self.isCanceled) {
+    for(TimeOut *syncTimeOut in [Load syncTimeOut:db]) {
+        if(![Tx syncTimeOut:db timeOut:syncTimeOut delegate:self.delegate] || self.isCanceled) {
             return;
         }
     }
-    NSArray<TimeOut *> *uploadTimeOutPhoto = [Load uploadTimeOutPhoto:db];
-    for(int x = 0; x < uploadTimeOutPhoto.count; x++) {
-        if(![Tx uploadTimeOutPhoto:db timeOut:uploadTimeOutPhoto[x] delegate:self.delegate] || self.isCanceled) {
+    for(TimeOut *uploadTimeOutPhoto in [Load uploadTimeOutPhoto:db]) {
+        if(![Tx uploadTimeOutPhoto:db timeOut:uploadTimeOutPhoto delegate:self.delegate] || self.isCanceled) {
             return;
         }
     }
-    NSArray<TimeOut *> *uploadTimeOutSignature = [Load uploadTimeOutSignature:db];
-    for(int x = 0; x < uploadTimeOutSignature.count; x++) {
-        if(![Tx uploadTimeOutSignature:db timeOut:uploadTimeOutSignature[x] delegate:self.delegate]) {
+    for(TimeOut *uploadTimeOutSignature in [Load uploadTimeOutSignature:db]) {
+        if(![Tx uploadTimeOutSignature:db timeOut:uploadTimeOutSignature delegate:self.delegate]) {
             return;
         }
     }
-    NSArray<Overtime *> *syncOvertime = [Load syncOvertime:db];
-    for(int x = 0; x < syncOvertime.count; x++) {
-        if(![Tx syncOvertime:db overtime:syncOvertime[x] delegate:self.delegate] || self.isCanceled) {
+    for(BreakIn *syncBreakIn in [Load syncBreakIn:db]) {
+        if(![Tx syncBreakIn:db breakIn:syncBreakIn delegate:self.delegate] || self.isCanceled) {
             return;
         }
     }
-    NSArray<Photos *> *uploadVisitPhotos = [Load uploadVisitPhotos:db];
-    for(int x = 0; x < uploadVisitPhotos.count; x++) {
-        if(![Tx uploadVisitPhoto:db photo:uploadVisitPhotos[x] delegate:self.delegate] || self.isCanceled) {
+    for(BreakOut *syncBreakOut in [Load syncBreakOut:db]) {
+        if(![Tx syncBreakOut:db breakOut:syncBreakOut delegate:self.delegate] || self.isCanceled) {
             return;
         }
     }
-    NSArray<Visits *> *syncVisits = [Load syncVisits:db];
-    for(int x = 0; x < syncVisits.count; x++) {
-        if(![Tx syncVisit:db visit:syncVisits[x] delegate:self.delegate] || self.isCanceled) {
+    for(Overtime *syncOvertime in [Load syncOvertime:db]) {
+        if(![Tx syncOvertime:db overtime:syncOvertime delegate:self.delegate] || self.isCanceled) {
             return;
         }
     }
-    NSArray<Visits *> *updateVisits = [Load updateVisits:db];
-    for(int x = 0; x < updateVisits.count; x++) {
-        if(![Tx updateVisit:db visit:updateVisits[x] delegate:self.delegate] || self.isCanceled) {
+    for(Tracking *syncTracking in [Load syncTracking:db]) {
+        if(![Tx syncTracking:db tracking:syncTracking delegate:self.delegate] || self.isCanceled) {
             return;
         }
     }
-    NSArray<Visits *> *deleteVisits = [Load deleteVisits:db];
-    for(int x = 0; x < deleteVisits.count; x++) {
-        if(![Tx deleteVisit:db visit:deleteVisits[x] delegate:self.delegate] || self.isCanceled) {
+    for(Alerts *syncAlert in [Load syncAlerts:db]) {
+        if(![Tx syncAlert:db alert:syncAlert delegate:self.delegate] || self.isCanceled) {
             return;
         }
     }
-    NSArray<CheckIn *> *syncCheckIn = [Load syncCheckIn:db];
-    for(int x = 0; x < syncCheckIn.count; x++) {
-        if(![Tx syncCheckIn:db checkIn:syncCheckIn[x] delegate:self.delegate] || self.isCanceled) {
+    for(Photos *uploadVisitPhoto in [Load uploadVisitPhotos:db]) {
+        if(![Tx uploadVisitPhoto:db photo:uploadVisitPhoto delegate:self.delegate] || self.isCanceled) {
             return;
         }
     }
-    NSArray<CheckIn *> *uploadCheckInPhoto = [Load uploadCheckInPhoto:db];
-    for(int x = 0; x < uploadCheckInPhoto.count; x++) {
-        if(![Tx uploadCheckInPhoto:db checkIn:uploadCheckInPhoto[x] delegate:self.delegate] || self.isCanceled) {
+    for(Visits *syncVisit in [Load syncVisits:db]) {
+        if(![Tx syncVisit:db visit:syncVisit delegate:self.delegate] || self.isCanceled) {
             return;
         }
     }
-    NSArray<CheckOut *> *syncCheckOut = [Load syncCheckOut:db];
-    for(int x = 0; x < syncCheckOut.count; x++) {
-        if(![Tx syncCheckOut:db checkOut:syncCheckOut[x] delegate:self.delegate] || self.isCanceled) {
+    for(Visits *updateVisit in [Load updateVisits:db]) {
+        if(![Tx updateVisit:db visit:updateVisit delegate:self.delegate] || self.isCanceled) {
             return;
         }
     }
-    NSArray<CheckOut *> *uploadCheckOutPhoto = [Load uploadCheckOutPhoto:db];
-    for(int x = 0; x < uploadCheckOutPhoto.count; x++) {
-        if(![Tx uploadCheckOutPhoto:db checkOut:uploadCheckOutPhoto[x] delegate:self.delegate] || self.isCanceled) {
+    for(Visits *deleteVisit in [Load deleteVisits:db]) {
+        if(![Tx deleteVisit:db visit:deleteVisit delegate:self.delegate] || self.isCanceled) {
             return;
         }
     }
-    NSArray<Tracking *> *syncTracking = [Load syncTracking:db];
-    for(int x = 0; x < syncTracking.count; x++) {
-        if(![Tx syncTracking:db tracking:syncTracking[x] delegate:self.delegate] || self.isCanceled) {
+    for(CheckIn *syncCheckIn in [Load syncCheckIn:db]) {
+        if(![Tx syncCheckIn:db checkIn:syncCheckIn delegate:self.delegate] || self.isCanceled) {
+            return;
+        }
+    }
+    for(CheckIn *uploadCheckInPhoto in [Load uploadCheckInPhoto:db]) {
+        if(![Tx uploadCheckInPhoto:db checkIn:uploadCheckInPhoto delegate:self.delegate] || self.isCanceled) {
+            return;
+        }
+    }
+    for(CheckOut *syncCheckOut in [Load syncCheckOut:db]) {
+        if(![Tx syncCheckOut:db checkOut:syncCheckOut delegate:self.delegate] || self.isCanceled) {
+            return;
+        }
+    }
+    for(CheckOut *uploadCheckOutPhoto in [Load uploadCheckOutPhoto:db]) {
+        if(![Tx uploadCheckOutPhoto:db checkOut:uploadCheckOutPhoto delegate:self.delegate] || self.isCanceled) {
             return;
         }
     }
@@ -310,6 +283,22 @@
     self.count = 1;
     if(![Tx sendBackupData:db delegate:self.delegate] || self.isCanceled) {
         return;
+    }
+}
+
+- (void)patch:(NSManagedObjectContext *)db {
+    self.count = 1;
+    if(![Rx patches:db delegate:self.delegate] || self.isCanceled) {
+        return;
+    }
+}
+
+- (void)syncPatch:(NSManagedObjectContext *)db {
+    self.count = [Get syncPatchesCount:db];
+    for(Patches *syncPatch in [Load syncPatches:db]) {
+        if(![Tx patchData:db patch:syncPatch delegate:self.delegate] || self.isCanceled) {
+            return;
+        }
     }
 }
 

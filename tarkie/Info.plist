@@ -19,9 +19,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
+	<string>1.0.0</string>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>4</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>fb</string>
@@ -42,6 +42,8 @@
 	<string>GPS required for location updates.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>GPS required for location updates.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Photo Library required for camera.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Font-Awesome-Brands-Free.otf</string>

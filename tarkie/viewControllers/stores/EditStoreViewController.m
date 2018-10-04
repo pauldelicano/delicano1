@@ -72,10 +72,8 @@
 
 - (IBAction)save:(id)sender {
     if(self.store == nil) {
-        Sequences *sequence = [Get sequence:self.app.db];
         self.store = [NSEntityDescription insertNewObjectForEntityForName:@"Stores" inManagedObjectContext:self.app.db];
-        sequence.stores += 1;
-        self.store.storeID = sequence.stores;
+        self.store.storeID = [Get sequenceID:self.app.db entity:@"Stores" attribute:@"storeID"] + 1;
         self.store.syncBatchID = self.app.syncBatchID;
         self.store.isFromWeb = NO;
         self.store.isSync = NO;

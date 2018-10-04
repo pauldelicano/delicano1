@@ -55,27 +55,32 @@ static MessageDialogViewController *vcMessage;
     }
 }
 
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    [self stopTimer];
+}
+
 - (void)onRefresh {
     [super onRefresh];
     if(self.count == 0) {
         [self stopTimer];
-        [View removeView:self.view animated:YES];
+        [View removeChildViewController:self animated:YES];
         vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
         vcMessage.subject = @"No GPS Signal";
         vcMessage.message = @"Unfortunately, your device is still unable to get GPS signal.";
         vcMessage.negativeTitle = @"Proceed";
         vcMessage.negativeTarget = ^{
-            [View removeView:vcMessage.view animated:YES];
+            [View removeChildViewController:vcMessage animated:YES];
             [self.delegate onNoGPSProceed];
         };
         vcMessage.positiveTitle = @"Retry";
         vcMessage.positiveTarget = ^{
-            [View removeView:vcMessage.view animated:YES];
+            [View removeChildViewController:vcMessage animated:YES];
             NoGPSDialogViewController *vcNoGPS = [self.storyboard instantiateViewControllerWithIdentifier: @"vcNoGPS"];
             vcNoGPS.delegate = self.delegate;
-            [View addSubview:vcMessage.view.superview subview:vcNoGPS.view animated:YES];
+            [View addChildViewController:vcMessage childViewController:vcNoGPS animated:YES];
         };
-        [View addSubview:self.view.superview subview:vcMessage.view animated:YES];
+        [View addChildViewController:self.parentViewController childViewController:vcMessage animated:YES];
     }
     if(self.count >= 0) {
         self.lTimer.text = [NSString stringWithFormat:@"%ld", self.count];
@@ -83,22 +88,22 @@ static MessageDialogViewController *vcMessage;
     }
     if(self.app.location != nil) {
         [self stopTimer];
-        [View removeView:vcMessage.view animated:YES];
-        [View removeView:self.view animated:YES];
+        [View removeChildViewController:vcMessage animated:YES];
+        [View removeChildViewController:self animated:YES];
         vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
         vcMessage.subject = @"GPS Acquired";
         vcMessage.message = @"GPS has been acquired, do you want to use this coordinates?";
         vcMessage.negativeTitle = @"Cancel";
         vcMessage.negativeTarget = ^{
-            [View removeView:vcMessage.view animated:YES];
+            [View removeChildViewController:vcMessage animated:YES];
             [self.delegate onNoGPSCancel];
         };
         vcMessage.positiveTitle = @"Yes";
         vcMessage.positiveTarget = ^{
-            [View removeView:vcMessage.view animated:YES];
+            [View removeChildViewController:vcMessage animated:YES];
             [self.delegate onNoGPSAcquired];
         };
-        [View addSubview:self.view.superview subview:vcMessage.view animated:YES];
+        [View addChildViewController:self.parentViewController childViewController:vcMessage animated:YES];
     }
 }
 

@@ -16,6 +16,7 @@
     self.viewWillAppear = NO;
     self.ivAbout.image = [UIImage imageNamed:@"About"];
     self.lAbout.text = [self.lAbout.text stringByReplacingOccurrencesOfString:@"Tarkie" withString:APP_NAME];
+    
 }
 
 - (void)viewDidLayoutSubviews {
@@ -47,43 +48,43 @@
     self.ivLogo.image = [UIImage imageWithCGImage:APP_LOGO_WHITE.CGImage scale:((self.ivLogo.image.scale * (APP_LOGO_WHITE.size.width / self.ivLogo.frame.size.width)) * 1.5) orientation:(self.ivLogo.image.imageOrientation)];
     self.lVersion.text = [NSString stringWithFormat:@"Version %@", [NSBundle.mainBundle.infoDictionary objectForKey:@"CFBundleShortVersionString"]];
     if([APP_NAME isEqualToString:@"Sevie"]) {
-        self.lAppURL.text = @"itunes.apple.com/us/app/apple-store/id375380948";
-        self.appURL = @"https://itunes.apple.com/";
+        self.lAppURL.text = @"";
+        self.appURL = @"";
     }
     if([APP_NAME isEqualToString:@"Tarkie"]) {
-        self.lAppURL.text = @"itunes.apple.com/us/app/apple-store/id375380948";
-        self.appURL = @"https://itunes.apple.com/";
+        self.lAppURL.text = @"itunes.apple.com/us/app/tarkie";
+        self.appURL = @"https://itunes.apple.com/us/app/tarkie/id1436957809";
     }
     if([APP_NAME isEqualToString:@"Timsie"]) {
-        self.lAppURL.text = @"itunes.apple.com/us/app/apple-store/id375380948";
-        self.appURL = @"https://itunes.apple.com/";
+        self.lAppURL.text = @"";
+        self.appURL = @"";
     }
     if([UIApplication.sharedApplication canOpenURL:[NSURL URLWithString:@"fb://"]]) {
         if([APP_NAME isEqualToString:@"Sevie"]) {
-            self.lFacebookURL.text = @"www.facebook.com/tarkieapp";
-            self.facebookURL = @"fb://profile/830853863618267";
+            self.lFacebookURL.text = @"";
+            self.facebookURL = @"";
         }
         if([APP_NAME isEqualToString:@"Tarkie"]) {
             self.lFacebookURL.text = @"www.facebook.com/tarkieapp";
             self.facebookURL = @"fb://profile/830853863618267";
         }
         if([APP_NAME isEqualToString:@"Timsie"]) {
-            self.lFacebookURL.text = @"www.facebook.com/timsieapp";
-            self.facebookURL = @"fb://profile/272139232947051";
+            self.lFacebookURL.text = @"";
+            self.facebookURL = @"";
         }
     }
     else {
         if([APP_NAME isEqualToString:@"Sevie"]) {
-            self.lFacebookURL.text = @"www.facebook.com/tarkieapp";
-            self.facebookURL = @"https://www.facebook.com/830853863618267";
+            self.lFacebookURL.text = @"";
+            self.facebookURL = @"";
         }
         if([APP_NAME isEqualToString:@"Tarkie"]) {
             self.lFacebookURL.text = @"www.facebook.com/tarkieapp";
             self.facebookURL = @"https://www.facebook.com/830853863618267";
         }
         if([APP_NAME isEqualToString:@"Timsie"]) {
-            self.lFacebookURL.text = @"www.facebook.com/timsieapp";
-            self.facebookURL = @"https://www.facebook.com/272139232947051";
+            self.lFacebookURL.text = @"";
+            self.facebookURL = @"";
         }
     }
     self.vScroll.contentInset = UIEdgeInsetsMake(0 - self.vStatus.frame.size.height + self.ivAbout.frame.size.height, 0, 0, 0);

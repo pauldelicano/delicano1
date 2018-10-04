@@ -15,8 +15,8 @@
 
 @property (weak, nonatomic) IBOutlet ScrollView *vScroll;
 @property (weak, nonatomic) IBOutlet UIView *vContent;
-@property (weak, nonatomic) IBOutlet UILabel *lSubject;
 @property (weak, nonatomic) IBOutlet UIButton *btnClose;
+@property (weak, nonatomic) IBOutlet UILabel *lSubject;
 @property (weak, nonatomic) IBOutlet CircularProgressBar *vCircularProgressBar;
 @property (weak, nonatomic) IBOutlet UILabel *lProgress;
 

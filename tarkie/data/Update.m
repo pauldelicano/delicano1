@@ -7,9 +7,8 @@
 + (BOOL)usersLogout:(NSManagedObjectContext *)db {
     NSMutableArray *predicates = NSMutableArray.alloc.init;
     [predicates addObject:[NSPredicate predicateWithFormat:@"isLogout == %@", @NO]];
-    NSArray<Users *> *result = [self execute:db entity:@"Users" predicates:predicates];
-    for(int x = 0; x < result.count; x++) {
-        result[x].isLogout = YES;
+    for(Users *user in [self execute:db entity:@"Users" predicates:predicates]) {
+        user.isLogout = YES;
     }
     return [self save:db];
 }
@@ -17,19 +16,51 @@
 + (void)employeesDeactivate:(NSManagedObjectContext *)db {
     NSMutableArray *predicates = NSMutableArray.alloc.init;
     [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
-    NSArray<Employees *> *result = [self execute:db entity:@"Employees" predicates:predicates];
-    for(int x = 0; x < result.count; x++) {
-        result[x].isActive = NO;
+    for(Employees *employee in [self execute:db entity:@"Employees" predicates:predicates]) {
+        employee.isActive = NO;
     }
+}
+
++ (int64_t)gpsSave:(NSManagedObjectContext *)db location:(CLLocation *)location {
+    if(location == nil || (location.coordinate.latitude == 0 && location.coordinate.longitude == 0)) {
+        return 0;
+    }
+    GPS *gps = [NSEntityDescription insertNewObjectForEntityForName:@"GPS" inManagedObjectContext:db];
+    gps.gpsID = [Get sequenceID:db entity:@"GPS" attribute:@"gpsID"] + 1;
+    gps.date = [Time getFormattedDate:DATE_FORMAT date:location.timestamp];
+    gps.time = [Time getFormattedDate:TIME_FORMAT date:location.timestamp];
+    gps.latitude = location.coordinate.latitude;
+    gps.longitude = location.coordinate.longitude;
+    gps.isValid = fabs([location.timestamp timeIntervalSinceNow]) <= 5;
+    if(![self save:db]) {
+        return 0;
+    }
+    NSLog(@"tracking: %@ %@ %f %f %d", gps.date, gps.time, gps.latitude, gps.longitude, gps.isValid);
+    return gps.gpsID;
+}
+
++ (BOOL)alertSave:(NSManagedObjectContext *)db alertTypeID:(int64_t)alertTypeID gpsID:(int64_t)gpsID value:(NSString *)value {
+    Alerts *alert = [NSEntityDescription insertNewObjectForEntityForName:@"Alerts" inManagedObjectContext:db];
+    alert.alertID = [Get sequenceID:db entity:@"Alerts" attribute:@"alertID"] + 1;
+    alert.syncBatchID = [Get syncBatch:db].syncBatchID;
+    alert.employeeID = [Get userID:db];
+    alert.timeInID = [Get timeIn:db].timeInID;
+    alert.alertTypeID = alertTypeID;
+    NSDate *currentDate = NSDate.date;
+    alert.date = [Time getFormattedDate:DATE_FORMAT date:currentDate];
+    alert.time = [Time getFormattedDate:TIME_FORMAT date:currentDate];
+    alert.gpsID = gpsID;
+    alert.value = value != nil ? value : @"";
+    alert.isSync = NO;
+    return [self save:db];
 }
 
 + (void)announcementsDeactivate:(NSManagedObjectContext *)db {
     NSMutableArray *predicates = NSMutableArray.alloc.init;
     [predicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
     [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
-    NSArray<Announcements *> *result = [self execute:db entity:@"Announcements" predicates:predicates];
-    for(int x = 0; x < result.count; x++) {
-        result[x].isActive = NO;
+    for(Announcements *announcement in [self execute:db entity:@"Announcements" predicates:predicates]) {
+        announcement.isActive = NO;
     }
 }
 
@@ -40,10 +71,9 @@
     [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
     [predicates addObject:[NSPredicate predicateWithFormat:@"isTag == %@", @YES]];
     [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @YES]];
-    NSArray<Stores *> *result = [self execute:db entity:@"Stores" predicates:predicates];
-    for(int x = 0; x < result.count; x++) {
-        result[x].isTag = NO;
-        result[x].isActive = NO;
+    for(Stores *store in [self execute:db entity:@"Stores" predicates:predicates]) {
+        store.isTag = NO;
+        store.isActive = NO;
     }
 }
 
@@ -52,18 +82,16 @@
     [predicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
     [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
     [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @YES]];
-    NSArray<StoreContacts *> *result = [self execute:db entity:@"StoreContacts" predicates:predicates];
-    for(int x = 0; x < result.count; x++) {
-        result[x].isActive = NO;
+    for(StoreContacts *storeContact in [self execute:db entity:@"StoreContacts" predicates:predicates]) {
+        storeContact.isActive = NO;
     }
 }
 
 + (void)scheduleTimesDeactivate:(NSManagedObjectContext *)db {
     NSMutableArray *predicates = NSMutableArray.alloc.init;
     [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
-    NSArray<ScheduleTimes *> *result = [self execute:db entity:@"ScheduleTimes" predicates:predicates];
-    for(int x = 0; x < result.count; x++) {
-        result[x].isActive = NO;
+    for(ScheduleTimes *scheduleTime in [self execute:db entity:@"ScheduleTimes" predicates:predicates]) {
+        scheduleTime.isActive = NO;
     }
 }
 
@@ -72,36 +100,25 @@
     [predicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
     [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
     [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @YES]];
-    NSArray<Schedules *> *result = [self execute:db entity:@"Schedules" predicates:predicates];
-    for(int x = 0; x < result.count; x++) {
-        result[x].isActive = NO;
+    for(Schedules *schedule in [self execute:db entity:@"Schedules" predicates:predicates]) {
+        schedule.isActive = NO;
+    }
+}
+
++ (void)breakTypesDeactivate:(NSManagedObjectContext *)db {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
+    for(BreakTypes *breakType in [self execute:db entity:@"BreakTypes" predicates:predicates]) {
+        breakType.isActive = NO;
     }
 }
 
 + (void)overtimeReasonsDeactivate:(NSManagedObjectContext *)db {
     NSMutableArray *predicates = NSMutableArray.alloc.init;
     [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
-    NSArray<OvertimeReasons *> *result = [self execute:db entity:@"OvertimeReasons" predicates:predicates];
-    for(int x = 0; x < result.count; x++) {
-        result[x].isActive = NO;
+    for(OvertimeReasons *overtimeReason in [self execute:db entity:@"OvertimeReasons" predicates:predicates]) {
+        overtimeReason.isActive = NO;
     }
-}
-
-+ (int64_t)gpsSave:(NSManagedObjectContext *)db location:(CLLocation *)location {
-    if(location == nil || (location.coordinate.latitude == 0 && location.coordinate.longitude == 0)) {
-        return 0;
-    }
-    Sequences *sequence = [Get sequence:db];
-    GPS *gps = [NSEntityDescription insertNewObjectForEntityForName:@"GPS" inManagedObjectContext:db];
-    sequence.gps += 1;
-    gps.gpsID = sequence.gps;
-    gps.date = [Time getFormattedDate:DATE_FORMAT date:location.timestamp];
-    gps.time = [Time getFormattedDate:TIME_FORMAT date:location.timestamp];
-    gps.latitude = location.coordinate.latitude;
-    gps.longitude = location.coordinate.longitude;
-    gps.isValid = fabs([location.timestamp timeIntervalSinceNow]) <= 5;
-    NSLog(@"tracking: %@ %@ %f %f %d", gps.date, gps.time, gps.latitude, gps.longitude, gps.isValid);
-    return gps.gpsID;
 }
 
 + (NSArray *)execute:(NSManagedObjectContext *)db entity:(NSString *)entity predicates:(NSArray<NSPredicate *> *)predicates  {

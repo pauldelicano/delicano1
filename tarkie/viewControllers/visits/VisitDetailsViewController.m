@@ -30,6 +30,7 @@
 @implementation VisitDetailsViewController
 
 static MessageDialogViewController *vcMessage;
+static ListDialogViewController *vcList;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -200,15 +201,15 @@ static MessageDialogViewController *vcMessage;
         vcMessage.message = @"Do you want to save changes?";
         vcMessage.negativeTitle = @"Discard";
         vcMessage.negativeTarget = ^{
-            [View removeView:vcMessage.view animated:YES];
+            [View removeChildViewController:vcMessage animated:YES];
             [self.navigationController popViewControllerAnimated:YES];
         };
         vcMessage.positiveTitle = @"Save";
         vcMessage.positiveTarget = ^{
-            [View removeView:vcMessage.view animated:YES];
+            [View removeChildViewController:vcMessage animated:YES];
             [self.btnSave sendActionsForControlEvents:UIControlEventTouchUpInside];
         };
-        [View addSubview:self.view subview:vcMessage.view animated:YES];
+        [View addChildViewController:self childViewController:vcMessage animated:YES];
         return;
     }
     [self.navigationController popViewControllerAnimated:YES];
@@ -221,9 +222,9 @@ static MessageDialogViewController *vcMessage;
         vcMessage.message = [NSString stringWithFormat:@"Please select %@ first to continue.", self.app.conventionStores.lowercaseString];
         vcMessage.positiveTitle = @"OK";
         vcMessage.positiveTarget = ^{
-            [View removeView:vcMessage.view animated:YES];
+            [View removeChildViewController:vcMessage animated:YES];
         };
-        [View addSubview:self.view subview:vcMessage.view animated:YES];
+        [View addChildViewController:self childViewController:vcMessage animated:YES];
         return;
     }
     NSString *notes = self.tfNotes.text;
@@ -236,9 +237,9 @@ static MessageDialogViewController *vcMessage;
         vcMessage.message = @"Please input notes.";
         vcMessage.positiveTitle = @"OK";
         vcMessage.positiveTarget = ^{
-            [View removeView:vcMessage.view animated:YES];
+            [View removeChildViewController:vcMessage animated:YES];
         };
-        [View addSubview:self.view subview:vcMessage.view animated:YES];
+        [View addChildViewController:self childViewController:vcMessage animated:YES];
         return;
     }
     self.visit.name = self.app.settingStoreDisplayLongName ? self.store.name : self.store.shortName;
@@ -257,14 +258,14 @@ static MessageDialogViewController *vcMessage;
     if(self.store.storeID == 0) {
         return;
     }
-    if(self.store.latitude != 0 && self.store.longitude != 0) {
-        [self openMapFromCoordinates:self.store.latitude longitude:self.store.longitude];
-        return;
-    }
-    if(self.store.address.length > 0) {
-        [self openMapFromAddress:self.store.address];
-        return;
-    }
+    vcList = [self.storyboard instantiateViewControllerWithIdentifier:@"vcList"];
+    vcList.delegate = self;
+    vcList.type = LIST_TYPE_MAP;
+    NSMutableArray *mapTypes = NSMutableArray.alloc.init;
+    [mapTypes addObject:@"Maps"];
+    [mapTypes addObject:@"Waze"];
+    vcList.items = mapTypes;
+    [View addChildViewController:self childViewController:vcList animated:YES];
 }
 
 - (IBAction)editStore:(id)sender {
@@ -280,9 +281,9 @@ static MessageDialogViewController *vcMessage;
     vcMessage.message = [NSString stringWithFormat:@"You have checked-out already. You cannot edit %@ anymore.", self.app.conventionStores.lowercaseString];
     vcMessage.positiveTitle = @"OK";
     vcMessage.positiveTarget = ^{
-        [View removeView:vcMessage.view animated:YES];
+        [View removeChildViewController:vcMessage animated:YES];
     };
-    [View addSubview:self.view subview:vcMessage.view animated:YES];
+    [View addChildViewController:self childViewController:vcMessage animated:YES];
 }
 
 - (IBAction)checkIn:(id)sender {
@@ -303,9 +304,9 @@ static MessageDialogViewController *vcMessage;
     vcMessage.message = @"You have checked-out already. You cannot add inventory anymore.";
     vcMessage.positiveTitle = @"OK";
     vcMessage.positiveTarget = ^{
-        [View removeView:vcMessage.view animated:YES];
+        [View removeChildViewController:vcMessage animated:YES];
     };
-    [View addSubview:self.view subview:vcMessage.view animated:YES];
+    [View addChildViewController:self childViewController:vcMessage animated:YES];
 }
 
 - (IBAction)addForms:(id)sender {
@@ -318,9 +319,9 @@ static MessageDialogViewController *vcMessage;
     vcMessage.message = @"You have checked-out already. You cannot add forms anymore.";
     vcMessage.positiveTitle = @"OK";
     vcMessage.positiveTarget = ^{
-        [View removeView:vcMessage.view animated:YES];
+        [View removeChildViewController:vcMessage animated:YES];
     };
-    [View addSubview:self.view subview:vcMessage.view animated:YES];
+    [View addChildViewController:self childViewController:vcMessage animated:YES];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -398,9 +399,9 @@ static MessageDialogViewController *vcMessage;
     vcMessage.message = @"You have checked-out already. You cannot add photos anymore.";
     vcMessage.positiveTitle = @"OK";
     vcMessage.positiveTarget = ^{
-        [View removeView:vcMessage.view animated:YES];
+        [View removeChildViewController:vcMessage animated:YES];
     };
-    [View addSubview:self.view subview:vcMessage.view animated:YES];
+    [View addChildViewController:self childViewController:vcMessage animated:YES];
 }
 
 - (void)onCameraCapture:(int)type image:(UIImage *)image {
@@ -419,10 +420,8 @@ static MessageDialogViewController *vcMessage;
             NSDate *currentDate = NSDate.date;
             NSString *filename = [NSString stringWithFormat:@"%lld-%.0f%@", self.app.employee.employeeID, [currentDate timeIntervalSince1970], @".png"];
             if([File saveImageFromImage:[File documentPath:filename] image:image] != nil) {
-                Sequences *sequence = [Get sequence:self.app.db];
                 Photos *photo = [NSEntityDescription insertNewObjectForEntityForName:@"Photos" inManagedObjectContext:self.app.db];
-                sequence.photos += 1;
-                photo.photoID = sequence.photos;
+                photo.photoID = [Get sequenceID:self.app.db entity:@"Photos" attribute:@"photoID"] + 1;
                 photo.syncBatchID = self.app.syncBatchID;
                 photo.employeeID = self.app.employee.employeeID;
                 photo.date = [Time getFormattedDate:DATE_FORMAT date:currentDate];
@@ -432,8 +431,7 @@ static MessageDialogViewController *vcMessage;
                 photo.isUpload = NO;
                 photo.isDelete = NO;
                 VisitPhotos *visitPhoto = [NSEntityDescription insertNewObjectForEntityForName:@"VisitPhotos" inManagedObjectContext:self.app.db];
-                sequence.visitPhotos += 1;
-                visitPhoto.visitPhotoID = sequence.visitPhotos;
+                visitPhoto.visitPhotoID = [Get sequenceID:self.app.db entity:@"VisitPhotos" attribute:@"visitPhotoID"] + 1;
                 visitPhoto.visitID = self.visit.visitID;
                 visitPhoto.photoID = photo.photoID;
                 if(![Update save:self.app.db]) {
@@ -503,19 +501,36 @@ static MessageDialogViewController *vcMessage;
     }
 }
 
+- (void)onListSelect:(int)type item:(id)item {
+    switch(type) {
+        case LIST_TYPE_MAP: {
+            NSString *mapType = (NSString *)item;
+            if(self.store.latitude != 0 && self.store.longitude != 0) {
+                [self openMapFromCoordinates:self.store.latitude longitude:self.store.longitude mapType:mapType];
+                break;
+            }
+            if(self.store.address.length > 0) {
+                [self openMapFromAddress:self.store.address mapType:mapType];
+                break;
+            }
+            break;
+        }
+    }
+}
+
 - (void)checkIn {
     if(self.visit.isCheckIn) {
         return;
     }
     if(!self.main.isTimeIn) {
         vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
-        vcMessage.subject = @"Time In Required";
-        vcMessage.message = @"Please time in first before you check-in";
+        vcMessage.subject = [NSString stringWithFormat:@"%@ Required", self.app.conventionTimeIn];
+        vcMessage.message = [NSString stringWithFormat:@"Please %@ first before you check-in.", self.app.conventionTimeIn.lowercaseString];
         vcMessage.positiveTitle = @"OK";
         vcMessage.positiveTarget = ^{
-            [View removeView:vcMessage.view animated:YES];
+            [View removeChildViewController:vcMessage animated:YES];
         };
-        [View addSubview:self.view subview:vcMessage.view animated:YES];
+        [View addChildViewController:self childViewController:vcMessage animated:YES];
         return;
     }
     if(!self.app.settingVisitsParallelCheckInOut && [Get isCheckIn:self.app.db]) {
@@ -533,9 +548,9 @@ static MessageDialogViewController *vcMessage;
         vcMessage.attributedMessage = attributedText;
         vcMessage.positiveTitle = @"OK";
         vcMessage.positiveTarget = ^{
-            [View removeView:vcMessage.view animated:YES];
+            [View removeChildViewController:vcMessage animated:YES];
         };
-        [View addSubview:self.view subview:vcMessage.view animated:YES];
+        [View addChildViewController:self childViewController:vcMessage animated:YES];
         return;
     }
     if([self.main gpsRequest]) {
@@ -569,21 +584,14 @@ static MessageDialogViewController *vcMessage;
     self.currentDate = NSDate.date;
     NSString *date = [Time getFormattedDate:DATE_FORMAT date:self.currentDate];
     NSString *time = [Time getFormattedDate:TIME_FORMAT date:self.currentDate];
-    Sequences *sequence = [Get sequence:self.app.db];
     CheckIn *checkIn = [NSEntityDescription insertNewObjectForEntityForName:@"CheckIn" inManagedObjectContext:self.app.db];
-    if(self.app.location != nil) {
-        int64_t gpsID = [Update gpsSave:self.app.db location:self.app.location];
-        if(gpsID != 0) {
-            checkIn.gpsID = gpsID;
-        }
-    }
-    sequence.checkIn += 1;
-    checkIn.checkInID = sequence.checkIn;
+    checkIn.checkInID = [Get sequenceID:self.app.db entity:@"CheckIn" attribute:@"checkInID"] + 1;
     checkIn.syncBatchID = self.app.syncBatchID;
     checkIn.timeInID = [Get timeIn:self.app.db].timeInID;
     checkIn.visitID = self.visit.visitID;
     checkIn.date = date;
     checkIn.time = time;
+    checkIn.gpsID = [Update gpsSave:self.app.dbTracking location:self.app.location];
     checkIn.photo = self.photoFilename;
     checkIn.isSync = NO;
     checkIn.isPhotoUpload = NO;
@@ -610,9 +618,9 @@ static MessageDialogViewController *vcMessage;
         vcMessage.message = [NSString stringWithFormat:@"Please complete the details of your %@ first.", self.app.conventionStores.lowercaseString];
         vcMessage.positiveTitle = @"OK";
         vcMessage.positiveTarget = ^{
-            [View removeView:vcMessage.view animated:YES];
+            [View removeChildViewController:vcMessage animated:YES];
         };
-        [View addSubview:self.view subview:vcMessage.view animated:YES];
+        [View addChildViewController:self childViewController:vcMessage animated:YES];
         return;
     }
     NSString *notes = self.tfNotes.text;
@@ -625,9 +633,9 @@ static MessageDialogViewController *vcMessage;
         vcMessage.message = @"Please complete the details of your notes first.";
         vcMessage.positiveTitle = @"OK";
         vcMessage.positiveTarget = ^{
-            [View removeView:vcMessage.view animated:YES];
+            [View removeChildViewController:vcMessage animated:YES];
         };
-        [View addSubview:self.view subview:vcMessage.view animated:YES];
+        [View addChildViewController:self childViewController:vcMessage animated:YES];
         return;
     }
     if(self.store.storeID != 0) {
@@ -682,27 +690,19 @@ static MessageDialogViewController *vcMessage;
         [checkOutStatus addObject:@"Not Completed"];
         [checkOutStatus addObject:@"Canceled"];
         vcDropDown.items = checkOutStatus;
-        [View addSubview:self.view subview:vcDropDown.view animated:YES];
-        [self addChildViewController:vcDropDown];
+        [View addChildViewController:self childViewController:vcDropDown animated:YES];
         return;
     }
     self.currentDate = NSDate.date;
     NSString *date = [Time getFormattedDate:DATE_FORMAT date:self.currentDate];
     NSString *time = [Time getFormattedDate:TIME_FORMAT date:self.currentDate];
-    Sequences *sequence = [Get sequence:self.app.db];
     CheckOut *checkOut = [NSEntityDescription insertNewObjectForEntityForName:@"CheckOut" inManagedObjectContext:self.app.db];
-    if(self.app.location != nil) {
-        int64_t gpsID = [Update gpsSave:self.app.db location:self.app.location];
-        if(gpsID != 0) {
-            checkOut.gpsID = gpsID;
-        }
-    }
-    sequence.checkOut += 1;
-    checkOut.checkOutID = sequence.checkOut;
+    checkOut.checkOutID = [Get sequenceID:self.app.db entity:@"CheckOut" attribute:@"checkOutID"] + 1;
     checkOut.syncBatchID = self.app.syncBatchID;
     checkOut.checkInID = self.visitCheckIn.checkInID;
     checkOut.date = date;
     checkOut.time = time;
+    checkOut.gpsID = [Update gpsSave:self.app.dbTracking location:self.app.location];
     checkOut.photo = self.photoFilename;
     checkOut.isSync = NO;
     checkOut.isPhotoUpload = NO;
@@ -772,20 +772,25 @@ static MessageDialogViewController *vcMessage;
     }
 }
 
-- (void)openMapFromAddress:(NSString *)address {
+- (void)openMapFromAddress:(NSString *)address mapType:(NSString *)mapType {
     [CLGeocoder.alloc.init geocodeAddressString:address completionHandler:^(NSArray<CLPlacemark *> * _Nullable placemarks, NSError * _Nullable error) {
-        [self openMapFromCoordinates:placemarks.firstObject.location.coordinate.latitude longitude:placemarks.firstObject.location.coordinate.longitude];
+        [self openMapFromCoordinates:placemarks.firstObject.location.coordinate.latitude longitude:placemarks.firstObject.location.coordinate.longitude mapType:mapType];
     }];
 }
-- (void)openMapFromCoordinates:(double)latitude longitude:(double)longitude {
-    NSString *url;
-    if([UIApplication.sharedApplication canOpenURL:[NSURL URLWithString:@"waze://"]]) {
-        url = [NSString stringWithFormat:@"waze://?ll=%f,%f&navigate=yes", latitude, longitude];
+- (void)openMapFromCoordinates:(double)latitude longitude:(double)longitude mapType:(NSString *)mapType {
+    if([mapType isEqualToString:@"Maps"]) {
+        [UIApplication.sharedApplication openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://maps.apple.com/?saddr=Current%%20Location&daddr=%f,%f", latitude, longitude]] options:@{} completionHandler:nil];
     }
-    else {
-        url = [NSString stringWithFormat:@"https://www.waze.com/ul?ll=%f,%f&navigate=yes", latitude, longitude];
+    if([mapType isEqualToString:@"Waze"]) {
+        NSString *url;
+        if([UIApplication.sharedApplication canOpenURL:[NSURL URLWithString:@"waze://"]]) {
+            url = [NSString stringWithFormat:@"waze://?ll=%f,%f&navigate=yes", latitude, longitude];
+        }
+        else {
+            url = [NSString stringWithFormat:@"https://www.waze.com/ul?ll=%f,%f&navigate=yes", latitude, longitude];
+        }
+        [UIApplication.sharedApplication openURL:[NSURL URLWithString:url] options:@{} completionHandler:nil];
     }
-    [UIApplication.sharedApplication openURL:[NSURL URLWithString:url] options:@{} completionHandler:nil];
 }
 
 @end

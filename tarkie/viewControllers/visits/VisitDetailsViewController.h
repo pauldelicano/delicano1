@@ -7,7 +7,7 @@
 #import "PhotoBarCollectionView.h"
 #import "CameraPreviewViewController.h"
 
-@interface VisitDetailsViewController : ViewController<UITableViewDataSource, UITableViewDelegate, StoresDelegate, PhotoBarDelegate, CameraDelegate, CameraPreviewDelegate, DropDownDelegate>
+@interface VisitDetailsViewController : ViewController<UITableViewDataSource, UITableViewDelegate, StoresDelegate, PhotoBarDelegate, CameraDelegate, CameraPreviewDelegate, DropDownDelegate, ListDelegate>
 
 @property (weak, nonatomic) IBOutlet UIView *vStatusBar;
 @property (weak, nonatomic) IBOutlet UIView *vNavBar;

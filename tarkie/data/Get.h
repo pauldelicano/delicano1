@@ -1,9 +1,6 @@
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
 
-#import "Sequences+CoreDataClass.h"
-#import "Patches+CoreDataClass.h"
-
 #import "Device+CoreDataClass.h"
 #import "Company+CoreDataClass.h"
 #import "Modules+CoreDataClass.h"
@@ -12,9 +9,11 @@
 #import "Settings+CoreDataClass.h"
 #import "SettingsTeams+CoreDataClass.h"
 #import "Conventions+CoreDataClass.h"
-#import "AlertTypes+CoreDataClass.h"
 #import "TimeSecurity+CoreDataClass.h"
 #import "SyncBatch+CoreDataClass.h"
+#import "Patches+CoreDataClass.h"
+#import "GPS+CoreDataClass.h"
+#import "Alerts+CoreDataClass.h"
 #import "Announcements+CoreDataClass.h"
 #import "AnnouncementSeen+CoreDataClass.h"
 
@@ -26,26 +25,24 @@
 #import "TimeIn+CoreDataClass.h"
 #import "TimeOut+CoreDataClass.h"
 #import "BreakTypes+CoreDataClass.h"
+#import "BreakIn+CoreDataClass.h"
+#import "BreakOut+CoreDataClass.h"
 #import "OvertimeReasons+CoreDataClass.h"
+#import "Overtime+CoreDataClass.h"
+#import "Tracking+CoreDataClass.h"
 
-#import "Visits+CoreDataClass.h"
 #import "Photos+CoreDataClass.h"
+#import "Visits+CoreDataClass.h"
 #import "VisitInventories+CoreDataClass.h"
 #import "VisitForms+CoreDataClass.h"
 #import "VisitPhotos+CoreDataClass.h"
 #import "CheckIn+CoreDataClass.h"
 #import "CheckOut+CoreDataClass.h"
 
-#import "GPS+CoreDataClass.h"
-#import "Tracking+CoreDataClass.h"
-
 @interface Get : NSObject
 
-+ (Sequences *)sequence:(NSManagedObjectContext *)db;
-+ (Patches *)patch:(NSManagedObjectContext *)db patchID:(int64_t)patchID;
-+ (long)syncPatchesCount:(NSManagedObjectContext *)db;
++ (int64_t)sequenceID:(NSManagedObjectContext *)db entity:(NSString *)entity attribute:(NSString *)attribute;
 
-//COMPANY
 + (Device *)device:(NSManagedObjectContext *)db;
 + (NSString *)apiKey:(NSManagedObjectContext *)db;
 + (Company *)company:(NSManagedObjectContext *)db;
@@ -64,9 +61,13 @@
 + (NSString *)settingTimeFormat:(NSManagedObjectContext *)db teamID:(int64_t)teamID;
 + (Conventions *)convention:(NSManagedObjectContext *)db conventionID:(int64_t)conventionID;
 + (NSString *)conventionName:(NSManagedObjectContext *)db conventionID:(int64_t)conventionID;
-+ (AlertTypes *)alertType:(NSManagedObjectContext *)db alertTypeID:(int64_t)alertTypeID;
 + (TimeSecurity *)timeSecurity:(NSManagedObjectContext *)db;
 + (SyncBatch *)syncBatch:(NSManagedObjectContext *)db;
++ (Patches *)patch:(NSManagedObjectContext *)db patchID:(int64_t)patchID;
++ (long)syncPatchesCount:(NSManagedObjectContext *)db;
++ (GPS *)gps:(NSManagedObjectContext *)db gpsID:(int64_t)gpsID;
++ (Alerts *)alert:(NSManagedObjectContext *)db alertTypeID:(int64_t)alertTypeID;
++ (long)syncAlertsCount:(NSManagedObjectContext *)db;
 + (Announcements *)announcement:(NSManagedObjectContext *)db announcementID:(int64_t)announcementID;
 + (AnnouncementSeen *)announcementSeen:(NSManagedObjectContext *)db announcementID:(int64_t)announcementID;
 + (long)unSeenAnnouncementsCount:(NSManagedObjectContext *)db;
@@ -97,9 +98,17 @@
 + (long)syncTimeOutCount:(NSManagedObjectContext *)db;
 + (long)uploadTimeOutPhotoCount:(NSManagedObjectContext *)db;
 + (long)uploadTimeOutSignatureCount:(NSManagedObjectContext *)db;
-+ (long)syncOvertimeCount:(NSManagedObjectContext *)db;
 + (BreakTypes *)breakType:(NSManagedObjectContext *)db breakTypeID:(int64_t)breakTypeID;
++ (BreakIn *)breakIn:(NSManagedObjectContext *)db timeInID:(int64_t)timeInID;
++ (BreakIn *)breakIn:(NSManagedObjectContext *)db timeInID:(int64_t)timeInID breakTypeID:(int64_t)breakTypeID;
++ (BreakIn *)breakIn:(NSManagedObjectContext *)db breakInID:(int64_t)breakInID;
++ (long)syncBreakInCount:(NSManagedObjectContext *)db;
++ (BreakOut *)breakOut:(NSManagedObjectContext *)db breakInID:(int64_t)breakInID;
++ (BreakOut *)breakOut:(NSManagedObjectContext *)db breakOutID:(int64_t)breakOutID;
++ (long)syncBreakOutCount:(NSManagedObjectContext *)db;
 + (OvertimeReasons *)overtimeReason:(NSManagedObjectContext *)db overtimeReasonID:(int64_t)overtimeReasonID;
++ (long)syncOvertimeCount:(NSManagedObjectContext *)db;
++ (long)syncTrackingCount:(NSManagedObjectContext *)db;
 
 //VISITS
 + (Photos *)photo:(NSManagedObjectContext *)db photoID:(int64_t)photoID;
@@ -128,8 +137,6 @@
 
 //FORMS
 
-+ (GPS *)gps:(NSManagedObjectContext *)db gpsID:(int64_t)gpsID;
-+ (long)syncTrackingCount:(NSManagedObjectContext *)db;
 
 + (long)syncTotalCount:(NSManagedObjectContext *)db;
 

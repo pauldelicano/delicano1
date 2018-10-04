@@ -7,9 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		470480F1215A564600CB2BA2 /* BreakViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 470480F0215A564600CB2BA2 /* BreakViewController.m */; };
 		4717DB0C21478A54006A2FF6 /* ScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4717DB0B21478A54006A2FF6 /* ScrollView.m */; };
 		4731BF3F2124555A00473261 /* LayoutConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = 4731BF3E2124555A00473261 /* LayoutConstraint.m */; };
 		47591A66211D6C2000E21A44 /* OvertimeFormViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 47591A65211D6C2000E21A44 /* OvertimeFormViewController.m */; };
+		477180DC2158945800F0085D /* ListDialogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 477180DB2158945700F0085D /* ListDialogViewController.m */; };
 		47A057EE215490D2003C9EFE /* Sqlite.m in Sources */ = {isa = PBXBuildFile; fileRef = 47A057ED215490D2003C9EFE /* Sqlite.m */; };
 		47AC039D21180538002CEFA8 /* Color.m in Sources */ = {isa = PBXBuildFile; fileRef = 47AC039C21180538002CEFA8 /* Color.m */; };
 		47B6382621463171009914F2 /* CircularProgressBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 47B6382521463171009914F2 /* CircularProgressBar.m */; };
@@ -91,16 +93,18 @@
 		14840DEEFCDCCE914EDDC146 /* Pods-tarkie.tarkie debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tarkie.tarkie debug.xcconfig"; path = "Pods/Target Support Files/Pods-tarkie/Pods-tarkie.tarkie debug.xcconfig"; sourceTree = "<group>"; };
 		28CDBEA7A8ED9A48F91A5338 /* Pods-tarkie.sevie release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tarkie.sevie release.xcconfig"; path = "Pods/Target Support Files/Pods-tarkie/Pods-tarkie.sevie release.xcconfig"; sourceTree = "<group>"; };
 		3D576833A30E7C71E3C393D9 /* Pods-tarkie.timsie debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tarkie.timsie debug.xcconfig"; path = "Pods/Target Support Files/Pods-tarkie/Pods-tarkie.timsie debug.xcconfig"; sourceTree = "<group>"; };
+		470480EF215A564600CB2BA2 /* BreakViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BreakViewController.h; sourceTree = "<group>"; };
+		470480F0215A564600CB2BA2 /* BreakViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BreakViewController.m; sourceTree = "<group>"; };
 		4717DB0A21478A54006A2FF6 /* ScrollView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScrollView.h; sourceTree = "<group>"; };
 		4717DB0B21478A54006A2FF6 /* ScrollView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ScrollView.m; sourceTree = "<group>"; };
 		4731BF3D2124555A00473261 /* LayoutConstraint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LayoutConstraint.h; sourceTree = "<group>"; };
 		4731BF3E2124555A00473261 /* LayoutConstraint.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LayoutConstraint.m; sourceTree = "<group>"; };
 		47591A64211D6C2000E21A44 /* OvertimeFormViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OvertimeFormViewController.h; sourceTree = "<group>"; };
 		47591A65211D6C2000E21A44 /* OvertimeFormViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OvertimeFormViewController.m; sourceTree = "<group>"; };
-		478C8CD3211979EA00B5BBF9 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Main.strings; sourceTree = "<group>"; };
+		477180DA2158945700F0085D /* ListDialogViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ListDialogViewController.h; sourceTree = "<group>"; };
+		477180DB2158945700F0085D /* ListDialogViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ListDialogViewController.m; sourceTree = "<group>"; };
 		47A057EC215490D2003C9EFE /* Sqlite.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Sqlite.h; sourceTree = "<group>"; };
 		47A057ED215490D2003C9EFE /* Sqlite.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Sqlite.m; sourceTree = "<group>"; };
-		47A057EF2154E6B9003C9EFE /* Sevie-Debug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Sevie-Debug.entitlements"; sourceTree = "<group>"; };
 		47AC039B21180538002CEFA8 /* Color.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Color.h; sourceTree = "<group>"; };
 		47AC039C21180538002CEFA8 /* Color.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Color.m; sourceTree = "<group>"; };
 		47B6382421463171009914F2 /* CircularProgressBar.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CircularProgressBar.h; sourceTree = "<group>"; };
@@ -204,8 +208,6 @@
 		DA823454208DB3EE00F8F8B4 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		DA88308420BE5305003C4D4E /* CameraViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CameraViewController.h; sourceTree = "<group>"; };
 		DA88308520BE5305003C4D4E /* CameraViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CameraViewController.m; sourceTree = "<group>"; };
-		DA8A5C7620E09CEC00C7BE6E /* Timsie.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Timsie.entitlements; sourceTree = "<group>"; };
-		DA8A5C7720E09D3100C7BE6E /* Sevie.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Sevie.entitlements; sourceTree = "<group>"; };
 		DA8A5C7820E0DD3F00C7BE6E /* Announcement.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Announcement.m4a; sourceTree = "<group>"; };
 		DA9D206F20BFA7F000E13E83 /* DropDownDialogViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DropDownDialogViewController.h; sourceTree = "<group>"; };
 		DA9D207020BFA7F000E13E83 /* DropDownDialogViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DropDownDialogViewController.m; sourceTree = "<group>"; };
@@ -355,9 +357,6 @@
 		DA1532C91FCE9A80003FD977 /* tarkie */ = {
 			isa = PBXGroup;
 			children = (
-				47A057EF2154E6B9003C9EFE /* Sevie-Debug.entitlements */,
-				DA8A5C7720E09D3100C7BE6E /* Sevie.entitlements */,
-				DA8A5C7620E09CEC00C7BE6E /* Timsie.entitlements */,
 				DA1532D81FCE9A80003FD977 /* Info.plist */,
 				DAE2684820627E13004F7EF8 /* DataModel.xcdatamodeld */,
 				DA1532D31FCE9A80003FD977 /* Assets.xcassets */,
@@ -430,6 +429,8 @@
 				DA9D207020BFA7F000E13E83 /* DropDownDialogViewController.m */,
 				DA51325A20C56C5700C6C0FE /* NoGPSDialogViewController.h */,
 				DA51325B20C56C5700C6C0FE /* NoGPSDialogViewController.m */,
+				477180DA2158945700F0085D /* ListDialogViewController.h */,
+				477180DB2158945700F0085D /* ListDialogViewController.m */,
 			);
 			path = dialog;
 			sourceTree = "<group>";
@@ -537,6 +538,8 @@
 				DA30067720D0EE040082DA34 /* AttendanceSummaryViewController.m */,
 				DA30067920D0EE200082DA34 /* AddSignatureViewController.h */,
 				DA30067A20D0EE200082DA34 /* AddSignatureViewController.m */,
+				470480EF215A564600CB2BA2 /* BreakViewController.h */,
+				470480F0215A564600CB2BA2 /* BreakViewController.m */,
 				47591A64211D6C2000E21A44 /* OvertimeFormViewController.h */,
 				47591A65211D6C2000E21A44 /* OvertimeFormViewController.m */,
 			);
@@ -618,7 +621,7 @@
 								enabled = 1;
 							};
 							com.apple.Push = {
-								enabled = 1;
+								enabled = 0;
 							};
 						};
 					};
@@ -716,9 +719,11 @@
 				DA0B7CF0203A89F400844221 /* Get.m in Sources */,
 				DAC24C26209195A800CCCAD6 /* EditStoreContactViewController.m in Sources */,
 				DA7DA8201FDF7E6400EA2358 /* ExpenseViewController.m in Sources */,
+				477180DC2158945800F0085D /* ListDialogViewController.m in Sources */,
 				DAF95B642096E68B000F1203 /* TextField.m in Sources */,
 				DA512D0D2058FB67008414C9 /* DateBarCollectionView.m in Sources */,
 				DA6E406620BD921300EB8BCA /* PhotoBarItemCollectionViewCell.m in Sources */,
+				470480F1215A564600CB2BA2 /* BreakViewController.m in Sources */,
 				DA6FE70820441E7F00BFC7A7 /* DrawerItemTableViewCell.m in Sources */,
 				DA9D207120BFA7F000E13E83 /* DropDownDialogViewController.m in Sources */,
 				DA628599209AAA3800B72A71 /* StoreContactsHeaderTableViewCell.m in Sources */,
@@ -769,7 +774,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				DA1532D11FCE9A80003FD977 /* Base */,
-				478C8CD3211979EA00B5BBF9 /* en */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -840,7 +844,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon$(PRODUCT_BUNDLE_IDENTIFIER_SUFFIX)";
 				BUILD_TYPE = DEBUG;
-				CODE_SIGN_ENTITLEMENTS = "tarkie/Sevie-Debug.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = E26F49V7U6;
 				FLAVOR = TARKIE;
@@ -917,7 +920,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon$(PRODUCT_BUNDLE_IDENTIFIER_SUFFIX)";
 				BUILD_TYPE = RELEASE;
-				CODE_SIGN_ENTITLEMENTS = "tarkie/Sevie-Debug.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = E26F49V7U6;
 				FLAVOR = TARKIE;
@@ -1049,7 +1051,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon$(PRODUCT_BUNDLE_IDENTIFIER_SUFFIX)";
 				BUILD_TYPE = DEBUG;
-				CODE_SIGN_ENTITLEMENTS = "tarkie/Sevie-Debug.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = E26F49V7U6;
 				FLAVOR = SEVIE;
@@ -1075,7 +1076,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon$(PRODUCT_BUNDLE_IDENTIFIER_SUFFIX)";
 				BUILD_TYPE = RELEASE;
-				CODE_SIGN_ENTITLEMENTS = "tarkie/Sevie-Debug.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = E26F49V7U6;
 				FLAVOR = SEVIE;
@@ -1156,7 +1156,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon$(PRODUCT_BUNDLE_IDENTIFIER_SUFFIX)";
 				BUILD_TYPE = DEBUG;
-				CODE_SIGN_ENTITLEMENTS = "tarkie/Sevie-Debug.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = E26F49V7U6;
 				FLAVOR = TIMSIE;
@@ -1233,7 +1232,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon$(PRODUCT_BUNDLE_IDENTIFIER_SUFFIX)";
 				BUILD_TYPE = RELEASE;
-				CODE_SIGN_ENTITLEMENTS = "tarkie/Sevie-Debug.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = E26F49V7U6;
 				FLAVOR = TIMSIE;

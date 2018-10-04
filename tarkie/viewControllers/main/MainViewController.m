@@ -44,6 +44,7 @@
 
 static MessageDialogViewController *vcSystemMessage, *vcMessage;
 static LoadingDialogViewController *vcLoading;
+static ListDialogViewController *vcList;
 static NSMutableArray<NSString *> *notificationRequestIdentifiers;
 
 - (void)viewDidLoad {
@@ -107,6 +108,8 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
         [self applicationDidBecomeActive];
         [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(willPresentNotification:) name:@"UserNotificationCenterWillPresentNotification" object:nil];
         [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(didReceiveNotificationResponse:) name:@"UserNotificationCenterDidReceiveNotificationResponse" object:nil];
+        [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(systemClockDidChange) name:NSSystemClockDidChangeNotification object:nil];
+        [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(systemClockDidChange) name:NSSystemTimeZoneDidChangeNotification object:nil];
         [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(didUpdateLocations) name:@"UserNotificationCenterDidUpdateLocations" object:nil];
     }
     [self updateUnSeenAnnouncementsCount];
@@ -118,6 +121,8 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
     [super viewWillDisappear:animated];
     [NSNotificationCenter.defaultCenter removeObserver:self name:@"UserNotificationCenterWillPresentNotification" object:nil];
     [NSNotificationCenter.defaultCenter removeObserver:self name:@"UserNotificationCenterDidReceiveNotificationResponse" object:nil];
+    [NSNotificationCenter.defaultCenter removeObserver:self name:NSSystemClockDidChangeNotification object:nil];
+    [NSNotificationCenter.defaultCenter removeObserver:self name:NSSystemTimeZoneDidChangeNotification object:nil];
     [NSNotificationCenter.defaultCenter removeObserver:self name:@"UserNotificationCenterDidUpdateLocations" object:nil];
     [NSNotificationCenter.defaultCenter removeObserver:self name:UIApplicationDidBecomeActiveNotification object:nil];
 }
@@ -232,22 +237,21 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
 
     [self.app.userNotificationCenter removePendingNotificationRequestsWithIdentifiers:notificationRequestIdentifiers];
     [notificationRequestIdentifiers removeAllObjects];
-    NSArray<Announcements *> *announcements = [Load announcements:self.app.db searchFilter:nil isScheduled:NO];
-    for(int x = 0; x < announcements.count; x++) {
+    for(Announcements *announcement in [Load announcements:self.app.db searchFilter:nil isScheduled:NO]) {
         NSMutableDictionary *userInfo = NSMutableDictionary.alloc.init;
         [userInfo setObject:@"ANNOUNCEMENT" forKey:@"NOTIFICATION_TYPE"];
-        [userInfo setObject:[NSString stringWithFormat:@"%lld", announcements[x].announcementID] forKey:@"NOTIFICATION_ID"];
+        [userInfo setObject:[NSString stringWithFormat:@"%lld", announcement.announcementID] forKey:@"NOTIFICATION_ID"];
         UNMutableNotificationContent *objNotificationContent = UNMutableNotificationContent.alloc.init;
-        objNotificationContent.title = announcements[x].subject;
-        objNotificationContent.body = announcements[x].message;
+        objNotificationContent.title = announcement.subject;
+        objNotificationContent.body = announcement.message;
         objNotificationContent.sound = [UNNotificationSound soundNamed:@"Announcement.m4a"];
         objNotificationContent.userInfo = userInfo;
-        [self.app.userNotificationCenter addNotificationRequest:[UNNotificationRequest requestWithIdentifier:[userInfo objectForKey:@"NOTIFICATION_ID"] content:objNotificationContent trigger:[UNTimeIntervalNotificationTrigger triggerWithTimeInterval:[[Time getDateFromString:[NSString stringWithFormat:@"%@ %@", announcements[x].scheduledDate, announcements[x].scheduledTime]] timeIntervalSinceNow] repeats:NO]] withCompletionHandler:^(NSError * _Nullable error) {
+        [self.app.userNotificationCenter addNotificationRequest:[UNNotificationRequest requestWithIdentifier:[userInfo objectForKey:@"NOTIFICATION_ID"] content:objNotificationContent trigger:[UNTimeIntervalNotificationTrigger triggerWithTimeInterval:[[Time getDateFromString:[NSString stringWithFormat:@"%@ %@", announcement.scheduledDate, announcement.scheduledTime]] timeIntervalSinceNow] repeats:NO]] withCompletionHandler:^(NSError * _Nullable error) {
             if(error) {
                 NSLog(@"error: main addNotificationRequest - %@", error.localizedDescription);
                 return;
             }
-            [notificationRequestIdentifiers addObject:[userInfo objectForKey:@"NOTIFICATION_ID"]];
+            [notificationRequestIdentifiers addObject:[NSString stringWithFormat:@"%@_%@", [userInfo objectForKey:@"NOTIFICATION_TYPE"], [userInfo objectForKey:@"NOTIFICATION_ID"]]];
         }];
     }
 }
@@ -265,9 +269,20 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
         name = self.app.conventionTimeOut;
     }
     [self.vcDrawer.menus[MENU_TIME_IN_OUT - 1] setValue:name forKey:@"name"];
+    [self.vcDrawer.menus[MENU_STORES - 1] setValue:self.app.conventionStores forKey:@"name"];
     [self.vcDrawer onRefresh];
     TimeIn *timeIn = [Get timeIn:self.app.db];
-    if(timeIn != nil && timeIn.isOvertime) {
+    if(timeIn == nil) {
+        return;
+    }
+    if(timeIn.isBreak) {
+        BreakViewController *vcBreak = [self.storyboard instantiateViewControllerWithIdentifier:@"vcBreak"];
+        vcBreak.delegate = self;
+        vcBreak.breakIn = [Get breakIn:self.app.db timeInID:timeIn.timeInID];
+        [View addChildViewController:self childViewController:vcBreak animated:YES];
+        return;
+    }
+    if(timeIn.isOvertime) {
         Schedules *schedule = [Get schedule:self.app.db scheduleID:timeIn.scheduleID];
         TimeOut *timeOut = [Get timeOut:self.app.db timeInID:timeIn.timeInID];
         NSDate *scheduleTimeIn = [Time getDateFromString:[NSString stringWithFormat:@"%@ %@", schedule.scheduleDate, schedule.timeIn]];
@@ -288,6 +303,7 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
         vcOvertimeForm.scheduleHours = scheduleHours;
         vcOvertimeForm.workHours = workHours;
         [self.navigationController pushViewController:vcOvertimeForm animated:YES];
+        return;
     }
 }
 
@@ -304,7 +320,15 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
 }
 
 - (BOOL)applicationDidBecomeActive {
-    [View removeView:vcSystemMessage.view animated:YES];
+    [View removeChildViewController:vcSystemMessage animated:YES];
+    int batteryLevel = (int)floor(UIDevice.currentDevice.batteryLevel * 100);
+    if(batteryLevel < 10) {
+        Alerts *alert = [Get alert:self.app.dbAlerts alertTypeID:ALERT_TYPE_LOW_BATTERY];
+        if(alert == nil) {
+            NSLog(@"alert: ALERT_TYPE_LOW_BATTERY");
+            [Update alertSave:self.app.dbAlerts alertTypeID:ALERT_TYPE_LOW_BATTERY gpsID:[Update gpsSave:self.app.dbTracking location:self.app.location] value:[NSString stringWithFormat:@"%d", batteryLevel]];
+        }
+    }
     if(self.isLoading) {
         return NO;
     }
@@ -322,10 +346,10 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
         }
     }
     if(self.isTimeIn) {
+        [self.app startUpdatingLocation];
         if([self gpsRequest]) {
             return NO;
         }
-        [self.app startUpdatingLocation];
     }
     else {
         [self.app stopUpdatingLocation];
@@ -350,6 +374,9 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
     if([[userInfo objectForKey:@"NOTIFICATION_TYPE"] isEqualToString:@"ANNOUNCEMENT"]) {
         [self updateUnSeenAnnouncementsCount];
     }
+    if([[userInfo objectForKey:@"NOTIFICATION_TYPE"] isEqualToString:@"BREAK"]) {
+        
+    }
 }
 
 - (void)didReceiveNotificationResponse:(NSNotification *)notification {
@@ -358,6 +385,26 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
         AnnouncementDetailsViewController *vcAnnouncementDetails = [self.storyboard instantiateViewControllerWithIdentifier:@"vcAnnouncementDetails"];
         vcAnnouncementDetails.announcement = [Get announcement:self.app.db announcementID:[[userInfo objectForKey:@"NOTIFICATION_ID"] intValue]];
         [self.navigationController pushViewController:vcAnnouncementDetails animated:YES];
+    }
+    if([[userInfo objectForKey:@"NOTIFICATION_TYPE"] isEqualToString:@"BREAK"]) {
+        
+    }
+}
+
+- (void)systemClockDidChange {
+    TimeSecurity *timeSecurity = [Get timeSecurity:self.app.db];
+    double interval = fabs([[[Time getDateFromString:[NSString stringWithFormat:@"%@ %@", timeSecurity.serverDate, timeSecurity.serverTime]] dateByAddingTimeInterval:fabs(timeSecurity.upTime - [Time getUptime])] timeIntervalSinceNow]);
+    if(interval > 60) {
+        if(!timeSecurity.didChange) {
+            timeSecurity.didChange = YES;
+            [Update save:self.app.db];
+        }
+    }
+    else {
+        if(timeSecurity.didChange) {
+            timeSecurity.didChange = NO;
+            [Update save:self.app.db];
+        }
     }
 }
 
@@ -383,18 +430,18 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
     vcMessage.message = [NSString stringWithFormat:@"You have %ld unsaved transaction. Do you want to send it to the server now?", self.syncDataCount];
     vcMessage.negativeTitle = @"Cancel";
     vcMessage.negativeTarget = ^{
-        [View removeView:vcMessage.view animated:YES];
+        [View removeChildViewController:vcMessage animated:YES];
     };
     vcMessage.positiveTitle = @"Yes";
     vcMessage.positiveTarget = ^{
-        [View removeView:vcMessage.view animated:YES];
+        [View removeChildViewController:vcMessage animated:YES];
         vcLoading = [self.storyboard instantiateViewControllerWithIdentifier:@"vcLoading"];
         vcLoading.delegate = self;
         vcLoading.action = LOADING_ACTION_SYNC_DATA;
-        [View addSubview:self.view subview:vcLoading.view animated:YES];
+        [View addChildViewController:self childViewController:vcLoading animated:YES];
         self.isLoading = YES;
     };
-    [View addSubview:self.view subview:vcMessage.view animated:YES];
+    [View addChildViewController:self childViewController:vcMessage animated:YES];
 }
 
 - (IBAction)visitsDate:(id)sender {
@@ -453,7 +500,8 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.pvcMain setViewControllers:@[self.viewControllers[self.currentPage]] direction:UIPageViewControllerNavigationDirectionForward animated:NO completion:nil];
             self.vNavBarButtonsHome.hidden = ![self.viewControllers[self.currentPage] isKindOfClass:HomeViewController.class];
-            self.vNavBarButtonsVisits.hidden = ![self.viewControllers[self.currentPage] isKindOfClass:VisitsViewController.class];
+//            self.vNavBarButtonsVisits.hidden = ![self.viewControllers[self.currentPage] isKindOfClass:VisitsViewController.class];
+            self.vNavBarButtonsVisits.hidden = YES;
             self.vNavBarButtonsExpense.hidden = ![self.viewControllers[self.currentPage] isKindOfClass:ExpenseViewController.class];
             self.vNavBarButtonsInventory.hidden = ![self.viewControllers[self.currentPage] isKindOfClass:InventoryViewController.class];
             self.vNavBarButtonsForms.hidden = ![self.viewControllers[self.currentPage] isKindOfClass:FormsViewController.class];
@@ -503,37 +551,53 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
                     vcMessage.attributedMessage = attributedText;
                     vcMessage.negativeTitle = @"Cancel";
                     vcMessage.negativeTarget = ^{
-                        [View removeView:vcMessage.view animated:YES];
+                        [View removeChildViewController:vcMessage animated:YES];
                     };
                     vcMessage.positiveTitle = @"View";
                     vcMessage.positiveTarget = ^{
-                        [View removeView:vcMessage.view animated:YES];
+                        [View removeChildViewController:vcMessage animated:YES];
                         VisitDetailsViewController *vcVisitDetails = [self.storyboard instantiateViewControllerWithIdentifier:@"vcVisitDetails"];
                         vcVisitDetails.main = self;
                         vcVisitDetails.visit = visit;
                         [self.navigationController pushViewController:vcVisitDetails animated:YES];
                     };
-                    [View addSubview:self.view subview:vcMessage.view animated:YES];
+                    [View addChildViewController:self childViewController:vcMessage animated:YES];
                 }
                 else {
                     vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
-                    vcMessage.subject = @"Confirm Time Out";
-                    vcMessage.message = @"Do you want to time out?";
+                    vcMessage.subject = [NSString stringWithFormat:@"Confirm %@", self.app.conventionTimeOut];
+                    vcMessage.message = [NSString stringWithFormat:@"Do you want to %@", self.app.conventionTimeOut.lowercaseString];
                     vcMessage.negativeTitle = @"Cancel";
                     vcMessage.negativeTarget = ^{
-                        [View removeView:vcMessage.view animated:YES];
+                        [View removeChildViewController:vcMessage animated:YES];
                     };
                     vcMessage.positiveTitle = @"Yes";
                     vcMessage.positiveTarget = ^{
-                        [View removeView:vcMessage.view animated:YES];
+                        [View removeChildViewController:vcMessage animated:YES];
                         [self timeOut];
                     };
-                    [View addSubview:self.view subview:vcMessage.view animated:YES];
+                    [View addChildViewController:self childViewController:vcMessage animated:YES];
                 }
             }
             break;
         }
         case MENU_BREAKS: {
+            if(!self.isTimeIn) {
+                vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
+                vcMessage.subject = [NSString stringWithFormat:@"%@ Required", self.app.conventionTimeIn];
+                vcMessage.message = [NSString stringWithFormat:@"Please %@ first before taking your break.", self.app.conventionTimeIn.lowercaseString];
+                vcMessage.positiveTitle = @"OK";
+                vcMessage.positiveTarget = ^{
+                    [View removeChildViewController:vcMessage animated:YES];
+                };
+                [View addChildViewController:self childViewController:vcMessage animated:YES];
+                return;
+            }
+            vcList = [self.storyboard instantiateViewControllerWithIdentifier:@"vcList"];
+            vcList.delegate = self;
+            vcList.type = LIST_TYPE_BREAK;
+            vcList.items = [Load breakTypes:self.app.db];
+            [View addChildViewController:self childViewController:vcList animated:YES];
             break;
         }
         case MENU_STORES: {
@@ -548,18 +612,18 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
             vcMessage.message = @"Do you want to download the latest master file?";
             vcMessage.negativeTitle = @"Cancel";
             vcMessage.negativeTarget = ^{
-                [View removeView:vcMessage.view animated:YES];
+                [View removeChildViewController:vcMessage animated:YES];
             };
             vcMessage.positiveTitle = @"Yes";
             vcMessage.positiveTarget = ^{
-                [View removeView:vcMessage.view animated:YES];
+                [View removeChildViewController:vcMessage animated:YES];
                 vcLoading = [self.storyboard instantiateViewControllerWithIdentifier:@"vcLoading"];
                 vcLoading.delegate = self;
                 vcLoading.action = LOADING_ACTION_UPDATE_MASTER_FILE;
-                [View addSubview:self.view subview:vcLoading.view animated:YES];
+                [View addChildViewController:self childViewController:vcLoading animated:YES];
                 self.isLoading = YES;
             };
-            [View addSubview:self.view subview:vcMessage.view animated:YES];
+            [View addChildViewController:self childViewController:vcMessage animated:YES];
             break;
         }
         case MENU_SEND_BACKUP_DATA: {
@@ -568,39 +632,41 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
             vcMessage.message = @"Do you want to send backup data?";
             vcMessage.negativeTitle = @"Cancel";
             vcMessage.negativeTarget = ^{
-                [View removeView:vcMessage.view animated:YES];
+                [View removeChildViewController:vcMessage animated:YES];
             };
             vcMessage.positiveTitle = @"Yes";
             vcMessage.positiveTarget = ^{
-                [View removeView:vcMessage.view animated:YES];
+                [View removeChildViewController:vcMessage animated:YES];
                 vcLoading = [self.storyboard instantiateViewControllerWithIdentifier:@"vcLoading"];
                 vcLoading.delegate = self;
                 vcLoading.action = LOADING_ACTION_SEND_BACKUP_DATA;
-                [View addSubview:self.view subview:vcLoading.view animated:YES];
+                [View addChildViewController:self childViewController:vcLoading animated:YES];
                 self.isLoading = YES;
             };
-            [View addSubview:self.view subview:vcMessage.view animated:YES];
+            [View addChildViewController:self childViewController:vcMessage animated:YES];
             break;
         }
         case MENU_BACKUP_DATA: {
+            vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
+            vcMessage.subject = @"Backup Data";
+            vcMessage.message = @"Backup your data to your storage. This data will be restored once you clear data/uninstall your app. Are you sure you want to backup your data?";
+            vcMessage.negativeTitle = @"Cancel";
+            vcMessage.negativeTarget = ^{
+                [View removeChildViewController:vcMessage animated:YES];
+            };
+            vcMessage.positiveTitle = @"Yes";
+            vcMessage.positiveTarget = ^{
+                [View removeChildViewController:vcMessage animated:YES];
+            };
+            [View addChildViewController:self childViewController:vcMessage animated:YES];
+            break;
+        }
+        case MENU_PATCH_DATA: {
             vcLoading = [self.storyboard instantiateViewControllerWithIdentifier:@"vcLoading"];
             vcLoading.delegate = self;
             vcLoading.action = LOADING_ACTION_GET_PATCH;
-            [View addSubview:self.view subview:vcLoading.view animated:YES];
+            [View addChildViewController:self childViewController:vcLoading animated:YES];
             self.isLoading = YES;
-            return;
-//            vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
-//            vcMessage.subject = @"Backup Data";
-//            vcMessage.message = @"Backup your data to your storage. This data will be restored once you clear data/uninstall your app. Are you sure you want to backup your data?";
-//            vcMessage.negativeTitle = @"Cancel";
-//            vcMessage.negativeTarget = ^{
-//                [View removeView:vcMessage.view animated:YES];
-//            };
-//            vcMessage.positiveTitle = @"Yes";
-//            vcMessage.positiveTarget = ^{
-//                [View removeView:vcMessage.view animated:YES];
-//            };
-//            [View addSubview:self.view subview:vcMessage.view animated:YES];
             break;
         }
         case MENU_ABOUT: {
@@ -614,9 +680,9 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
                 vcMessage.message = [NSString stringWithFormat:@"Sorry you cannnot Logout yet. Please %@ first to proceed.", self.app.conventionTimeOut];
                 vcMessage.positiveTitle = @"OK";
                 vcMessage.positiveTarget = ^{
-                    [View removeView:vcMessage.view animated:YES];
+                    [View removeChildViewController:vcMessage animated:YES];
                 };
-                [View addSubview:self.view subview:vcMessage.view animated:YES];
+                [View addChildViewController:self childViewController:vcMessage animated:YES];
                 return;
             }
             vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
@@ -624,15 +690,17 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
             vcMessage.message = @"Are you sure you want to logout?";
             vcMessage.negativeTitle = @"Cancel";
             vcMessage.negativeTarget = ^{
-                [View removeView:vcMessage.view animated:YES];
+                [View removeChildViewController:vcMessage animated:YES];
             };
             vcMessage.positiveTitle = @"Yes";
             vcMessage.positiveTarget = ^{
-                [View removeView:vcMessage.view animated:YES];
+                [View removeChildViewController:vcMessage animated:YES];
+                NSLog(@"alert: ALERT_TYPE_LOGOUT");
+                [Update alertSave:self.app.dbAlerts alertTypeID:ALERT_TYPE_LOGOUT gpsID:[Update gpsSave:self.app.dbTracking location:self.app.location] value:nil];
                 [Update usersLogout:self.app.db];
                 [self.navigationController popViewControllerAnimated:NO];
             };
-            [View addSubview:self.view subview:vcMessage.view animated:YES];
+            [View addChildViewController:self childViewController:vcMessage animated:YES];
             break;
         }
     }
@@ -656,11 +724,11 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
                 vcMessage.message = @"Failed to validate date and time.";
                 vcMessage.positiveTitle = @"OK";
                 vcMessage.positiveTarget = ^{
-                    [View removeView:vcMessage.view animated:YES];
+                    [View removeChildViewController:vcMessage animated:YES];
                     self.isLoading = NO;
                     [self applicationDidBecomeActive];
                 };
-                [View addSubview:self.view subview:vcMessage.view animated:NO];
+                [View addChildViewController:self childViewController:vcMessage animated:NO];
                 break;
             }
             self.isLoading = NO;
@@ -674,11 +742,11 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
                 vcMessage.message = [result isEqualToString:@"ok"] ? @"Update master file successful." : @"Failed to update master file.";
                 vcMessage.positiveTitle = @"OK";
                 vcMessage.positiveTarget = ^{
-                    [View removeView:vcMessage.view animated:YES];
+                    [View removeChildViewController:vcMessage animated:YES];
                     self.isLoading = NO;
                     [self applicationDidBecomeActive];
                 };
-                [View addSubview:self.view subview:vcMessage.view animated:NO];
+                [View addChildViewController:self childViewController:vcMessage animated:NO];
             }
             else {
                 self.isLoading = NO;
@@ -694,7 +762,7 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
                 vcLoading = [self.storyboard instantiateViewControllerWithIdentifier:@"vcLoading"];
                 vcLoading.delegate = self;
                 vcLoading.action = LOADING_ACTION_SYNC_PATCH;
-                [View addSubview:self.view subview:vcLoading.view animated:NO];
+                [View addChildViewController:self childViewController:vcLoading animated:NO];
                 self.isLoading = YES;
                 break;
             }
@@ -715,11 +783,11 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
                 vcMessage.message = [result isEqualToString:@"ok"] ? @"Sync data successful." : @"Failed to sync data.";
                 vcMessage.positiveTitle = @"OK";
                 vcMessage.positiveTarget = ^{
-                    [View removeView:vcMessage.view animated:YES];
+                    [View removeChildViewController:vcMessage animated:YES];
                     self.isLoading = NO;
                     [self applicationDidBecomeActive];
                 };
-                [View addSubview:self.view subview:vcMessage.view animated:NO];
+                [View addChildViewController:self childViewController:vcMessage animated:NO];
             }
             else {
                 self.isLoading = NO;
@@ -735,11 +803,11 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
                 vcMessage.message = [result isEqualToString:@"ok"] ? @"Send back data successful." : @"Failed to send backup data.";
                 vcMessage.positiveTitle = @"OK";
                 vcMessage.positiveTarget = ^{
-                    [View removeView:vcMessage.view animated:YES];
+                    [View removeChildViewController:vcMessage animated:YES];
                     self.isLoading = NO;
                     [self applicationDidBecomeActive];
                 };
-                [View addSubview:self.view subview:vcMessage.view animated:NO];
+                [View addChildViewController:self childViewController:vcMessage animated:NO];
             }
             else {
                 self.isLoading = NO;
@@ -802,6 +870,54 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
     }
 }
 
+- (void)onListSelect:(int)type item:(id)item {
+    switch(type) {
+        case LIST_TYPE_BREAK: {
+            BreakTypes *breakType = (BreakTypes *)item;
+            BreakIn *breakIn = [NSEntityDescription insertNewObjectForEntityForName:@"BreakIn" inManagedObjectContext:self.app.db];
+            breakIn.breakInID = [Get sequenceID:self.app.db entity:@"BreakIn" attribute:@"breakInID"] + 1;
+            breakIn.syncBatchID = self.app.syncBatchID;
+            breakIn.employeeID = self.app.employee.employeeID;
+            TimeIn *timeIn = [Get timeIn:self.app.db];
+            breakIn.timeInID = timeIn.timeInID;
+            NSDate *currentDate = NSDate.date;
+            breakIn.date = [Time getFormattedDate:DATE_FORMAT date:currentDate];
+            breakIn.time = [Time getFormattedDate:TIME_FORMAT date:currentDate];
+            breakIn.breakTypeID = breakType.breakTypeID;
+            breakIn.gpsID = [Update gpsSave:self.app.dbTracking location:self.app.location];
+            breakIn.isBreakOut = NO;
+            breakIn.isSync = NO;
+            timeIn.isBreak = YES;
+            if([Update save:self.app.db]) {
+                [self updateTimeInOut];
+            }
+            break;
+        }
+    }
+}
+
+- (void)onBreakCancel {
+    [UIApplication.sharedApplication performSelector:@selector(suspend)];
+}
+
+- (void)onBreakDone:(BreakIn *)breakIn {
+    BreakOut *breakOut = [NSEntityDescription insertNewObjectForEntityForName:@"BreakOut" inManagedObjectContext:self.app.db];
+    breakOut.breakOutID = [Get sequenceID:self.app.db entity:@"BreakOut" attribute:@"breakOutID"] + 1;
+    breakOut.syncBatchID = self.app.syncBatchID;
+    NSDate *currentDate = NSDate.date;
+    breakOut.date = [Time getFormattedDate:DATE_FORMAT date:currentDate];
+    breakOut.time = [Time getFormattedDate:TIME_FORMAT date:currentDate];
+    breakOut.breakInID = breakIn.breakInID;
+    breakOut.gpsID = [Update gpsSave:self.app.dbTracking location:self.app.location];
+    breakOut.isSync = NO;
+    breakIn.isBreakOut = YES;
+    TimeIn *timeIn = [Get timeIn:self.app.db];
+    timeIn.isBreak = NO;
+    if([Update save:self.app.db]) {
+        [self updateTimeInOut];
+    }
+}
+
 - (void)onCameraCancel:(int)action {
     switch(action) {
         case CAMERA_ACTION_TIME_IN: {
@@ -841,23 +957,33 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
 - (BOOL)timeSecurity {
     TimeSecurity *timeSecurity = [Get timeSecurity:self.app.db];
     NSDate *server = [Time getDateFromString:[NSString stringWithFormat:@"%@ %@", timeSecurity.serverDate, timeSecurity.serverTime]];
-    NSDate *newServer = [server dateByAddingTimeInterval:fabs(timeSecurity.upTime - NSProcessInfo.processInfo.systemUptime)];
+    NSDate *newServer = [server dateByAddingTimeInterval:fabs(timeSecurity.upTime - [Time getUptime])];
     double interval = fabs([newServer timeIntervalSinceNow]);
     NSLog(@"info: timeSecurity - %f sec, %@ - %@", interval, NSDate.date, newServer);
     if(timeSecurity == nil || interval > 60) {
+        if(self.isTimeIn && timeSecurity.didChange) {
+            timeSecurity.didChange = NO;
+            NSLog(@"alert: ALERT_TYPE_CHANGED_DATE_TIME");
+            [Update alertSave:self.app.dbAlerts alertTypeID:ALERT_TYPE_CHANGED_DATE_TIME gpsID:[Update gpsSave:self.app.dbTracking location:self.app.location] value:nil];
+            [self updateSyncDataCount];
+        }
         vcSystemMessage = [self.storyboard instantiateViewControllerWithIdentifier: @"vcMessage"];
         vcSystemMessage.subject = @"Time Security";
         vcSystemMessage.message = @"Device and server time do not match.";
         vcSystemMessage.positiveTitle = @"Validate";
         vcSystemMessage.positiveTarget = ^{
-            [View removeView:vcSystemMessage.view animated:YES];
+            [View removeChildViewController:vcSystemMessage animated:YES];
             vcLoading = [self.storyboard instantiateViewControllerWithIdentifier:@"vcLoading"];
             vcLoading.delegate = self;
             vcLoading.action = LOADING_ACTION_TIME_SECURITY;
-            [View addSubview:self.view subview:vcLoading.view animated:YES];
+            [View addChildViewController:self childViewController:vcLoading animated:YES];
             self.isLoading = YES;
         };
-        [View addSubview:self.app.window subview:vcSystemMessage.view animated:YES];
+        UIViewController *rootViewController = self.app.window.rootViewController;
+        if([rootViewController isKindOfClass:UINavigationController.class]) {
+            rootViewController = [(UINavigationController *)rootViewController topViewController];
+        }
+        [View addChildViewController:rootViewController childViewController:vcSystemMessage animated:YES];
         return YES;
     }
     return NO;
@@ -885,10 +1011,13 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
         };
         vcSystemMessage.positiveTitle = @"OK";
         vcSystemMessage.positiveTarget = ^{
-//            [UIApplication.sharedApplication openURL:[NSURL URLWithString:@"App-Prefs:root=Privacy&path=LOCATION"] options:@{} completionHandler:nil];
             [UIApplication.sharedApplication openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:@{} completionHandler:nil];
         };
-        [View addSubview:self.app.window subview:vcSystemMessage.view animated:YES];
+        UIViewController *rootViewController = self.app.window.rootViewController;
+        if([rootViewController isKindOfClass:UINavigationController.class]) {
+            rootViewController = [(UINavigationController *)rootViewController topViewController];
+        }
+        [View addChildViewController:rootViewController childViewController:vcSystemMessage animated:YES];
         self.isGPSRequest = YES;
         return YES;
     }
@@ -914,7 +1043,11 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
         vcSystemMessage.positiveTarget = ^{
             [UIApplication.sharedApplication openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:@{} completionHandler:nil];
         };
-        [View addSubview:self.app.window subview:vcSystemMessage.view animated:YES];
+        UIViewController *rootViewController = self.app.window.rootViewController;
+        if([rootViewController isKindOfClass:UINavigationController.class]) {
+            rootViewController = [(UINavigationController *)rootViewController topViewController];
+        }
+        [View addChildViewController:rootViewController childViewController:vcSystemMessage animated:YES];
         self.isCameraRequest = YES;
         return YES;
     }
@@ -929,9 +1062,9 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
         vcMessage.message = [NSString stringWithFormat:@"You've already %@, you're not allowed to %@ anymore.", self.app.conventionTimeIn, self.app.conventionTimeIn];
         vcMessage.positiveTitle = @"OK";
         vcMessage.positiveTarget = ^{
-            [View removeView:vcMessage.view animated:YES];
+            [View removeChildViewController:vcMessage animated:YES];
         };
-        [View addSubview:self.view subview:vcMessage.view animated:YES];
+        [View addChildViewController:self childViewController:vcMessage animated:YES];
         return;
     }
     if([self gpsRequest]) {
@@ -941,7 +1074,7 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
     if(self.app.location == nil && !self.proceedWithoutGPS) {
         NoGPSDialogViewController *vcNoGPS = [self.storyboard instantiateViewControllerWithIdentifier: @"vcNoGPS"];
         vcNoGPS.delegate = self;
-        [View addSubview:self.view subview:vcNoGPS.view animated:YES];
+        [View addChildViewController:self childViewController:vcNoGPS animated:YES];
         [self.app startUpdatingLocation];
         return;
     }
@@ -951,8 +1084,7 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
         vcDropDown.parent = self;
         vcDropDown.type = DROP_DOWN_TYPE_STORE;
         vcDropDown.action = DROP_DOWN_ACTION_TIME_IN;
-        [View addSubview:self.view subview:vcDropDown.view animated:YES];
-        [self addChildViewController:vcDropDown];
+        [View addChildViewController:self childViewController:vcDropDown animated:YES];
         return;
     }
     if(self.app.settingAttendanceSchedule) {
@@ -964,8 +1096,7 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
             vcDropDown.type = DROP_DOWN_TYPE_SCHEDULE;
             vcDropDown.action = DROP_DOWN_ACTION_TIME_IN;
             vcDropDown.items = [Load scheduleTimes:self.app.db];
-            [View addSubview:self.view subview:vcDropDown.view animated:YES];
-            [self addChildViewController:vcDropDown];
+            [View addChildViewController:self childViewController:vcDropDown animated:YES];
             return;
         }
     }
@@ -998,14 +1129,7 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
     }
     NSString *date = [Time getFormattedDate:DATE_FORMAT date:self.currentDate];
     NSString *time = [Time getFormattedDate:TIME_FORMAT date:self.currentDate];
-    Sequences *sequence = [Get sequence:self.app.db];
     TimeIn *timeIn = [NSEntityDescription insertNewObjectForEntityForName:@"TimeIn" inManagedObjectContext:self.app.db];
-    if(!self.proceedWithoutGPS && self.app.location != nil) {
-        int64_t gpsID = [Update gpsSave:self.app.db location:self.app.location];
-        if(gpsID != 0) {
-            timeIn.gpsID = gpsID;
-        }
-    }
     if(self.app.settingAttendanceStore) {
         timeIn.storeID = self.store.storeID;
     }
@@ -1013,8 +1137,7 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
         Schedules *schedule = [Get schedule:self.app.db webScheduleID:0 scheduleDate:date];
         if(schedule == nil) {
             schedule = [NSEntityDescription insertNewObjectForEntityForName:@"Schedules" inManagedObjectContext:self.app.db];
-            sequence.schedules += 1;
-            schedule.scheduleID = sequence.schedules;
+            schedule.scheduleID = [Get sequenceID:self.app.db entity:@"Schedules" attribute:@"scheduleID"] + 1;
             schedule.syncBatchID = self.app.syncBatchID;
             schedule.employeeID = self.app.employee.employeeID;
             schedule.date = date;
@@ -1031,19 +1154,22 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
     if(self.app.settingAttendanceTimeInPhoto) {
         timeIn.photo = self.photoFilename;
     }
-    sequence.timeIn += 1;
-    timeIn.timeInID = sequence.timeIn;
+    timeIn.timeInID = [Get sequenceID:self.app.db entity:@"TimeIn" attribute:@"timeInID"] + 1;
     timeIn.syncBatchID = self.app.syncBatchID;
     timeIn.employeeID = self.app.employee.employeeID;
     timeIn.date = date;
     timeIn.time = time;
-    timeIn.batteryLevel = [NSString stringWithFormat:@"%f", UIDevice.currentDevice.batteryLevel];
+    timeIn.gpsID = [Update gpsSave:self.app.dbTracking location:self.app.location];
+    timeIn.batteryLevel = [NSString stringWithFormat:@"%d", (int)floor(UIDevice.currentDevice.batteryLevel * 100)];
     timeIn.isSync = NO;
     timeIn.isPhotoUpload = NO;
     timeIn.isPhotoExists = NO;
     timeIn.isPhotoDelete = NO;
+    timeIn.isBreak = NO;
     timeIn.isOvertime = NO;
     if([Update save:self.app.db]) {
+        NSLog(@"alert: ALERT_TYPE_TIME_IN_BATTERY_LEVEL");
+        [Update alertSave:self.app.dbAlerts alertTypeID:ALERT_TYPE_TIME_IN_BATTERY_LEVEL gpsID:timeIn.gpsID value:timeIn.batteryLevel];
         [self cancelTimeIn];
         [self updateTimeInOut];
         [self.app startUpdatingLocation];
@@ -1074,8 +1200,7 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
         vcDropDown.parent = self;
         vcDropDown.type = DROP_DOWN_TYPE_STORE;
         vcDropDown.action = DROP_DOWN_ACTION_TIME_OUT;
-        [View addSubview:self.view subview:vcDropDown.view animated:YES];
-        [self addChildViewController:vcDropDown];
+        [View addChildViewController:self childViewController:vcDropDown animated:YES];
         [vcDropDown onStoresSelect:[Get store:self.app.db storeID:timeIn.storeID]];
         return;
     }
@@ -1113,6 +1238,10 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
         vcAttendanceSummary.timeOut = [Time getFormattedDate:[NSString stringWithFormat:@"%@ %@", self.app.settingDisplayDateFormat, self.app.settingDisplayTimeFormat] date:self.currentDate];
         vcAttendanceSummary.workHours = [[Time dateRemoveSeconds:self.currentDate] timeIntervalSinceDate:[Time dateRemoveSeconds:[Time getDateFromString:[NSString stringWithFormat:@"%@ %@", timeIn.date, timeIn.time]]]];
         vcAttendanceSummary.breakHours = 0;
+        for(BreakIn *breakIn in [Load breakIn:self.app.db timeInID:timeIn.timeInID]) {
+            BreakOut *breakOut = [Get breakOut:self.app.db breakInID:breakIn.breakInID];
+            vcAttendanceSummary.breakHours += [[Time dateRemoveSeconds:[Time getDateFromString:[NSString stringWithFormat:@"%@ %@", breakOut.date, breakOut.time]]] timeIntervalSinceDate:[Time dateRemoveSeconds:[Time getDateFromString:[NSString stringWithFormat:@"%@ %@", breakIn.date, breakIn.time]]]];
+        }
         vcAttendanceSummary.isHistory = NO;
         [self.navigationController pushViewController:vcAttendanceSummary animated:YES];
         return;
@@ -1129,14 +1258,7 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
     }
     NSString *date = [Time getFormattedDate:DATE_FORMAT date:self.currentDate];
     NSString *time = [Time getFormattedDate:TIME_FORMAT date:self.currentDate];
-    Sequences *sequence = [Get sequence:self.app.db];
     TimeOut *timeOut = [NSEntityDescription insertNewObjectForEntityForName:@"TimeOut" inManagedObjectContext:self.app.db];
-    if(self.app.location != nil) {
-        int64_t gpsID = [Update gpsSave:self.app.db location:self.app.location];
-        if(gpsID != 0) {
-            timeOut.gpsID = gpsID;
-        }
-    }
     if(self.app.settingAttendanceStore) {
         timeOut.storeID = self.store.storeID;
     }
@@ -1146,13 +1268,13 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
     if(self.app.settingAttendanceTimeOutSignature) {
         timeOut.signature = self.signatureFilename;
     }
-    sequence.timeOut += 1;
-    timeOut.timeOutID = sequence.timeOut;
+    timeOut.timeOutID = [Get sequenceID:self.app.db entity:@"TimeOut" attribute:@"timeOutID"] + 1;
     timeOut.syncBatchID = self.app.syncBatchID;
-    timeOut.employeeID = self.app.employee.employeeID;
     timeOut.timeInID = timeIn.timeInID;
     timeOut.date = date;
     timeOut.time = time;
+    timeOut.gpsID = [Update gpsSave:self.app.dbTracking location:self.app.location];
+    timeOut.batteryLevel = [NSString stringWithFormat:@"%d", (int)floor(UIDevice.currentDevice.batteryLevel * 100)];
     timeOut.isSync = NO;
     timeOut.isPhotoUpload = NO;
     timeOut.isPhotoExists = NO;
@@ -1172,6 +1294,8 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
         }
     }
     if([Update save:self.app.db]) {
+        NSLog(@"alert: ALERT_TYPE_TIME_OUT_BATTERY_LEVEL");
+        [Update alertSave:self.app.dbAlerts alertTypeID:ALERT_TYPE_TIME_OUT_BATTERY_LEVEL gpsID:timeOut.gpsID value:timeOut.batteryLevel];
         [self cancelTimeOut];
         [self updateTimeInOut];
         [self.app stopUpdatingLocation];

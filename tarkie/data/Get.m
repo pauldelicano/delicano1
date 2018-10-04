@@ -4,39 +4,66 @@
 
 @implementation Get
 
-+ (Sequences *)sequence:(NSManagedObjectContext *)db {
-    Sequences *sequence = [self execute:db entity:@"Sequences"];
-    if(sequence == nil) {
-        sequence = [NSEntityDescription insertNewObjectForEntityForName:@"Sequences" inManagedObjectContext:db];
-        sequence.stores = 0;
-        sequence.storeContacts = 0;
-        sequence.gps = 0;
-        sequence.tracking = 0;
-        sequence.schedules = 0;
-        sequence.visits = 0;
-        sequence.visitInventories = 0;
-        sequence.visitForms = 0;
-        sequence.visitPhotos = 0;
-        sequence.timeIn = 0;
-        sequence.timeOut = 0;
-        sequence.checkIn = 0;
-        sequence.checkOut = 0;
-        sequence.photos = 0;
++ (int64_t)sequenceID:(NSManagedObjectContext *)db entity:(NSString *)entity attribute:(NSString *)attribute {
+    int64_t ID = 0;
+    NSMutableArray *sortDescriptors = NSMutableArray.alloc.init;
+    [sortDescriptors addObject:[NSSortDescriptor.alloc initWithKey:attribute ascending:NO]];
+    NSManagedObject *managedObject = [self execute:db entity:entity predicates:nil sortDescriptors:sortDescriptors];
+    if([managedObject isKindOfClass:GPS.class]) {
+        ID = ((GPS *)managedObject).gpsID;
     }
-    return sequence;
-}
-
-+ (Patches *)patch:(NSManagedObjectContext *)db patchID:(int64_t)patchID {
-    NSMutableArray *predicates = NSMutableArray.alloc.init;
-    [predicates addObject:[NSPredicate predicateWithFormat:@"patchID == %ld", patchID]];
-    return [self execute:db entity:@"Patches" predicates:predicates];
-}
-
-+ (long)syncPatchesCount:(NSManagedObjectContext *)db {
-    NSMutableArray *predicates = NSMutableArray.alloc.init;
-    [predicates addObject:[NSPredicate predicateWithFormat:@"isDone == %@", @YES]];
-    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
-    return [self count:db entity:@"Patches" predicates:predicates];
+    if([managedObject isKindOfClass:Stores.class]) {
+        ID = ((Stores *)managedObject).storeID;
+    }
+    if([managedObject isKindOfClass:StoreContacts.class]) {
+        ID = ((StoreContacts *)managedObject).storeContactID;
+    }
+    if([managedObject isKindOfClass:Schedules.class]) {
+        ID = ((Schedules *)managedObject).scheduleID;
+    }
+    if([managedObject isKindOfClass:TimeIn.class]) {
+        ID = ((TimeIn *)managedObject).timeInID;
+    }
+    if([managedObject isKindOfClass:TimeOut.class]) {
+        ID = ((TimeOut *)managedObject).timeOutID;
+    }
+    if([managedObject isKindOfClass:BreakIn.class]) {
+        ID = ((BreakIn *)managedObject).breakInID;
+    }
+    if([managedObject isKindOfClass:BreakOut.class]) {
+        ID = ((BreakOut *)managedObject).breakOutID;
+    }
+    if([managedObject isKindOfClass:Overtime.class]) {
+        ID = ((Overtime *)managedObject).overtimeID;
+    }
+    if([managedObject isKindOfClass:Tracking.class]) {
+        ID = ((Tracking *)managedObject).trackingID;
+    }
+    if([managedObject isKindOfClass:Alerts.class]) {
+        ID = ((Alerts *)managedObject).alertID;
+    }
+    if([managedObject isKindOfClass:Photos.class]) {
+        ID = ((Photos *)managedObject).photoID;
+    }
+    if([managedObject isKindOfClass:Visits.class]) {
+        ID = ((Visits *)managedObject).visitID;
+    }
+    if([managedObject isKindOfClass:VisitPhotos.class]) {
+        ID = ((VisitPhotos *)managedObject).visitPhotoID;
+    }
+    if([managedObject isKindOfClass:VisitInventories.class]) {
+        ID = ((VisitInventories *)managedObject).visitInventoryID;
+    }
+    if([managedObject isKindOfClass:VisitForms.class]) {
+        ID = ((VisitForms *)managedObject).visitFormID;
+    }
+    if([managedObject isKindOfClass:CheckIn.class]) {
+        ID = ((CheckIn *)managedObject).checkInID;
+    }
+    if([managedObject isKindOfClass:CheckOut.class]) {
+        ID = ((CheckOut *)managedObject).checkOutID;
+    }
+    return ID;
 }
 
 + (Device *)device:(NSManagedObjectContext *)db {
@@ -368,18 +395,62 @@
     return [self convention:db conventionID:conventionID].value.capitalizedString;
 }
 
-+ (AlertTypes *)alertType:(NSManagedObjectContext *)db alertTypeID:(int64_t)alertTypeID {
-    NSMutableArray *predicates = NSMutableArray.alloc.init;
-    [predicates addObject:[NSPredicate predicateWithFormat:@"alertTypeID == %ld", alertTypeID]];
-    return [self execute:db entity:@"AlertTypes" predicates:predicates];
-}
-
 + (TimeSecurity *)timeSecurity:(NSManagedObjectContext *)db {
     return [self execute:db entity:@"TimeSecurity"];
 }
 
 + (SyncBatch *)syncBatch:(NSManagedObjectContext *)db {
     return [self execute:db entity:@"SyncBatch"];
+}
+
++ (Patches *)patch:(NSManagedObjectContext *)db patchID:(int64_t)patchID {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"patchID == %ld", patchID]];
+    return [self execute:db entity:@"Patches" predicates:predicates];
+}
+
++ (long)syncPatchesCount:(NSManagedObjectContext *)db {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isDone == %@", @YES]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
+    return [self count:db entity:@"Patches" predicates:predicates];
+}
+
++ (GPS *)gps:(NSManagedObjectContext *)db gpsID:(int64_t)gpsID {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"gpsID == %ld", gpsID]];
+    return [self execute:db entity:@"GPS" predicates:predicates];
+}
+
++ (Alerts *)alert:(NSManagedObjectContext *)db alertTypeID:(int64_t)alertTypeID {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    int64_t timeInID = [Get timeIn:db].timeInID;
+    if(timeInID != 0) {
+        [predicates addObject:[NSPredicate predicateWithFormat:@"timeInID == %ld", timeInID]];
+    }
+    switch(alertTypeID) {
+        case ALERT_TYPE_GPS_ACQUIRED:
+        case ALERT_TYPE_NO_GPS_SIGNAL: {
+            [predicates addObject:[NSPredicate predicateWithFormat:@"alertTypeID == %ld || alertTypeID == %ld", ALERT_TYPE_GPS_ACQUIRED, ALERT_TYPE_NO_GPS_SIGNAL]];
+            break;
+        }
+        case ALERT_TYPE_INSIDE_GEO_FENCE:
+        case ALERT_TYPE_OUTSIDE_GEO_FENCE: {
+            [predicates addObject:[NSPredicate predicateWithFormat:@"alertTypeID == %ld || alertTypeID == %ld", ALERT_TYPE_INSIDE_GEO_FENCE, ALERT_TYPE_OUTSIDE_GEO_FENCE]];
+            break;
+        }
+        default: {
+            [predicates addObject:[NSPredicate predicateWithFormat:@"alertTypeID == %ld", alertTypeID]];
+            break;
+        }
+    }
+    return [self execute:db entity:@"Alerts" predicates:predicates];
+}
+
++ (long)syncAlertsCount:(NSManagedObjectContext *)db {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
+    return [self count:db entity:@"Alerts" predicates:predicates];
 }
 
 + (Announcements *)announcement:(NSManagedObjectContext *)db announcementID:(int64_t)announcementID {
@@ -555,22 +626,72 @@
     return [self count:db entity:@"TimeOut" predicates:predicates];
 }
 
-+ (long)syncOvertimeCount:(NSManagedObjectContext *)db {
-    NSMutableArray *predicates = NSMutableArray.alloc.init;
-    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
-    return [self count:db entity:@"Overtime" predicates:predicates];
-}
-
 + (BreakTypes *)breakType:(NSManagedObjectContext *)db breakTypeID:(int64_t)breakTypeID {
     NSMutableArray *predicates = NSMutableArray.alloc.init;
     [predicates addObject:[NSPredicate predicateWithFormat:@"breakTypeID == %ld", breakTypeID]];
     return [self execute:db entity:@"BreakTypes" predicates:predicates];
 }
 
++ (BreakIn *)breakIn:(NSManagedObjectContext *)db timeInID:(int64_t)timeInID {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"timeInID == %ld", timeInID]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isBreakOut == %@", @NO]];
+    return [self execute:db entity:@"BreakIn" predicates:predicates];
+}
+
++ (BreakIn *)breakIn:(NSManagedObjectContext *)db timeInID:(int64_t)timeInID breakTypeID:(int64_t)breakTypeID {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"timeInID == %ld", timeInID]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"breakTypeID == %ld", breakTypeID]];
+    return [self execute:db entity:@"BreakIn" predicates:predicates];
+}
+
++ (BreakIn *)breakIn:(NSManagedObjectContext *)db breakInID:(int64_t)breakInID {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"breakInID == %ld", breakInID]];
+    return [self execute:db entity:@"BreakIn" predicates:predicates];
+}
+
++ (long)syncBreakInCount:(NSManagedObjectContext *)db {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
+    return [self count:db entity:@"BreakIn" predicates:predicates];
+}
+
++ (BreakOut *)breakOut:(NSManagedObjectContext *)db breakInID:(int64_t)breakInID {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"breakInID == %ld", breakInID]];
+    return [self execute:db entity:@"BreakOut" predicates:predicates];
+}
+
++ (BreakOut *)breakOut:(NSManagedObjectContext *)db breakOutID:(int64_t)breakOutID {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"breakOutID == %ld", breakOutID]];
+    return [self execute:db entity:@"BreakOut" predicates:predicates];
+}
+
++ (long)syncBreakOutCount:(NSManagedObjectContext *)db {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
+    return [self count:db entity:@"BreakOut" predicates:predicates];
+}
+
 + (OvertimeReasons *)overtimeReason:(NSManagedObjectContext *)db overtimeReasonID:(int64_t)overtimeReasonID {
     NSMutableArray *predicates = NSMutableArray.alloc.init;
     [predicates addObject:[NSPredicate predicateWithFormat:@"overtimeReasonID == %ld", overtimeReasonID]];
     return [self execute:db entity:@"OvertimeReasons" predicates:predicates];
+}
+
++ (long)syncOvertimeCount:(NSManagedObjectContext *)db {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
+    return [self count:db entity:@"Overtime" predicates:predicates];
+}
+
++ (long)syncTrackingCount:(NSManagedObjectContext *)db {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
+    return [self count:db entity:@"Tracking" predicates:predicates];
 }
 
 + (Photos *)photo:(NSManagedObjectContext *)db photoID:(int64_t)photoID {
@@ -690,19 +811,7 @@
 }
 
 + (long)syncTotalCount:(NSManagedObjectContext *)db {
-    return [self syncAnnouncementSeenCount:db] + [self syncStoresCount:db] + [self syncStoreContactsCount:db] + [self syncSchedulesCount:db] + [self syncTimeInCount:db] + [self uploadTimeInPhotoCount:db] + [self syncTimeOutCount:db] + [self uploadTimeOutPhotoCount:db] + [self uploadTimeOutSignatureCount:db] + [self syncOvertimeCount:db] + [self syncVisitsCount:db] + [self uploadVisitPhotosCount:db] + [self syncCheckInCount:db] + [self uploadCheckInPhotoCount:db] + [self syncCheckOutCount:db] + [self uploadCheckOutPhotoCount:db] + [self syncTrackingCount:db];
-}
-
-+ (GPS *)gps:(NSManagedObjectContext *)db gpsID:(int64_t)gpsID {
-    NSMutableArray *predicates = NSMutableArray.alloc.init;
-    [predicates addObject:[NSPredicate predicateWithFormat:@"gpsID == %ld", gpsID]];
-    return [self execute:db entity:@"GPS" predicates:predicates];
-}
-
-+ (long)syncTrackingCount:(NSManagedObjectContext *)db {
-    NSMutableArray *predicates = NSMutableArray.alloc.init;
-    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
-    return [self count:db entity:@"Tracking" predicates:predicates];
+    return [self syncAnnouncementSeenCount:db] + [self syncStoresCount:db] + [self syncStoreContactsCount:db] + [self syncSchedulesCount:db] + [self syncTimeInCount:db] + [self uploadTimeInPhotoCount:db] + [self syncTimeOutCount:db] + [self uploadTimeOutPhotoCount:db] + [self uploadTimeOutSignatureCount:db] + [self syncBreakInCount:db] + [self syncBreakOutCount:db] + [self syncOvertimeCount:db] + [self syncTrackingCount:db] + [self syncAlertsCount:db] + [self syncVisitsCount:db] + [self uploadVisitPhotosCount:db] + [self syncCheckInCount:db] + [self uploadCheckInPhotoCount:db] + [self syncCheckOutCount:db] + [self uploadCheckOutPhotoCount:db];
 }
 
 + (id)execute:(NSManagedObjectContext *)db entity:(NSString *)entity {

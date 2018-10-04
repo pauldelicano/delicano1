@@ -5,25 +5,11 @@
 
 @implementation Load
 
-+ (NSArray<Patches *> *)patches:(NSManagedObjectContext *)db {
-    NSMutableArray *predicates = NSMutableArray.alloc.init;
-    [predicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
-    [predicates addObject:[NSPredicate predicateWithFormat:@"isDone == %@", @NO]];
-    return [self execute:db entity:@"Patches" predicates:predicates];
-}
-
-+ (NSArray<Patches *> *)syncPatches:(NSManagedObjectContext *)db {
-    NSMutableArray *predicates = NSMutableArray.alloc.init;
-    [predicates addObject:[NSPredicate predicateWithFormat:@"isDone == %@", @YES]];
-    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
-    return [self execute:db entity:@"Patches" predicates:predicates];
-}
-
 + (NSArray<NSDictionary *> *)drawerMenus:(NSManagedObjectContext *)db {
     NSMutableArray *menus = NSMutableArray.alloc.init;
     for(int x = 1; x <= MENU_LOGOUT; x++) {
         NSString *name;
-        NSString *icon;
+        id icon;
         switch(x) {
             case MENU_TIME_IN_OUT: {
                 name = @"Time In";
@@ -51,7 +37,12 @@
                 break;
             }
             case MENU_BACKUP_DATA: {
-                name = @"Backup Data";
+//                name = @"Backup Data";
+                icon = @"\uf019";
+                break;
+            }
+            case MENU_PATCH_DATA: {
+                name = @"Patch Data";
                 icon = @"\uf019";
                 break;
             }
@@ -70,9 +61,14 @@
             NSMutableDictionary *menu = NSMutableDictionary.alloc.init;
             [menu setObject:[NSString stringWithFormat:@"%d", x] forKey:@"ID"];
             icon = nil;
-            [menu setObject:icon == nil ? [UIImage imageNamed:[NSString stringWithFormat:@"%@%@", @"Menu", [name stringByReplacingOccurrencesOfString:@" " withString:@""]]] : icon forKey:@"icon"];
-            if([name isEqualToString:@"Backup Data"]) {
-                name = @"Patch Data";
+            if(icon == nil) {
+                icon = [UIImage imageNamed:[NSString stringWithFormat:@"%@%@", @"Menu", [name stringByReplacingOccurrencesOfString:@" " withString:@""]]];
+                if([name isEqualToString:@"Patch Data"]) {
+                    icon = [UIImage imageNamed:[NSString stringWithFormat:@"%@%@", @"Menu", @"BackupData"]];
+                }
+            }
+            if(icon != nil) {
+                [menu setObject:icon forKey:@"icon"];
             }
             [menu setObject:name forKey:@"name"];
             [menus addObject:menu];
@@ -146,6 +142,26 @@
     [predicates addObject:[NSPredicate predicateWithFormat:@"teamID == %lld", teamID]];
     [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
     return [self execute:db entity:@"Employees" predicates:predicates];
+}
+
++ (NSArray<Patches *> *)patches:(NSManagedObjectContext *)db {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isDone == %@", @NO]];
+    return [self execute:db entity:@"Patches" predicates:predicates];
+}
+
++ (NSArray<Patches *> *)syncPatches:(NSManagedObjectContext *)db {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isDone == %@", @YES]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
+    return [self execute:db entity:@"Patches" predicates:predicates];
+}
+
++ (NSArray<Alerts *> *)syncAlerts:(NSManagedObjectContext *)db {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
+    return [self execute:db entity:@"Alerts" predicates:predicates];
 }
 
 + (NSArray<Announcements *> *)announcements:(NSManagedObjectContext *)db searchFilter:(NSString *)searchFilter isScheduled:(BOOL)isScheduled {
@@ -290,6 +306,32 @@
     return [self execute:db entity:@"TimeOut" predicates:predicates];
 }
 
++ (NSArray<BreakTypes *> *)breakTypes:(NSManagedObjectContext *)db {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
+    NSMutableArray *sortDescriptors = NSMutableArray.alloc.init;
+    [sortDescriptors addObject:[NSSortDescriptor.alloc initWithKey:@"name" ascending:YES]];
+    return [self execute:db entity:@"BreakTypes" predicates:predicates sortDescriptors:sortDescriptors];
+}
+
++ (NSArray<BreakIn *> *)breakIn:(NSManagedObjectContext *)db timeInID:(int64_t)timeInID {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"timeInID == %ld", timeInID]];
+    return [self execute:db entity:@"BreakIn" predicates:predicates];
+}
+
++ (NSArray<BreakIn *> *)syncBreakIn:(NSManagedObjectContext *)db {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
+    return [self execute:db entity:@"BreakIn" predicates:predicates];
+}
+
++ (NSArray<BreakOut *> *)syncBreakOut:(NSManagedObjectContext *)db {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
+    return [self execute:db entity:@"BreakOut" predicates:predicates];
+}
+
 + (NSArray<OvertimeReasons *> *)overtimeReasons:(NSManagedObjectContext *)db {
     NSMutableArray *predicates = NSMutableArray.alloc.init;
     [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
@@ -304,14 +346,19 @@
     return [self execute:db entity:@"Overtime" predicates:predicates];
 }
 
++ (NSArray<Tracking *> *)syncTracking:(NSManagedObjectContext *)db {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
+    return [self execute:db entity:@"Tracking" predicates:predicates];
+}
+
 + (NSArray<Photos *> *)visitPhotos:(NSManagedObjectContext *)db visitID:(int64_t)visitID {
     NSMutableArray<Photos *> *photos = NSMutableArray.alloc.init;
     NSMutableArray *predicates = NSMutableArray.alloc.init;
     [predicates addObject:[NSPredicate predicateWithFormat:@"visitID == %ld", visitID]];
-    NSArray<VisitPhotos *> *visitPhotos = [self execute:db entity:@"VisitPhotos" predicates:predicates];
-    for(int x = 0 ; x < visitPhotos.count; x++) {
+    for(VisitPhotos *visitPhoto in [self execute:db entity:@"VisitPhotos" predicates:predicates]) {
         NSMutableArray *predicates = NSMutableArray.alloc.init;
-        [predicates addObject:[NSPredicate predicateWithFormat:@"photoID == %ld", visitPhotos[x].photoID]];
+        [predicates addObject:[NSPredicate predicateWithFormat:@"photoID == %ld", visitPhoto.photoID]];
         [predicates addObject:[NSPredicate predicateWithFormat:@"isDelete == %@", @NO]];
         [photos addObjectsFromArray:[self execute:db entity:@"Photos" predicates:predicates]];
     }
@@ -459,12 +506,6 @@
 //    NSMutableArray *sortDescriptors = NSMutableArray.alloc.init;
 //    [sortDescriptors addObject:[NSSortDescriptor.alloc initWithKey:@"formID" ascending:YES]];
 //    return [self execute:db entity:@"Forms" predicates:nil sortDescriptors:sortDescriptors];
-}
-
-+ (NSArray<Tracking *> *)syncTracking:(NSManagedObjectContext *)db {
-    NSMutableArray *predicates = NSMutableArray.alloc.init;
-    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
-    return [self execute:db entity:@"Tracking" predicates:predicates];
 }
 
 + (NSArray *)execute:(NSManagedObjectContext *)db entity:(NSString *)entity {

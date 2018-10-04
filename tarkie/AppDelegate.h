@@ -8,7 +8,7 @@
 @interface AppDelegate : UIResponder <UIApplicationDelegate, CLLocationManagerDelegate, UNUserNotificationCenterDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
-@property (strong, nonatomic) NSManagedObjectContext *db, *dbSync, *dbTracking;
+@property (strong, nonatomic) NSManagedObjectContext *db, *dbTracking, *dbAlerts;
 @property (strong, nonatomic) CLLocationManager *locationManager;
 @property (nonatomic) CLAuthorizationStatus authorizationStatus;
 @property (strong, nonatomic) CLLocation *location;

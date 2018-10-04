@@ -39,11 +39,11 @@ static MessageDialogViewController *vcMessage;
         vcMessage.message = @"Device has no camera.";
         vcMessage.positiveTitle = @"OK";
         vcMessage.positiveTarget = ^{
-            [View removeView:vcMessage.view animated:NO];
+            [View removeChildViewController:vcMessage animated:NO];
             [self.navigationController popViewControllerAnimated:YES];
             [self.cameraDelegate onCameraCancel:self.action];
         };
-        [View addSubview:self.view subview:vcMessage.view animated:YES];
+        [View addChildViewController:self childViewController:vcMessage animated:YES];
         return;
     }
 }

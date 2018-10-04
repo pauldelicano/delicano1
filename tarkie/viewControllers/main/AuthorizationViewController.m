@@ -72,9 +72,9 @@ static LoadingDialogViewController *vcLoading;
         vcMessage.message = @"Device ID not found.";
         vcMessage.positiveTitle = @"OK";
         vcMessage.positiveTarget = ^{
-            [View removeView:vcMessage.view animated:YES];
+            [View removeChildViewController:vcMessage animated:YES];
         };
-        [View addSubview:self.view subview:vcMessage.view animated:YES];
+        [View addChildViewController:self childViewController:vcMessage animated:YES];
         return;
     }
     if(authorizationCode.length == 0) {
@@ -83,9 +83,9 @@ static LoadingDialogViewController *vcLoading;
         vcMessage.message = @"Please input authorization code.";
         vcMessage.positiveTitle = @"OK";
         vcMessage.positiveTarget = ^{
-            [View removeView:vcMessage.view animated:YES];
+            [View removeChildViewController:vcMessage animated:YES];
         };
-        [View addSubview:self.view subview:vcMessage.view animated:YES];
+        [View addChildViewController:self childViewController:vcMessage animated:YES];
         return;
     }
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
@@ -97,7 +97,7 @@ static LoadingDialogViewController *vcLoading;
     vcLoading.delegate = self;
     vcLoading.action = LOADING_ACTION_AUTHORIZE;
     vcLoading.params = params;
-    [View addSubview:self.view subview:vcLoading.view animated:YES];
+    [View addChildViewController:self childViewController:vcLoading animated:YES];
 }
 
 - (void)onLoadingUpdate:(int)action {
@@ -113,9 +113,9 @@ static LoadingDialogViewController *vcLoading;
                 vcMessage.message = @"Failed to authorize device.";
                 vcMessage.positiveTitle = @"OK";
                 vcMessage.positiveTarget = ^{
-                    [View removeView:vcMessage.view animated:YES];
+                    [View removeChildViewController:vcMessage animated:YES];
                 };
-                [View addSubview:self.view subview:vcMessage.view animated:NO];
+                [View addChildViewController:self childViewController:vcMessage animated:NO];
                 break;
             }
             [self.navigationController popViewControllerAnimated:NO];
