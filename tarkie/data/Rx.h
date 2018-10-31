@@ -31,7 +31,7 @@
 
 //EXPENSE
 + (BOOL)expenseTypeCategories:(NSManagedObjectContext *)db delegate:(id)delegate;
-+ (BOOL)expenseTypes:(NSManagedObjectContext *)db delegate:(id)delegate;
++ (NSString *)expenseTypes:(NSManagedObjectContext *)db expenseTypeCategoryID:(int64_t)expenseTypeCategoryID delegate:(id)delegate;
 
 //INVENTORY
 + (BOOL)inventories:(NSManagedObjectContext *)db delegate:(id)delegate;

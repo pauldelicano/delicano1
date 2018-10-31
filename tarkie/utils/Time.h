@@ -11,7 +11,7 @@
 + (NSString *)formatDate:(NSString *)format date:(NSString *)date;
 + (NSString *)formatTime:(NSString *)format time:(NSString *)time;
 + (NSDate *)dateRemoveSeconds:(NSDate *)date;
-+ (NSString *)secondsToHoursMinutes:(NSTimeInterval)seconds;
++ (NSString *)secondsToDHMS:(NSTimeInterval)seconds;
 + (time_t)getUptime;
 
 @end

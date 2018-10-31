@@ -59,7 +59,7 @@
         }
         if(name != nil) {
             NSMutableDictionary *menu = NSMutableDictionary.alloc.init;
-            [menu setObject:[NSString stringWithFormat:@"%d", x] forKey:@"ID"];
+            menu[@"ID"] = [NSString stringWithFormat:@"%d", x];
             icon = nil;
             if(icon == nil) {
                 icon = [UIImage imageNamed:[NSString stringWithFormat:@"%@%@", @"Menu", [name stringByReplacingOccurrencesOfString:@" " withString:@""]]];
@@ -68,9 +68,9 @@
                 }
             }
             if(icon != nil) {
-                [menu setObject:icon forKey:@"icon"];
+                menu[@"icon"] = icon;
             }
-            [menu setObject:name forKey:@"name"];
+            menu[@"name"] = name;
             [menus addObject:menu];
         }
     }
@@ -115,22 +115,22 @@
             }
         }
         if(x == MODULE_FORMS + 1 && isAttendance) {
-//            name = @"History";
+            name = @"History";
             icon = @"\uf252";
         }
         if(name != nil) {
             NSMutableDictionary *page = NSMutableDictionary.alloc.init;
-            [page setObject:[NSString stringWithFormat:@"%d", x] forKey:@"ID"];
-            [page setObject:[NSString stringWithFormat:@"%@%@", @"vc", name] forKey:@"viewController"];
+            page[@"ID"] = [NSString stringWithFormat:@"%d", x];
+            page[@"viewController"] = [NSString stringWithFormat:@"%@%@", @"vc", name];
             icon = nil;
-            [page setObject:icon == nil ? [UIImage imageNamed:[NSString stringWithFormat:@"%@%@", @"Page", name]] : icon forKey:@"icon"];
+            page[@"icon"] = icon != nil ? icon : [UIImage imageNamed:[NSString stringWithFormat:@"%@%@", @"Page", name]];
             if([name isEqualToString:@"Visits"]) {
                 name = [Get conventionName:db conventionID:CONVENTION_VISITS];
             }
             if([name isEqualToString:@"Forms"]) {
                 name = @"Entries";
             }
-            [page setObject:name forKey:@"name"];
+            page[@"name"] = name;
             [pages addObject:page];
         }
     }
@@ -273,6 +273,16 @@
     return [self execute:db entity:@"Schedules" predicates:predicates];
 }
 
++ (NSArray<TimeIn *> *)timeIn:(NSManagedObjectContext *)db date:(NSString *)date {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"date <= %@", date]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
+    NSMutableArray *sortDescriptors = NSMutableArray.alloc.init;
+    [sortDescriptors addObject:[NSSortDescriptor.alloc initWithKey:@"date" ascending:NO]];
+    [sortDescriptors addObject:[NSSortDescriptor.alloc initWithKey:@"time" ascending:NO]];
+    return [self execute:db entity:@"TimeIn" predicates:predicates sortDescriptors:sortDescriptors];
+}
+
 + (NSArray<TimeIn *> *)syncTimeIn:(NSManagedObjectContext *)db {
     NSMutableArray *predicates = NSMutableArray.alloc.init;
     [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
@@ -352,6 +362,57 @@
     return [self execute:db entity:@"Tracking" predicates:predicates];
 }
 
++ (NSArray<NSDictionary *> *)activities:(NSManagedObjectContext *)db date:(NSString *)date {
+    NSMutableArray *activities = NSMutableArray.alloc.init;
+    int64_t employeeID = [Get userID:db];
+    int64_t teamID = [Get teamID:db employeeID:employeeID];
+    NSString *displayTimeFormat = [Get settingTimeFormat:db teamID:teamID];
+    NSString *conventionTimeIn = [Get conventionName:db conventionID:CONVENTION_TIME_IN];
+    NSString *conventionTimeOut = [Get conventionName:db conventionID:CONVENTION_TIME_OUT];
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"date == %@", date]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", employeeID]];
+    for(TimeIn *timeIn in [self execute:db entity:@"TimeIn" predicates:predicates sortDescriptors:nil]) {
+        NSMutableDictionary *activity = NSMutableDictionary.alloc.init;
+        activity[@"Event"] = conventionTimeIn;
+        activity[@"Time"] = [Time formatTime:displayTimeFormat time:timeIn.time];
+        activity[@"Sort"] = [NSString stringWithFormat:@"%@ %@", timeIn.date, timeIn.time];
+        [activities addObject:activity];
+        TimeOut *timeOut = [Get timeOut:db timeInID:timeIn.timeInID];
+        if(timeOut != nil) {
+            NSMutableDictionary *activity = NSMutableDictionary.alloc.init;
+            activity[@"Event"] = conventionTimeOut;
+            activity[@"Time"] = [Time formatTime:displayTimeFormat time:timeOut.time];
+            activity[@"Sort"] = [NSString stringWithFormat:@"%@ %@", timeOut.date, timeOut.time];
+            [activities addObject:activity];
+        }
+        NSMutableArray *predicates = NSMutableArray.alloc.init;
+        [predicates addObject:[NSPredicate predicateWithFormat:@"date == %@", date]];
+        [predicates addObject:[NSPredicate predicateWithFormat:@"timeInID == %lld", timeIn.timeInID]];
+        for(BreakIn *breakIn in [self execute:db entity:@"BreakIn" predicates:predicates sortDescriptors:nil]) {
+            BreakTypes *breakType = [Get breakType:db breakTypeID:breakIn.breakTypeID];
+            BreakOut *breakOut = [Get breakOut:db breakInID:breakIn.breakInID];
+            NSMutableDictionary *activity = NSMutableDictionary.alloc.init;
+            activity[@"Event"] = [NSString stringWithFormat:@"%@\n(%@)", breakType.name, [Time secondsToDHMS:[[Time getDateFromString:[NSString stringWithFormat:@"%@ %@", breakOut.date, breakOut.time]] timeIntervalSinceDate:[Time getDateFromString:[NSString stringWithFormat:@"%@ %@", breakIn.date, breakIn.time]]]]];
+            activity[@"Time"] = [NSString stringWithFormat:@"%@ - %@", [Time formatTime:displayTimeFormat time:breakIn.time], [Time formatTime:displayTimeFormat time:breakOut.time]];
+            activity[@"Sort"] = [NSString stringWithFormat:@"%@ %@", breakIn.date, breakIn.time];
+            [activities addObject:activity];
+        }
+        for(CheckIn *checkIn in [self execute:db entity:@"CheckIn" predicates:predicates sortDescriptors:nil]) {
+            Visits *visit = [Get visit:db visitID:checkIn.visitID];
+            CheckOut *checkOut = [Get checkOut:db checkInID:checkIn.checkInID];
+            NSMutableDictionary *activity = NSMutableDictionary.alloc.init;
+            activity[@"Event"] = [NSString stringWithFormat:@"%@%@", visit.name, visit.isCheckOut ? [NSString stringWithFormat:@"\n(%@)", [Time secondsToDHMS:[[Time getDateFromString:[NSString stringWithFormat:@"%@ %@", checkOut.date, checkOut.time]] timeIntervalSinceDate:[Time getDateFromString:[NSString stringWithFormat:@"%@ %@", checkIn.date, checkIn.time]]]]] : @""];
+            activity[@"Time"] = [NSString stringWithFormat:@"%@ - %@", [Time formatTime:displayTimeFormat time:checkIn.time], visit.isCheckOut ? [Time formatTime:displayTimeFormat time:checkOut.time] : @"NO OUT"];
+            activity[@"Sort"] = [NSString stringWithFormat:@"%@ %@", checkIn.date, checkIn.time];
+            [activities addObject:activity];
+        }
+    }
+    NSMutableArray *sortDescriptors = NSMutableArray.alloc.init;
+    [sortDescriptors addObject:[NSSortDescriptor.alloc initWithKey:@"Sort" ascending:YES]];
+    return [activities sortedArrayUsingDescriptors:sortDescriptors];
+}
+
 + (NSArray<Photos *> *)visitPhotos:(NSManagedObjectContext *)db visitID:(int64_t)visitID {
     NSMutableArray<Photos *> *photos = NSMutableArray.alloc.init;
     NSMutableArray *predicates = NSMutableArray.alloc.init;
@@ -372,14 +433,14 @@
     return [self execute:db entity:@"Photos" predicates:predicates];
 }
 
-+ (NSArray<Visits *> *)visits:(NSManagedObjectContext *)db date:(NSDate *)date isNoCheckOutOnly:(BOOL)isNoCheckOutOnly {
++ (NSArray<Visits *> *)visits:(NSManagedObjectContext *)db date:(NSString *)date isNoCheckOutOnly:(BOOL)isNoCheckOutOnly {
     NSMutableArray *predicates = NSMutableArray.alloc.init;
     [predicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
     if(isNoCheckOutOnly) {
         [predicates addObject:[NSPredicate predicateWithFormat:@"isCheckOut == %@", @NO]];
     }
     [predicates addObject:[NSPredicate predicateWithFormat:@"isDelete == %@", @NO]];
-    [predicates addObject:[NSPredicate predicateWithFormat:@"%@ BETWEEN {startDate, endDate}", [Time getFormattedDate:DATE_FORMAT date:date]]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"%@ BETWEEN {startDate, endDate}", date]];
     return [self execute:db entity:@"Visits" predicates:predicates];
 }
 
@@ -476,7 +537,103 @@
     return [self execute:db entity:@"CheckOut" predicates:predicates];
 }
 
-+ (NSArray<Inventories *> *)inventories:(NSManagedObjectContext *)db date:(NSDate *)date {
++ (NSArray<ExpenseTypeCategories *> *)expenseTypeCategories:(NSManagedObjectContext *)db {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
+    return [self execute:db entity:@"ExpenseTypeCategories" predicates:predicates];
+}
+
++ (NSArray<ExpenseTypes *> *)expenseTypes:(NSManagedObjectContext *)db {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
+    return [self execute:db entity:@"ExpenseTypes" predicates:predicates];
+}
+
++ (NSArray<NSMutableDictionary *> *)expenseItems:(NSManagedObjectContext *)db startDate:(NSString *)startDate endDate:(NSString *)endDate {
+    NSDate *start = [Time getDateFromString:DATE_FORMAT string:startDate];
+    NSDate *end = [Time getDateFromString:DATE_FORMAT string:endDate];
+    NSMutableArray<NSMutableDictionary *> *expenseItems = NSMutableArray.alloc.init;
+    for(int x = [end timeIntervalSinceDate:start] / 60 / 60 / 24; x >= 0; x--) {
+        NSString *date = [Time getFormattedDate:DATE_FORMAT date:[start dateByAddingTimeInterval:60 * 60 * 24 * x]];
+        if([Get expenseTodayCount:db date:date withoutDeleted:YES] > 0) {
+            double totalAmount = 0;
+            NSArray<Expense *> *items = [Load expense:db date:date];
+            for(Expense *expense in items) {
+                totalAmount += expense.amount;
+            }
+            NSMutableDictionary *expenseItem = NSMutableDictionary.alloc.init;
+            expenseItem[@"Date"] = date;
+            expenseItem[@"TotalAmount"] = [NSString stringWithFormat:@"%.02f", totalAmount];
+            expenseItem[@"Hidden"] = @YES;
+            [expenseItems addObject:expenseItem];
+        }
+    }
+    return expenseItems;
+}
+
++ (NSMutableArray<Expense *> *)expense:(NSManagedObjectContext *)db date:(NSString *)date {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"date == %@", date]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isDelete == %@", @NO]];
+    NSMutableArray *sortDescriptors = NSMutableArray.alloc.init;
+    [sortDescriptors addObject:[NSSortDescriptor.alloc initWithKey:@"time" ascending:NO]];
+    return [self execute:db entity:@"Expense" predicates:predicates sortDescriptors:sortDescriptors];
+}
+
++ (NSArray<ExpenseReports *> *)expenseReports:(NSManagedObjectContext *)db searchFilter:(NSString *)searchFilter {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    if(searchFilter.length > 0) {
+        [predicates addObject:[NSPredicate predicateWithFormat:@"name CONTAINS[cd] %@", searchFilter.lowercaseString]];
+    }
+    [predicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %lld", [Get userID:db]]];
+    NSMutableArray *sortDescriptors = NSMutableArray.alloc.init;
+    [sortDescriptors addObject:[NSSortDescriptor.alloc initWithKey:@"date" ascending:NO]];
+    [sortDescriptors addObject:[NSSortDescriptor.alloc initWithKey:@"time" ascending:NO]];
+    NSMutableArray<ExpenseReports *> *reports = [NSMutableArray.alloc initWithArray:[self execute:db entity:@"ExpenseReports" predicates:predicates sortDescriptors:sortDescriptors]];
+    if(reports.count == 0) {
+        ExpenseReports *report1 = [NSEntityDescription insertNewObjectForEntityForName:@"ExpenseReports" inManagedObjectContext:db];
+        report1.expenseReportID = [Get sequenceID:db entity:@"ExpenseReports" attribute:@"expenseReportID"];;
+        report1.syncBatchID = [Get syncBatch:db].syncBatchID;
+        report1.employeeID = [Get userID:db];
+        report1.name = @"Expense Report 1";
+        NSDate *currentDate = NSDate.date;
+        report1.date = [Time getFormattedDate:DATE_FORMAT date:currentDate];
+        report1.time = [Time getFormattedDate:TIME_FORMAT date:currentDate];
+        report1.isDelete = NO;
+        report1.isSync = NO;
+        report1.isSubmit = NO;
+        report1.isUpdate = NO;
+        report1.isWebSubmit = NO;
+        [reports addObject:report1];
+    }
+    return reports;
+}
+
++ (NSArray<Expense *> *)syncExpenses:(NSManagedObjectContext *)db {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isDelete == %@", @NO]];
+    return [self execute:db entity:@"Expense" predicates:predicates];
+}
+
++ (NSArray<Expense *> *)updateExpenses:(NSManagedObjectContext *)db {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @YES]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isUpdate == %@", @YES]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isWebUpdate == %@", @NO]];
+    return [self execute:db entity:@"Expense" predicates:predicates];
+}
+
++ (NSArray<Expense *> *)deleteExpenses:(NSManagedObjectContext *)db {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @YES]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isDelete == %@", @YES]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isWebDelete == %@", @NO]];
+    return [self execute:db entity:@"Expense" predicates:predicates];
+}
+
++ (NSArray<Inventories *> *)inventories:(NSManagedObjectContext *)db date:(NSString *)date {
     return nil;
 //    NSMutableArray<Inventories *> *inventories = [NSMutableArray.alloc initWithArray:[self execute:db entity:@"Inventories"]];
 //    if(inventories.count == 0) {
@@ -492,7 +649,7 @@
 //    return [self execute:db entity:@"Inventories" predicates:nil sortDescriptors:sortDescriptors];
 }
 
-+ (NSArray<Forms *> *)forms:(NSManagedObjectContext *)db date:(NSDate *)date {
++ (NSArray<Forms *> *)forms:(NSManagedObjectContext *)db date:(NSString *)date {
     return nil;
 //    NSMutableArray<Forms *> *forms = [NSMutableArray.alloc initWithArray:[self execute:db entity:@"Forms"]];
 //    if(forms.count == 0) {

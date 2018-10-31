@@ -4,7 +4,7 @@
 
 @interface MessageDialogViewController()
 
-@property (nonatomic) BOOL viewDidAppear;
+@property (nonatomic) BOOL viewWillAppear;
 
 @end
 
@@ -12,8 +12,9 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.viewDidAppear = NO;
+    self.viewWillAppear = NO;
 }
+
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
     if(self.vContent.frame.size.height < self.vScroll.frame.size.height) {
@@ -25,10 +26,10 @@
     }
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    if(!self.viewDidAppear) {
-        self.viewDidAppear = YES;
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    if(!self.viewWillAppear) {
+        self.viewWillAppear = YES;
         self.lSubject.textColor = THEME_PRI;
         self.btnPositive.backgroundColor = THEME_SEC;
         [View setCornerRadiusByWidth:self.lSubject.superview cornerRadius:0.075];
@@ -61,13 +62,6 @@
         if(self.positiveTarget != nil) {
             [self.btnPositive addTarget:self.positiveTarget action:@selector(invoke) forControlEvents:UIControlEventTouchUpInside];
         }
-    }
-    if(self.vContent.frame.size.height < self.vScroll.frame.size.height) {
-        CGFloat inset = self.vScroll.frame.size.height - self.vContent.frame.size.height;
-        self.vScroll.contentInset = UIEdgeInsetsMake(inset * 0.5, 0, inset * 0.5, 0);
-    }
-    else {
-        self.vScroll.contentInset = UIEdgeInsetsZero;
     }
 }
 

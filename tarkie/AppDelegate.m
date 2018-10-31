@@ -55,9 +55,9 @@ void uncaughtExceptionHandler(NSException *exception) {
     NSPersistentStoreCoordinator *persistentStoreCoordinator = [NSPersistentStoreCoordinator.alloc initWithManagedObjectModel:[NSManagedObjectModel.alloc initWithContentsOfURL:[NSBundle.mainBundle URLForResource:@"DataModel" withExtension:@"momd"]]];
     NSError *error = nil;
     NSMutableDictionary *options = NSMutableDictionary.alloc.init;
-    [options setObject:@YES forKey:NSMigratePersistentStoresAutomaticallyOption];
-    [options setObject:@YES forKey:NSInferMappingModelAutomaticallyOption];
-    [options setObject:@{@"journal_mode":@"DELETE"} forKey:NSSQLitePragmasOption];
+    options[NSMigratePersistentStoresAutomaticallyOption] = @YES;
+    options[NSInferMappingModelAutomaticallyOption] = @YES;
+    options[NSSQLitePragmasOption] = @{@"journal_mode":@"DELETE"};
     [persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:[[NSFileManager.defaultManager URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask].lastObject URLByAppendingPathComponent:dbName] options:options error:&error];
     if(error != nil) {
         NSLog(@"error: appDelegate persistentStoreCoordinatorInit - %@", error.localizedDescription);
@@ -101,11 +101,11 @@ void uncaughtExceptionHandler(NSException *exception) {
         if(self.authorizationStatus != 0 && self.authorizationStatus != status) {
             if(status == kCLAuthorizationStatusAuthorizedAlways) {
                 NSLog(@"alert: ALERT_TYPE_TURNED_ON_GPS");
-                [Update alertSave:self.dbAlerts alertTypeID:ALERT_TYPE_TURNED_ON_GPS gpsID:[Update gpsSave:self.dbTracking location:self.location] value:nil];
+                [Update alertSave:self.dbAlerts alertTypeID:ALERT_TYPE_TURNED_ON_GPS gpsID:[Update gpsSave:self.dbTracking dbAlerts:self.dbAlerts location:self.location] value:nil];
             }
             else {
                 NSLog(@"alert: ALERT_TYPE_TURNED_OFF_GPS");
-                [Update alertSave:self.dbAlerts alertTypeID:ALERT_TYPE_TURNED_OFF_GPS gpsID:[Update gpsSave:self.dbTracking location:self.location] value:nil];
+                [Update alertSave:self.dbAlerts alertTypeID:ALERT_TYPE_TURNED_OFF_GPS gpsID:[Update gpsSave:self.dbTracking dbAlerts:self.dbAlerts location:self.location] value:nil];
             }
         }
         [self.locationManager startUpdatingLocation];
@@ -172,19 +172,9 @@ void uncaughtExceptionHandler(NSException *exception) {
 }
 
 - (BOOL)saveTracking {
-    int64_t gpsID = [Update gpsSave:self.dbTracking location:self.location];
+    int64_t gpsID = [Update gpsSave:self.dbTracking dbAlerts:self.dbAlerts location:self.location];
     if(gpsID == 0) {
-        Alerts *alert = [Get alert:self.dbAlerts alertTypeID:ALERT_TYPE_NO_GPS_SIGNAL];
-        if(alert == nil || alert.alertTypeID != ALERT_TYPE_NO_GPS_SIGNAL) {
-            NSLog(@"alert: ALERT_TYPE_NO_GPS_SIGNAL");
-            [Update alertSave:self.dbAlerts alertTypeID:ALERT_TYPE_NO_GPS_SIGNAL gpsID:gpsID value:nil];
-        }
         return NO;
-    }
-    Alerts *alert = [Get alert:self.dbAlerts alertTypeID:ALERT_TYPE_GPS_ACQUIRED];
-    if(alert == nil || alert.alertTypeID != ALERT_TYPE_GPS_ACQUIRED) {
-        NSLog(@"alert: ALERT_TYPE_GPS_ACQUIRED");
-        [Update alertSave:self.dbAlerts alertTypeID:ALERT_TYPE_GPS_ACQUIRED gpsID:gpsID value:nil];
     }
     Tracking *tracking = [NSEntityDescription insertNewObjectForEntityForName:@"Tracking" inManagedObjectContext:self.dbTracking];
     tracking.trackingID = [Get sequenceID:self.dbTracking entity:@"Tracking" attribute:@"trackingID"] + 1;

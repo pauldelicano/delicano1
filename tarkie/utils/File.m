@@ -12,10 +12,16 @@
 }
 
 + (BOOL)deleteFromCaches:(NSString *)filename {
+    if(filename == nil) {
+        return NO;
+    }
     return [self deleteFromDirectory:[self cachesPath:filename]];
 }
 
 + (BOOL)deleteFromDocument:(NSString *)filename {
+    if(filename == nil) {
+        return NO;
+    }
     return [self deleteFromDirectory:[self documentPath:filename]];
 }
 

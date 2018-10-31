@@ -69,6 +69,7 @@
     header.lAddress.text = self.store.address.length > 0 ? self.store.address : @"No address";
     header.btnEdit.hidden = !self.app.settingStoreEdit;
     [header.btnEdit addTarget:self action:@selector(editStore:) forControlEvents:UIControlEventTouchUpInside];
+    [header layoutIfNeeded];
     return header;
 }
 
@@ -82,6 +83,7 @@
     item.btnEdit.tag = indexPath.row;
     item.btnEdit.hidden = !self.app.settingStoreEdit;
     [item.btnEdit addTarget:self action:@selector(editStoreContact:) forControlEvents:UIControlEventTouchUpInside];
+    [item layoutIfNeeded];
     return item;
 }
 

@@ -6,7 +6,7 @@
 
 + (BOOL)usersLogout:(NSManagedObjectContext *)db;
 + (void)employeesDeactivate:(NSManagedObjectContext *)db;
-+ (int64_t)gpsSave:(NSManagedObjectContext *)db location:(CLLocation *)location;
++ (int64_t)gpsSave:(NSManagedObjectContext *)db dbAlerts:(NSManagedObjectContext *)dbAlerts location:(CLLocation *)location;
 + (BOOL)alertSave:(NSManagedObjectContext *)db alertTypeID:(int64_t)alertTypeID gpsID:(int64_t)gpsID value:(NSString *)value;
 + (void)announcementsDeactivate:(NSManagedObjectContext *)db;
 
@@ -24,6 +24,8 @@
 
 
 //EXPENSE
++ (void)expenseTypeCategoriesDeactivate:(NSManagedObjectContext *)db;
++ (void)expenseTypesDeactivate:(NSManagedObjectContext *)db expenseTypeCategoryID:(int64_t)expenseTypeCategoryID;
 
 
 //INVENTORY

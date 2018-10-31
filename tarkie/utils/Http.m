@@ -125,13 +125,13 @@
 
 + (NSDictionary *)createErrorResult:(NSError *)error {
     NSMutableDictionary *initDictionary = NSMutableDictionary.alloc.init;
-    [initDictionary setObject:@"error" forKey:@"status"];
-    [initDictionary setObject:@"0" forKey:@"recno"];
-    [initDictionary setObject:error.localizedDescription forKey:@"message"];
+    initDictionary[@"status"] = @"error";
+    initDictionary[@"recno"] = @"0";
+    initDictionary[@"message"] = error.localizedDescription;
     NSMutableArray *initArray = NSMutableArray.alloc.init;
     [initArray addObject:initDictionary];
     NSMutableDictionary *result = NSMutableDictionary.alloc.init;
-    [result setObject:initArray forKey:@"init"];
+    result[@"init"] = initArray;
     return result;
 }
 

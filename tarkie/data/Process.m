@@ -41,7 +41,7 @@
 }
 
 - (void)updateMasterFile:(NSManagedObjectContext *)db isAttendance:(BOOL)isAttendance isVisits:(BOOL)isVisits isExpense:(BOOL)isExpense isInventory:(BOOL)isInventory isForms:(BOOL)isForms {
-    self.count = 7 + (isAttendance ? 4 : 0) + (isVisits ? 1 : 0) + (isExpense ? 0 : 0) + (isInventory ? 0 : 0) + (isForms ? 0 : 0);
+    self.count = 8 + (isAttendance ? 4 : 0) + (isVisits ? 1 : 0) + (isExpense ? 1 : 0) + (isInventory ? 0 : 0) + (isForms ? 0 : 0);
     if(![Rx company:db delegate:self.delegate] || self.isCanceled) {
         return;
     }
@@ -89,12 +89,9 @@
         }
     }
     if(isExpense) {
-//        if(![Rx expenseTypes:db delegate:self.delegate] || self.isCanceled) {
-//            return;
-//        }
-//        if(![Rx expenseTypeCategories:db delegate:self.delegate] || self.isCanceled) {
-//            return;
-//        }
+        if(![Rx expenseTypeCategories:db delegate:self.delegate] || self.isCanceled) {
+            return;
+        }
     }
     if(isInventory) {
 //        if(![Rx inventories:db delegate:self.delegate] || self.isCanceled) {
@@ -144,6 +141,9 @@
 //        if(![Rx formFields:db delegate:self.delegate] || self.isCanceled) {
 //            return;
 //        }
+    }
+    if(![Rx syncBatchID:db delegate:self.delegate] || self.isCanceled) {
+        return;
     }
 }
 
@@ -274,6 +274,21 @@
     }
     for(CheckOut *uploadCheckOutPhoto in [Load uploadCheckOutPhoto:db]) {
         if(![Tx uploadCheckOutPhoto:db checkOut:uploadCheckOutPhoto delegate:self.delegate] || self.isCanceled) {
+            return;
+        }
+    }
+    for(Expense *syncExpense in [Load syncExpenses:db]) {
+        if(![Tx syncExpenses:db expense:syncExpense delegate:self.delegate] || self.isCanceled) {
+            return;
+        }
+    }
+    for(Expense *updateExpense in [Load updateExpenses:db]) {
+        if(![Tx updateExpenses:db expense:updateExpense delegate:self.delegate] || self.isCanceled) {
+            return;
+        }
+    }
+    for(Expense *deleteExpense in [Load deleteExpenses:db]) {
+        if(![Tx deleteExpenses:db expense:deleteExpense delegate:self.delegate] || self.isCanceled) {
             return;
         }
     }

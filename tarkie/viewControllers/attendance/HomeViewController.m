@@ -11,6 +11,8 @@
 #import "HomeTableViewCell.h"
 #import "MessageDialogViewController.h"
 #import "MainViewController.h"
+#import "ExpenseViewController.h"
+#import "ExpenseItemsViewController.h"
 #import "VisitDetailsViewController.h"
 
 @interface HomeViewController()
@@ -21,7 +23,7 @@
 @property (strong, nonatomic) NSMutableArray<Forms *> *forms;
 @property (strong, nonatomic) NSMutableArray<Inventories *> *inventories;
 @property (strong, nonatomic) NSTimer *timer;
-@property (nonatomic) BOOL viewWillAppear, viewDidAppear, visitsLoaded, formsLoaded, inventoryLoaded;
+@property (nonatomic) BOOL viewWillAppear, visitsLoaded, formsLoaded, inventoryLoaded;
 
 @end
 
@@ -47,17 +49,6 @@ static MessageDialogViewController *vcMessage;
     self.viewWillAppear = NO;
 }
 
-- (void)viewDidLayoutSubviews {
-    [super viewDidLayoutSubviews];
-    if(self.vContent.frame.size.height < self.vScroll.frame.size.height) {
-        CGFloat inset = self.vScroll.frame.size.height - self.vContent.frame.size.height;
-        self.vScroll.contentInset = UIEdgeInsetsMake(inset * 0.4, 0, inset * 0.6, 0);
-    }
-    else {
-        self.vScroll.contentInset = UIEdgeInsetsZero;
-    }
-}
-
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     if(!self.viewWillAppear) {
@@ -76,6 +67,17 @@ static MessageDialogViewController *vcMessage;
         [View setCornerRadiusByHeight:self.btnExpense cornerRadius:1];
     }
     [self onRefresh];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    if(self.vContent.frame.size.height < self.vScroll.frame.size.height) {
+        CGFloat inset = self.vScroll.frame.size.height - self.vContent.frame.size.height;
+        self.vScroll.contentInset = UIEdgeInsetsMake(inset * 0.4, 0, inset * 0.6, 0);
+    }
+    else {
+        self.vScroll.contentInset = UIEdgeInsetsZero;
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -99,7 +101,7 @@ static MessageDialogViewController *vcMessage;
             self.ivCompanyLogo.image = image;
         });
     });
-    NSDate *currentDate = NSDate.date;
+    NSString *currentDate = [Time getFormattedDate:DATE_FORMAT date:NSDate.date];
     if(self.app.moduleVisits) {
         [self.visits addObjectsFromArray:[Load visits:self.app.db date:currentDate isNoCheckOutOnly:YES]];
     }
@@ -228,11 +230,13 @@ static MessageDialogViewController *vcMessage;
         visit.webVisitID = 0;
         visit.storeID = 0;
         NSDate *currentDate = NSDate.date;
-        visit.name = [NSString stringWithFormat:@"New %@ %ld", self.app.conventionVisits, [Get visitTodayCount:self.app.db date:[Time getFormattedDate:DATE_FORMAT date:currentDate]] + 1];
-        visit.createdDate = [Time getFormattedDate:DATE_FORMAT date:currentDate];
-        visit.createdTime = [Time getFormattedDate:TIME_FORMAT date:currentDate];
-        visit.startDate = [Time getFormattedDate:DATE_FORMAT date:currentDate];
-        visit.endDate = [Time getFormattedDate:DATE_FORMAT date:currentDate];
+        NSString *date = [Time getFormattedDate:DATE_FORMAT date:currentDate];
+        NSString *time = [Time getFormattedDate:TIME_FORMAT date:currentDate];
+        visit.name = [NSString stringWithFormat:@"New %@ %ld", self.app.conventionVisits, [Get visitTodayCount:self.app.db date:date] + 1];
+        visit.createdDate = date;
+        visit.createdTime = time;
+        visit.startDate = date;
+        visit.endDate = date;
         visit.notes = @"";
         visit.isCheckOut = NO;
         visit.isCheckIn = NO;
@@ -252,14 +256,95 @@ static MessageDialogViewController *vcMessage;
 }
 
 - (IBAction)addExpense:(id)sender {
-    NSLog(@"paul: addExpense");
+    if(!self.main.isTimeIn) {
+        vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
+        vcMessage.subject = [NSString stringWithFormat:@"%@ Required", self.app.conventionTimeIn];
+        vcMessage.message = [NSString stringWithFormat:@"Please %@ first before creating new reports. To %@, please tap on Menu or slide to the right and select '%@'", self.app.conventionTimeIn.lowercaseString, self.app.conventionTimeIn.lowercaseString, self.app.conventionTimeIn];
+        vcMessage.positiveTitle = @"OK";
+        vcMessage.positiveTarget = ^{
+            vcMessage.view.alpha = 1;
+            [UIView animateWithDuration:0.25 animations:^{
+                vcMessage.view.alpha = 0;
+            } completion:^(BOOL finished) {
+                [vcMessage.view removeFromSuperview];
+                [vcMessage removeFromParentViewController];
+                [self.main.vcDrawer openDrawer];
+            }];
+        };
+        [View addChildViewController:self.main childViewController:vcMessage animated:YES];
+        return;
+    }
+    Expense *expense = [NSEntityDescription insertNewObjectForEntityForName:@"Expense" inManagedObjectContext:self.app.db];
+    expense.expenseID = [Get sequenceID:self.app.db entity:@"Expense" attribute:@"expenseID"] + 1;
+    expense.syncBatchID = self.app.syncBatchID;
+    expense.employeeID = self.app.employee.employeeID;
+    expense.timeInID = [Get timeIn:self.app.db].timeInID;
+    NSDate *currentDate = NSDate.date;
+    NSString *date = [Time getFormattedDate:DATE_FORMAT date:currentDate];
+    NSString *time = [Time getFormattedDate:TIME_FORMAT date:currentDate];
+    expense.name = [NSString stringWithFormat:@"Expense %ld", [Get expenseTodayCount:self.app.db date:date withoutDeleted:NO] + 1];
+    expense.date = date;
+    expense.time = time;
+    expense.gpsID = [Update gpsSave:self.app.dbTracking dbAlerts:self.app.dbAlerts location:self.app.location];
+    expense.amount = 0;
+    expense.isReimbursable = YES;
+    expense.isSubmit = NO;
+    expense.isSync = NO;
+    expense.isUpdate = NO;
+    expense.isWebUpdate = NO;
+    expense.isDelete = NO;
+    expense.isWebDelete = NO;
+    if([Update save:self.app.db]) {
+        for(ViewController *mainViewController in self.main.viewControllers) {
+            if([mainViewController isKindOfClass:ExpenseViewController.class]) {
+                for(ViewController *expenseViewController in ((ExpenseViewController *)mainViewController).viewControllers) {
+                    if([expenseViewController isKindOfClass:ExpenseItemsViewController.class]) {
+                        [expenseViewController onRefresh];
+                        break;
+                    }
+                }
+            }
+        }
+        [self.main updateSyncDataCount];
+        [View showAlert:self.main.navigationController.view message:[NSString stringWithFormat:@"%@ has been added. You may enter more details later.", expense.name] duration:2];
+    }
 }
 
 - (void)onLongPress:(UILongPressGestureRecognizer *)longPressGesture {
     if(longPressGesture.state == UIGestureRecognizerStateBegan) {
         longPressGesture.state = UIGestureRecognizerStateEnded;
         if(longPressGesture.view.superview == self.tvVisits) {
-            [self deleteVisit:[NSIndexPath indexPathForRow:longPressGesture.view.tag inSection:0]];
+            NSIndexPath *indexPath = [self.tvVisits indexPathForCell:(HomeTableViewCell *)longPressGesture.view];
+            if(self.app.settingVisitsDelete) {
+                if(self.visits[indexPath.row].isCheckIn || self.visits[indexPath.row].isCheckOut) {
+                    vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
+                    vcMessage.subject = [NSString stringWithFormat:@"Delete %@", self.app.conventionVisits];
+                    vcMessage.message = [NSString stringWithFormat:@"This %@ has already been checked-in. You're not allowed to delete it.", self.app.conventionVisits];
+                    vcMessage.positiveTitle = @"OK";
+                    vcMessage.positiveTarget = ^{
+                        [View removeChildViewController:vcMessage animated:YES];
+                    };
+                    [View addChildViewController:self.main childViewController:vcMessage animated:YES];
+                    return;
+                }
+                vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
+                vcMessage.subject = [NSString stringWithFormat:@"Delete %@", self.app.conventionVisits];
+                vcMessage.message = [NSString stringWithFormat:@"Are you sure you want to delete this %@?", self.app.conventionVisits];
+                vcMessage.negativeTitle = @"No";
+                vcMessage.negativeTarget = ^{
+                    [View removeChildViewController:vcMessage animated:YES];
+                };
+                vcMessage.positiveTitle = @"Yes";
+                vcMessage.positiveTarget = ^{
+                    self.visits[indexPath.row].isDelete = YES;
+                    if([Update save:self.app.db]) {
+                        [View removeChildViewController:vcMessage animated:YES];
+                        [self onRefresh];
+                        [self.main updateSyncDataCount];
+                    }
+                };
+                [View addChildViewController:self.main childViewController:vcMessage animated:YES];
+            }
         }
         if(longPressGesture.view.superview == self.tvForms) {
         }
@@ -269,36 +354,6 @@ static MessageDialogViewController *vcMessage;
 }
 
 - (void)deleteVisit:(NSIndexPath *)indexPath {
-    if(self.app.settingVisitsDelete) {
-        if(self.visits[indexPath.row].isCheckIn || self.visits[indexPath.row].isCheckOut) {
-            vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
-            vcMessage.subject = [NSString stringWithFormat:@"Delete %@", self.app.conventionVisits];
-            vcMessage.message = [NSString stringWithFormat:@"This %@ has already been checked-in. You're not allowed to delete it.", self.app.conventionVisits];
-            vcMessage.positiveTitle = @"OK";
-            vcMessage.positiveTarget = ^{
-                [View removeChildViewController:vcMessage animated:YES];
-            };
-            [View addChildViewController:self.main childViewController:vcMessage animated:YES];
-            return;
-        }
-        vcMessage = [self.storyboard instantiateViewControllerWithIdentifier:@"vcMessage"];
-        vcMessage.subject = [NSString stringWithFormat:@"Delete %@", self.app.conventionVisits];
-        vcMessage.message = [NSString stringWithFormat:@"Are you sure you want to delete this %@?", self.app.conventionVisits];
-        vcMessage.negativeTitle = @"No";
-        vcMessage.negativeTarget = ^{
-            [View removeChildViewController:vcMessage animated:YES];
-        };
-        vcMessage.positiveTitle = @"Yes";
-        vcMessage.positiveTarget = ^{
-            self.visits[indexPath.row].isDelete = YES;
-            if([Update save:self.app.db]) {
-                [View removeChildViewController:vcMessage animated:YES];
-                [self onRefresh];
-                [self.main updateSyncDataCount];
-            }
-        };
-        [View addChildViewController:self.main childViewController:vcMessage animated:YES];
-    }
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -316,7 +371,6 @@ static MessageDialogViewController *vcMessage;
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     HomeTableViewCell *item = [tableView dequeueReusableCellWithIdentifier:@"item" forIndexPath:indexPath];
-    item.tag = indexPath.row;
     [item.longPressGesture addTarget:self action:@selector(onLongPress:)];
     if(tableView == self.tvVisits) {
         Visits *visit = self.visits[indexPath.row];
@@ -341,6 +395,7 @@ static MessageDialogViewController *vcMessage;
             self.inventoryLoaded = YES;
         }
     }
+    [item layoutIfNeeded];
     return item;
 }
 

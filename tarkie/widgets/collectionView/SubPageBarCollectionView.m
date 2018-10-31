@@ -1,14 +1,14 @@
-#import "PageBarCollectionView.h"
-#import "PageBarItemCollectionViewCell.h"
+#import "SubPageBarCollectionView.h"
+#import "SubPageBarItemCollectionViewCell.h"
 
-@interface PageBarCollectionView()
+@interface SubPageBarCollectionView()
 
 @property (nonatomic) NSIndexPath *selectedIndexPath;
 @property (nonatomic) BOOL isDrawn;
 
 @end
 
-@implementation PageBarCollectionView
+@implementation SubPageBarCollectionView
 
 - (instancetype)init {
     return [self initialize:[super init]];
@@ -26,7 +26,7 @@
     return [self initialize:[super initWithFrame:frame collectionViewLayout:layout]];
 }
 
-- (instancetype)initialize:(PageBarCollectionView *)instance {
+- (instancetype)initialize:(SubPageBarCollectionView *)instance {
     instance.delegate = self;
     instance.dataSource = self;
     self.isDrawn = NO;
@@ -60,22 +60,10 @@
     return self.pages.count;
 }
 
-- (PageBarItemCollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    PageBarItemCollectionViewCell *item = [collectionView dequeueReusableCellWithReuseIdentifier:@"item" forIndexPath:indexPath];
+- (SubPageBarItemCollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
+    SubPageBarItemCollectionViewCell *item = [collectionView dequeueReusableCellWithReuseIdentifier:@"item" forIndexPath:indexPath];
     item.selected = indexPath == self.selectedIndexPath;
-    NSDictionary *page = self.pages[indexPath.row];
-    id icon = [page objectForKey:@"icon"];
-    if([icon isKindOfClass:UIImage.class]) {
-        item.ivIcon.alpha = 1;
-        item.lIcon.alpha = 0;
-        item.ivIcon.image = icon;
-    }
-    if([icon isKindOfClass:NSString.class]) {
-        item.ivIcon.alpha = 0;
-        item.lIcon.alpha = 1;
-        item.lIcon.text = icon;
-    }
-    item.lName.text = [page objectForKey:@"name"];
+    item.lName.text = self.pages[indexPath.row];
     return item;
 }
 
@@ -86,7 +74,7 @@
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    [self.pageBarDelegate onPageBarSelect:indexPath.row];
+    [self.subPageBarDelegate onSubPageBarSelect:indexPath.row];
     self.selectedIndexPath = indexPath;
 }
 

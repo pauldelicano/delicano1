@@ -6,13 +6,12 @@
 #import "File.h"
 #import "View.h"
 #import "Time.h"
-#import "AnnouncementItemTableViewCell.h"
+#import "AnnouncementsItemTableViewCell.h"
 #import "AnnouncementDetailsViewController.h"
 
 @interface AnnouncementsViewController()
 
 @property (strong, nonatomic) AppDelegate *app;
-@property (strong, nonatomic) NSCache *cache;
 @property (strong, nonatomic) NSMutableArray<Announcements*> *announcements;
 @property (strong, nonatomic) NSString *searchFilter;
 @property (nonatomic) BOOL viewWillAppear;
@@ -58,7 +57,7 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    AnnouncementItemTableViewCell *item = [tableView dequeueReusableCellWithIdentifier:@"item" forIndexPath:indexPath];
+    AnnouncementsItemTableViewCell *item = [tableView dequeueReusableCellWithIdentifier:@"item" forIndexPath:indexPath];
     Announcements *announcement = self.announcements[indexPath.row];
     Employees *createdBy = [Get employee:self.app.db employeeID:announcement.createdByID];
     item.ivPhoto.image = nil;
@@ -71,6 +70,7 @@
     item.lName.font = [UIFont fontWithName:!announcement.isSeen ? @"ProximaNova-Semibold" : @"ProximaNova-Regular" size:item.lName.font.pointSize];
     item.lName.text = announcement.subject;
     item.lDetails.text = [NSString stringWithFormat:@"%@ %@ | %@ | %@", createdBy.firstName, createdBy.lastName, [Time formatTime:self.app.settingDisplayTimeFormat time:announcement.scheduledTime], [Time formatDate:self.app.settingDisplayDateFormat date:announcement.scheduledDate]];
+    [item layoutIfNeeded];
     return item;
 }
 
@@ -81,7 +81,7 @@
     [self.navigationController pushViewController:vcAnnouncementDetails animated:YES];
 }
 
-- (void)onTextFieldTextChanged:(NSString *)text {
+- (void)onTextFieldTextChanged:(UITextField *)textfield text:(NSString *)text {
     self.searchFilter = text;
     [self onRefresh];
 }

@@ -48,10 +48,6 @@
     }
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-}
-
 - (void)onRefresh {
     [super onRefresh];
     self.lName.text = [NSString stringWithFormat:@"%@ %@", self.store.storeID != 0 ? @"Edit" : @"Add", self.app.conventionStores];

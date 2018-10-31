@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14315.18" systemVersion="18A384a" minimumToolsVersion="Automatic" sourceLanguage="Objective-C" userDefinedModelVersionIdentifier="1.0.0">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14315.18" systemVersion="18B73a" minimumToolsVersion="Automatic" sourceLanguage="Objective-C" userDefinedModelVersionIdentifier="1.0.0">
     <entity name="Alerts" representedClassName="Alerts" syncable="YES" codeGenerationType="class">
         <attribute name="alertID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="alertTypeID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
@@ -38,7 +38,6 @@
         <attribute name="breakInID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="breakTypeID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="date" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="employeeID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="gpsID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isBreakOut" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isSync" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
@@ -116,7 +115,103 @@
         <attribute name="withOvertime" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
     </entity>
     <entity name="Expense" representedClassName="Expense" syncable="YES" codeGenerationType="class">
+        <attribute name="amount" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="date" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="destination" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="employeeID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="expenseID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="expenseTypeID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="gpsID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isDelete" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isReimbursable" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isSubmit" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isSync" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isUpdate" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isWebDelete" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isWebUpdate" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="notes" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="origin" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="storeID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="syncBatchID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="time" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="timeInID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+    </entity>
+    <entity name="ExpenseDefault" representedClassName="ExpenseDefault" syncable="YES" codeGenerationType="class">
+        <attribute name="establishment" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="expenseID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isPhotoDelete" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isPhotoUpload" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="orNumber" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="photo" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="withOR" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+    </entity>
+    <entity name="ExpenseFuelConsumption" representedClassName="ExpenseFuelConsumption" syncable="YES" codeGenerationType="class">
+        <attribute name="end" optional="YES" attributeType="Integer 64" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="endPhoto" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="expenseID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isEndPhotoDelete" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isEndPhotoUpload" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isKilometer" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isStartPhotoDelete" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isStartPhotoUpload" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="rate" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="start" optional="YES" attributeType="Integer 64" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="startPhoto" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="ExpenseFuelPurchase" representedClassName="ExpenseFuelPurchase" syncable="YES" codeGenerationType="class">
+        <attribute name="establishment" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="expenseID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isPhotoDelete" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isPhotoUpload" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isStartPhotoDelete" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isStartPhotoUpload" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="liters" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="orNumber" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="photo" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="price" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="start" optional="YES" attributeType="Integer 64" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="startPhoto" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="withOR" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+    </entity>
+    <entity name="ExpenseReports" representedClassName="ExpenseReports" syncable="YES" codeGenerationType="class">
+        <attribute name="approverID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="date" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="dateSubmitted" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="employeeID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="expenseReportID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isDelete" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isSignatureDelete" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isSignatureUpload" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isSubmit" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isSync" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isUpdate" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isWebSubmit" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="message" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="referenceNumber" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="signature" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="subject" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="syncBatchID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="time" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="timeSubmitted" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="ExpenseReportTaggedDates" representedClassName="ExpenseReportTaggedDates" syncable="YES" codeGenerationType="class">
+        <attribute name="date" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="employeeID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isTag" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+    </entity>
+    <entity name="ExpenseTypeCategories" representedClassName="ExpenseTypeCategories" syncable="YES" codeGenerationType="class">
+        <attribute name="expenseTypeCategoryID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isActive" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="ExpenseTypes" representedClassName="ExpenseTypes" syncable="YES" codeGenerationType="class">
+        <attribute name="expenseTypeCategoryID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="expenseTypeID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isActive" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isRequired" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <entity name="Forms" representedClassName="Forms" syncable="YES" codeGenerationType="class">
         <attribute name="formID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
@@ -281,7 +376,6 @@
         <attribute name="isBreak" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isOvertime" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isPhotoDelete" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="isPhotoExists" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isPhotoUpload" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isSync" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="photo" optional="YES" attributeType="String" syncable="YES"/>
@@ -296,8 +390,8 @@
         <attribute name="date" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="gpsID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isPhotoDelete" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="isPhotoExists" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isPhotoUpload" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isSignatureDelete" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isSignatureUpload" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isSync" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="photo" optional="YES" attributeType="String" syncable="YES"/>
@@ -394,7 +488,7 @@
         <element name="Alerts" positionX="45" positionY="135" width="128" height="195"/>
         <element name="Announcements" positionX="-18" positionY="153" width="128" height="210"/>
         <element name="AnnouncementSeen" positionX="45" positionY="135" width="128" height="105"/>
-        <element name="BreakIn" positionX="45" positionY="135" width="128" height="195"/>
+        <element name="BreakIn" positionX="45" positionY="135" width="128" height="180"/>
         <element name="BreakOut" positionX="54" positionY="144" width="128" height="150"/>
         <element name="BreakTypes" positionX="45" positionY="135" width="128" height="105"/>
         <element name="CheckIn" positionX="63" positionY="153" width="128" height="210"/>
@@ -403,6 +497,13 @@
         <element name="Conventions" positionX="-36" positionY="135" width="128" height="90"/>
         <element name="Device" positionX="-63" positionY="-18" width="128" height="90"/>
         <element name="Employees" positionX="-45" positionY="36" width="128" height="210"/>
+        <element name="Expense" positionX="45" positionY="135" width="128" height="360"/>
+        <element name="ExpenseDefault" positionX="63" positionY="162" width="128" height="150"/>
+        <element name="ExpenseFuelConsumption" positionX="72" positionY="171" width="128" height="210"/>
+        <element name="ExpenseFuelPurchase" positionX="81" positionY="180" width="128" height="240"/>
+        <element name="ExpenseReports" positionX="45" positionY="135" width="128" height="30"/>
+        <element name="ExpenseTypeCategories" positionX="54" positionY="144" width="128" height="30"/>
+        <element name="ExpenseTypes" positionX="45" positionY="135" width="128" height="30"/>
         <element name="Forms" positionX="-45" positionY="144" width="128" height="75"/>
         <element name="GPS" positionX="63" positionY="153" width="128" height="135"/>
         <element name="Inventories" positionX="-36" positionY="153" width="128" height="75"/>
@@ -418,8 +519,8 @@
         <element name="StoreContacts" positionX="160" positionY="192" width="128" height="300"/>
         <element name="Stores" positionX="-18" positionY="162" width="128" height="390"/>
         <element name="SyncBatch" positionX="-54" positionY="54" width="128" height="90"/>
-        <element name="TimeIn" positionX="45" positionY="135" width="128" height="285"/>
-        <element name="TimeOut" positionX="54" positionY="144" width="128" height="270"/>
+        <element name="TimeIn" positionX="45" positionY="135" width="128" height="30"/>
+        <element name="TimeOut" positionX="54" positionY="144" width="128" height="30"/>
         <element name="TimeSecurity" positionX="-36" positionY="135" width="128" height="105"/>
         <element name="Tracking" positionX="54" positionY="144" width="128" height="165"/>
         <element name="Users" positionX="-54" positionY="0" width="128" height="105"/>
@@ -427,6 +528,6 @@
         <element name="VisitInventories" positionX="-18" positionY="144" width="128" height="135"/>
         <element name="VisitPhotos" positionX="54" positionY="144" width="128" height="90"/>
         <element name="Visits" positionX="-54" positionY="90" width="128" height="390"/>
-        <element name="Expense" positionX="45" positionY="135" width="128" height="60"/>
+        <element name="ExpenseReportTaggedDates" positionX="45" positionY="135" width="128" height="90"/>
     </elements>
 </model>

@@ -63,6 +63,9 @@
     if([managedObject isKindOfClass:CheckOut.class]) {
         ID = ((CheckOut *)managedObject).checkOutID;
     }
+    if([managedObject isKindOfClass:Expense.class]) {
+        ID = ((Expense *)managedObject).expenseID;
+    }
     return ID;
 }
 
@@ -85,7 +88,7 @@
 }
 
 + (BOOL)isModuleEnabled:(NSManagedObjectContext *)db moduleID:(int64_t)moduleID {
-    if(moduleID == 3 || moduleID == 4 || moduleID == 5) {
+    if(moduleID == 4 || moduleID == 5) {
         return NO;//paul
     }
     return [self module:db moduleID:moduleID].isEnabled;
@@ -322,9 +325,13 @@
     return [[self settingTeam:db settingID:settingID teamID:teamID].value isEqualToString:@"yes"];
 }
 
++ (NSString *)settingCurrencyCode:(NSManagedObjectContext *)db teamID:(int64_t)teamID {
+    return [self settingTeam:db settingID:SETTING_DISPLAY_CURRENCY teamID:teamID].value;
+}
+
 + (NSString *)settingCurrencySymbol:(NSManagedObjectContext *)db teamID:(int64_t)teamID {
     NSString *currencySymbol;
-    NSString *currencyCode = [self settingTeam:db settingID:SETTING_DISPLAY_CURRENCY teamID:teamID].value;
+    NSString *currencyCode = [self settingCurrencyCode:db teamID:teamID];
     if([currencyCode isEqualToString:@"AUD"] || [currencyCode isEqualToString:@"CAD"] || [currencyCode isEqualToString:@"HKD"] || [currencyCode isEqualToString:@"SGD"] || [currencyCode isEqualToString:@"USD"]) {
         currencySymbol = @"$";
     }
@@ -444,7 +451,9 @@
             break;
         }
     }
-    return [self execute:db entity:@"Alerts" predicates:predicates];
+    NSMutableArray *sortDescriptors = NSMutableArray.alloc.init;
+    [sortDescriptors addObject:[NSSortDescriptor.alloc initWithKey:@"alertID" ascending:NO]];
+    return [self execute:db entity:@"Alerts" predicates:predicates sortDescriptors:sortDescriptors];
 }
 
 + (long)syncAlertsCount:(NSManagedObjectContext *)db {
@@ -810,8 +819,91 @@
     return [self count:db entity:@"CheckOut" predicates:predicates];
 }
 
++ (long)expenseTypeCategoriesCount:(NSManagedObjectContext *)db {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
+    return [self count:db entity:@"ExpenseTypeCategories" predicates:predicates];
+}
+
++ (ExpenseTypeCategories *)expenseTypeCategory:(NSManagedObjectContext *)db expenseTypeCategoryID:(int64_t)expenseTypeCategoryID {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"expenseTypeCategoryID == %ld", expenseTypeCategoryID]];
+    return [self execute:db entity:@"ExpenseTypeCategories" predicates:predicates];
+}
+
++ (ExpenseTypes *)expenseType:(NSManagedObjectContext *)db expenseTypeID:(int64_t)expenseTypeID {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"expenseTypeID == %ld", expenseTypeID]];
+    return [self execute:db entity:@"ExpenseTypes" predicates:predicates];
+}
+
++ (Expense *)expense:(NSManagedObjectContext *)db expenseID:(int64_t)expenseID {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"expenseID == %ld", expenseID]];
+    return [self execute:db entity:@"Expense" predicates:predicates];
+}
+
++ (ExpenseFuelConsumption *)expenseFuelConsumption:(NSManagedObjectContext *)db expenseID:(int64_t)expenseID {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"expenseID == %ld", expenseID]];
+    return [self execute:db entity:@"ExpenseFuelConsumption" predicates:predicates];
+}
+
++ (ExpenseFuelPurchase *)expenseFuelPurchase:(NSManagedObjectContext *)db expenseID:(int64_t)expenseID {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"expenseID == %ld", expenseID]];
+    return [self execute:db entity:@"ExpenseFuelPurchase" predicates:predicates];
+}
+
++ (ExpenseDefault *)expenseDefault:(NSManagedObjectContext *)db expenseID:(int64_t)expenseID {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"expenseID == %ld", expenseID]];
+    return [self execute:db entity:@"ExpenseDefault" predicates:predicates];
+}
+
++ (long)expenseTodayCount:(NSManagedObjectContext *)db date:(NSString *)date withoutDeleted:(BOOL)withoutDeleted {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %ld", [self userID:db]]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"date == %@", date]];
+    if(withoutDeleted) {
+        [predicates addObject:[NSPredicate predicateWithFormat:@"isDelete == %@", @NO]];
+    }
+    return [self count:db entity:@"Expense" predicates:predicates];
+}
+
++ (long)syncExpenseCount:(NSManagedObjectContext *)db {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @NO]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isDelete == %@", @NO]];
+    return [self count:db entity:@"Expense" predicates:predicates];
+}
+
++ (long)updateExpenseCount:(NSManagedObjectContext *)db {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @YES]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isUpdate == %@", @YES]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isWebUpdate == %@", @NO]];
+    return [self count:db entity:@"Expense" predicates:predicates];
+}
+
++ (long)deleteExpenseCount:(NSManagedObjectContext *)db {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isSync == %@", @YES]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isDelete == %@", @YES]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isWebDelete == %@", @NO]];
+    return [self count:db entity:@"Expense" predicates:predicates];
+}
+
++ (BOOL)isExpenseItemTagged:(NSManagedObjectContext *)db date:(NSString *)date {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"employeeID == %ld", [self userID:db]]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"date == %@", date]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isTag == %@", @NO]];
+    return [self count:db entity:@"ExpenseReportTaggedDates" predicates:predicates] > 0;
+}
+
 + (long)syncTotalCount:(NSManagedObjectContext *)db {
-    return [self syncAnnouncementSeenCount:db] + [self syncStoresCount:db] + [self syncStoreContactsCount:db] + [self syncSchedulesCount:db] + [self syncTimeInCount:db] + [self uploadTimeInPhotoCount:db] + [self syncTimeOutCount:db] + [self uploadTimeOutPhotoCount:db] + [self uploadTimeOutSignatureCount:db] + [self syncBreakInCount:db] + [self syncBreakOutCount:db] + [self syncOvertimeCount:db] + [self syncTrackingCount:db] + [self syncAlertsCount:db] + [self syncVisitsCount:db] + [self uploadVisitPhotosCount:db] + [self syncCheckInCount:db] + [self uploadCheckInPhotoCount:db] + [self syncCheckOutCount:db] + [self uploadCheckOutPhotoCount:db];
+    return [self syncAnnouncementSeenCount:db] + [self syncStoresCount:db] + [self syncStoreContactsCount:db] + [self syncSchedulesCount:db] + [self syncTimeInCount:db] + [self uploadTimeInPhotoCount:db] + [self syncTimeOutCount:db] + [self uploadTimeOutPhotoCount:db] + [self uploadTimeOutSignatureCount:db] + [self syncBreakInCount:db] + [self syncBreakOutCount:db] + [self syncOvertimeCount:db] + [self syncTrackingCount:db] + [self syncAlertsCount:db] + [self syncVisitsCount:db] + [self uploadVisitPhotosCount:db] + [self syncCheckInCount:db] + [self uploadCheckInPhotoCount:db] + [self syncCheckOutCount:db] + [self uploadCheckOutPhotoCount:db] + [self syncExpenseCount:db] + [self updateExpenseCount:db] + [self deleteExpenseCount:db];
 }
 
 + (id)execute:(NSManagedObjectContext *)db entity:(NSString *)entity {

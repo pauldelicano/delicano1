@@ -15,7 +15,7 @@
 @property (strong, nonatomic) NSDate *breakOutDate;
 @property (strong, nonatomic) NSTimer *timer;
 @property (nonatomic) NSTimeInterval remaining;
-@property (nonatomic) BOOL viewDidAppear;
+@property (nonatomic) BOOL viewWillAppear;
 
 @end
 
@@ -31,28 +31,28 @@ static MessageDialogViewController *vcMessage;
     blur.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self.view addSubview:blur];
     [self.view sendSubviewToBack:blur];
-    self.viewDidAppear = NO;
+    self.viewWillAppear = NO;
 }
 
-- (void)viewDidLayoutSubviews {
-    [super viewDidLayoutSubviews];
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    if(!self.viewWillAppear) {
+        self.viewWillAppear = YES;
+        self.btnDone.backgroundColor = THEME_SEC;
+        [View setCornerRadiusByHeight:self.btnClose cornerRadius:1];
+        [View setCornerRadiusByHeight:self.btnDone cornerRadius:0.2];
+        [self onRefresh];
+    }
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
     if(self.vContent.frame.size.height < self.vScroll.frame.size.height) {
         CGFloat inset = self.vScroll.frame.size.height - self.vContent.frame.size.height;
         self.vScroll.contentInset = UIEdgeInsetsMake(inset * 0.5, 0, inset * 0.5, 0);
     }
     else {
         self.vScroll.contentInset = UIEdgeInsetsZero;
-    }
-}
-
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    if(!self.viewDidAppear) {
-        self.viewDidAppear = YES;
-        self.btnDone.backgroundColor = THEME_SEC;
-        [View setCornerRadiusByHeight:self.btnClose cornerRadius:1];
-        [View setCornerRadiusByHeight:self.btnDone cornerRadius:0.2];
-        [self onRefresh];
     }
 }
 
@@ -68,14 +68,6 @@ static MessageDialogViewController *vcMessage;
     self.lName.text = self.breakType.name;
     self.lDuration.text = [NSString stringWithFormat:@"You are currently on\n%@. (%lld mins)", self.breakType.name, self.breakType.duration];
     [self updateRemainingTime];
-    [self.vContent layoutIfNeeded];
-    if(self.vContent.frame.size.height < self.vScroll.frame.size.height) {
-        CGFloat inset = self.vScroll.frame.size.height - self.vContent.frame.size.height;
-        self.vScroll.contentInset = UIEdgeInsetsMake(inset * 0.5, 0, inset * 0.5, 0);
-    }
-    else {
-        self.vScroll.contentInset = UIEdgeInsetsZero;
-    }
 }
 
 - (void)updateRemainingTime {
@@ -88,23 +80,23 @@ static MessageDialogViewController *vcMessage;
     if(self.remaining < 1) {
         [self stopTimer];
         NSLog(@"alert: ALERT_TYPE_EXCESSIVE_BREAK");
-        [Update alertSave:self.app.dbAlerts alertTypeID:ALERT_TYPE_EXCESSIVE_BREAK gpsID:[Update gpsSave:self.app.dbTracking location:self.app.location] value:nil];
+        [Update alertSave:self.app.dbAlerts alertTypeID:ALERT_TYPE_EXCESSIVE_BREAK gpsID:[Update gpsSave:self.app.dbTracking dbAlerts:self.app.dbAlerts location:self.app.location] value:nil];
         NSMutableDictionary *userInfo = NSMutableDictionary.alloc.init;
-        [userInfo setObject:@"BREAK" forKey:@"NOTIFICATION_TYPE"];
-        [userInfo setObject:[NSString stringWithFormat:@"%lld", self.breakIn.breakInID] forKey:@"NOTIFICATION_ID"];
+        userInfo[@"NOTIFICATION_TYPE"] = @"BREAK";
+        userInfo[@"NOTIFICATION_ID"] = [NSString stringWithFormat:@"%lld", self.breakIn.breakInID];
         UNMutableNotificationContent *objNotificationContent = UNMutableNotificationContent.alloc.init;
         objNotificationContent.title = @"Excessive Break Alert";
         objNotificationContent.body = @"Ack, you may have forgotten the time! Hurry up and end your break asap.";
         objNotificationContent.sound = [UNNotificationSound soundNamed:@"Announcement.m4a"];
         objNotificationContent.userInfo = userInfo;
-        [self.app.userNotificationCenter addNotificationRequest:[UNNotificationRequest requestWithIdentifier:[userInfo objectForKey:@"NOTIFICATION_ID"] content:objNotificationContent trigger:[UNTimeIntervalNotificationTrigger triggerWithTimeInterval:1 repeats:NO]] withCompletionHandler:^(NSError * _Nullable error) {
+        [self.app.userNotificationCenter addNotificationRequest:[UNNotificationRequest requestWithIdentifier:userInfo[@"NOTIFICATION_ID"] content:objNotificationContent trigger:[UNTimeIntervalNotificationTrigger triggerWithTimeInterval:1 repeats:NO]] withCompletionHandler:^(NSError * _Nullable error) {
             if(error) {
                 NSLog(@"error: break addNotificationRequest - %@", error.localizedDescription);
                 return;
             }
         }];
     }
-    self.lRemaining.text = [NSString stringWithFormat:@"%@ left", [Time secondsToHoursMinutes:self.remaining]];
+    self.lRemaining.text = [NSString stringWithFormat:@"%@ left", [Time secondsToDHMS:self.remaining]];
 }
 
 - (void)stopTimer {

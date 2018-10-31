@@ -1,4 +1,5 @@
 #import "Update.h"
+#import "App.h"
 #import "Get.h"
 #import "Time.h"
 
@@ -21,22 +22,38 @@
     }
 }
 
-+ (int64_t)gpsSave:(NSManagedObjectContext *)db location:(CLLocation *)location {
-    if(location == nil || (location.coordinate.latitude == 0 && location.coordinate.longitude == 0)) {
-        return 0;
++ (int64_t)gpsSave:(NSManagedObjectContext *)db dbAlerts:(NSManagedObjectContext *)dbAlerts location:(CLLocation *)location {
+    int64_t gpsID = 0;
+    BOOL isValid = NO;
+    if(location != nil && location.coordinate.latitude != 0 && location.coordinate.longitude != 0) {
+        isValid = fabs([location.timestamp timeIntervalSinceNow]) <= 5;
+        GPS *gps = [NSEntityDescription insertNewObjectForEntityForName:@"GPS" inManagedObjectContext:db];
+        gps.gpsID = [Get sequenceID:db entity:@"GPS" attribute:@"gpsID"] + 1;;
+        gps.date = [Time getFormattedDate:DATE_FORMAT date:location.timestamp];
+        gps.time = [Time getFormattedDate:TIME_FORMAT date:location.timestamp];
+        gps.latitude = location.coordinate.latitude;
+        gps.longitude = location.coordinate.longitude;
+        gps.isValid = isValid;
+        NSLog(@"gps: %@ %@ %f %f %d", gps.date, gps.time, gps.latitude, gps.longitude, gps.isValid);
+        if([self save:db]) {
+            gpsID = gps.gpsID;
+        }
     }
-    GPS *gps = [NSEntityDescription insertNewObjectForEntityForName:@"GPS" inManagedObjectContext:db];
-    gps.gpsID = [Get sequenceID:db entity:@"GPS" attribute:@"gpsID"] + 1;
-    gps.date = [Time getFormattedDate:DATE_FORMAT date:location.timestamp];
-    gps.time = [Time getFormattedDate:TIME_FORMAT date:location.timestamp];
-    gps.latitude = location.coordinate.latitude;
-    gps.longitude = location.coordinate.longitude;
-    gps.isValid = fabs([location.timestamp timeIntervalSinceNow]) <= 5;
-    if(![self save:db]) {
-        return 0;
+    if(gpsID == 0 || !isValid) {
+        Alerts *alert = [Get alert:dbAlerts alertTypeID:ALERT_TYPE_NO_GPS_SIGNAL];
+        if(alert == nil || alert.alertTypeID != ALERT_TYPE_NO_GPS_SIGNAL) {
+            NSLog(@"alert: ALERT_TYPE_NO_GPS_SIGNAL");
+            [self alertSave:dbAlerts alertTypeID:ALERT_TYPE_NO_GPS_SIGNAL gpsID:gpsID value:nil];
+        }
     }
-    NSLog(@"tracking: %@ %@ %f %f %d", gps.date, gps.time, gps.latitude, gps.longitude, gps.isValid);
-    return gps.gpsID;
+    else {
+        Alerts *alert = [Get alert:dbAlerts alertTypeID:ALERT_TYPE_GPS_ACQUIRED];
+        if(alert == nil || alert.alertTypeID != ALERT_TYPE_GPS_ACQUIRED) {
+            NSLog(@"alert: ALERT_TYPE_GPS_ACQUIRED");
+            [self alertSave:dbAlerts alertTypeID:ALERT_TYPE_GPS_ACQUIRED gpsID:gpsID value:nil];
+        }
+    }
+    return gpsID;
 }
 
 + (BOOL)alertSave:(NSManagedObjectContext *)db alertTypeID:(int64_t)alertTypeID gpsID:(int64_t)gpsID value:(NSString *)value {
@@ -50,7 +67,7 @@
     alert.date = [Time getFormattedDate:DATE_FORMAT date:currentDate];
     alert.time = [Time getFormattedDate:TIME_FORMAT date:currentDate];
     alert.gpsID = gpsID;
-    alert.value = value != nil ? value : @"";
+    alert.value = value;
     alert.isSync = NO;
     return [self save:db];
 }
@@ -118,6 +135,23 @@
     [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
     for(OvertimeReasons *overtimeReason in [self execute:db entity:@"OvertimeReasons" predicates:predicates]) {
         overtimeReason.isActive = NO;
+    }
+}
+
++ (void)expenseTypeCategoriesDeactivate:(NSManagedObjectContext *)db {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
+    for(ExpenseTypeCategories *expenseTypeCategory in [self execute:db entity:@"ExpenseTypeCategories" predicates:predicates]) {
+        expenseTypeCategory.isActive = NO;
+    }
+}
+
++ (void)expenseTypesDeactivate:(NSManagedObjectContext *)db expenseTypeCategoryID:(int64_t)expenseTypeCategoryID {
+    NSMutableArray *predicates = NSMutableArray.alloc.init;
+    [predicates addObject:[NSPredicate predicateWithFormat:@"expenseTypeCategoryID == %lld", expenseTypeCategoryID]];
+    [predicates addObject:[NSPredicate predicateWithFormat:@"isActive == %@", @YES]];
+    for(ExpenseTypes *expenseType in [self execute:db entity:@"ExpenseTypes" predicates:predicates]) {
+        expenseType.isActive = NO;
     }
 }
 

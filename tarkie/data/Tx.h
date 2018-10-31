@@ -21,6 +21,8 @@
 #import "CheckIn+CoreDataClass.h"
 #import "CheckOut+CoreDataClass.h"
 
+#import "Expense+CoreDataClass.h"
+
 @interface Tx : NSObject
 
 + (BOOL)authorize:(NSManagedObjectContext *)db params:(NSDictionary *)params delegate:(id)delegate;
@@ -60,7 +62,9 @@
 + (BOOL)uploadCheckOutPhoto:(NSManagedObjectContext *)db checkOut:(CheckOut *)checkOut delegate:(id)delegate;
 
 //EXPENSE
-
++ (BOOL)syncExpenses:(NSManagedObjectContext *)db expense:(Expense *)expense delegate:(id)delegate;
++ (BOOL)updateExpenses:(NSManagedObjectContext *)db expense:(Expense *)expense delegate:(id)delegate;
++ (BOOL)deleteExpenses:(NSManagedObjectContext *)db expense:(Expense *)expense delegate:(id)delegate;
 
 //INVENTORY
 

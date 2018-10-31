@@ -59,8 +59,8 @@ static MessageDialogViewController *vcMessage;
     self.lSchedule.text = self.schedule;
     self.lTimeIn.text = self.timeIn;
     self.lTimeOut.text = self.timeOut;
-    self.lTotalHours.text = [Time secondsToHoursMinutes:self.workHours];
-    self.lHoursEligibleForOT.text = [Time secondsToHoursMinutes:self.workHours - self.scheduleHours];
+    self.lTotalHours.text = [Time secondsToDHMS:self.workHours];
+    self.lHoursEligibleForOT.text = [Time secondsToDHMS:self.workHours - self.scheduleHours];
     [self updateOvertimeForm];
 }
 
@@ -138,7 +138,6 @@ static MessageDialogViewController *vcMessage;
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     OvertimeFormTableViewCell *item = [tableView dequeueReusableCellWithIdentifier:@"item" forIndexPath:indexPath];
-    item.tag = indexPath.row;
     [item.longPressGesture addTarget:self action:@selector(onLongPress:)];
     [View setCornerRadiusByHeight:item.lIcon cornerRadius:0.4];
     item.lIcon.textColor = THEME_SEC;
@@ -150,6 +149,7 @@ static MessageDialogViewController *vcMessage;
     if(indexPath.row == self.overtimeReasons.count - 1) {
         self.overtimeReasonsLoaded = YES;
     }
+    [item layoutIfNeeded];
     return item;
 }
 
@@ -168,7 +168,8 @@ static MessageDialogViewController *vcMessage;
 - (void)onLongPress:(UILongPressGestureRecognizer *)longPressGesture {
     if(longPressGesture.state == UIGestureRecognizerStateBegan) {
         longPressGesture.state = UIGestureRecognizerStateEnded;
-        [self selectOvertimeReason:[NSIndexPath indexPathForRow:longPressGesture.view.tag inSection:0]];
+        NSIndexPath *indexPath = [self.tvOvertimeReasons indexPathForCell:(OvertimeFormTableViewCell *)longPressGesture.view];
+        [self selectOvertimeReason:indexPath];
     }
 }
 

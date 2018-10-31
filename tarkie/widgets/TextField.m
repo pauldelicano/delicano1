@@ -43,7 +43,31 @@
 }
 
 - (BOOL)textField:(TextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
-    [self.textFieldDelegate onTextFieldTextChanged:[textField.text stringByReplacingCharactersInRange:range withString:string]];
+    NSString *newString = [textField.text stringByReplacingCharactersInRange:range withString:string];
+    if(newString.length > 0) {
+        if(textField.keyboardType == UIKeyboardTypeNumberPad) {
+            newString = [NSString stringWithFormat:@"%lld", newString.longLongValue];
+            [self.textFieldDelegate onTextFieldTextChanged:self text:newString];
+            textField.text = newString;
+            return NO;
+        }
+        if(textField.keyboardType == UIKeyboardTypeDecimalPad) {
+            if([newString containsString:@"."]) {
+                NSArray<NSString *> *decimal = [newString componentsSeparatedByString:@"."];
+                if(decimal.count <= 2) {
+                    newString = [NSString stringWithFormat:@"%lld.%@", decimal[0].longLongValue, decimal[1]];
+                    [self.textFieldDelegate onTextFieldTextChanged:self text:newString];
+                    textField.text = newString;
+                }
+                return NO;
+            }
+            newString = [NSString stringWithFormat:@"%lld", newString.longLongValue];
+            [self.textFieldDelegate onTextFieldTextChanged:self text:newString];
+            textField.text = newString;
+            return NO;
+        }
+    }
+    [self.textFieldDelegate onTextFieldTextChanged:self text:newString];
     return YES;
 }
 

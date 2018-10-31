@@ -1,7 +1,7 @@
-#import "PageBarItemCollectionViewCell.h"
+#import "MainPageBarItemCollectionViewCell.h"
 #import "Color.h"
 
-@implementation PageBarItemCollectionViewCell
+@implementation MainPageBarItemCollectionViewCell
 
 - (void)awakeFromNib {
     [super awakeFromNib];

@@ -42,7 +42,7 @@
 }
 
 - (void)keyboardDidShow:(NSNotification *)notification {
-    UIEdgeInsets contentInset = UIEdgeInsetsMake(self.insetTop, 0, self.insetBottom + [[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].size.height, 0);
+    UIEdgeInsets contentInset = UIEdgeInsetsMake(self.insetTop, 0, self.insetBottom + [notification.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue].size.height, 0);
     [UIView animateWithDuration:0.125 animations:^{
         self.contentInset = contentInset;
         self.scrollIndicatorInsets = contentInset;
@@ -60,7 +60,10 @@
 }
 
 - (BOOL)scrollToFirstResponder:(UIView *)view {
-    if(view.isFirstResponder) {
+    if(view.isFirstResponder && [view isKindOfClass:UITextView.class]) {
+        while(![view.superview.superview isKindOfClass:ScrollView.class]) {
+            view = view.superview;
+        }
         [self scrollRectToVisible:view.frame animated:YES];
         return YES;
     }

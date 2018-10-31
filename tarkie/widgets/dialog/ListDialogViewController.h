@@ -16,7 +16,8 @@
 
 typedef enum {
     LIST_TYPE_BREAK,
-    LIST_TYPE_MAP
+    LIST_TYPE_MAP,
+    LIST_TYPE_EXPENSE_TYPE
 } ListType;
 
 @property (assign) id <ListDelegate> delegate;

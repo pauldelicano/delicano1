@@ -30,7 +30,6 @@
 @implementation VisitDetailsViewController
 
 static MessageDialogViewController *vcMessage;
-static ListDialogViewController *vcList;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -71,10 +70,6 @@ static ListDialogViewController *vcList;
         [self applicationDidBecomeActive];
     }
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(applicationDidBecomeActive) name:UIApplicationDidBecomeActiveNotification object:nil];
-}
-
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -258,7 +253,7 @@ static ListDialogViewController *vcList;
     if(self.store.storeID == 0) {
         return;
     }
-    vcList = [self.storyboard instantiateViewControllerWithIdentifier:@"vcList"];
+    ListDialogViewController *vcList = [self.storyboard instantiateViewControllerWithIdentifier:@"vcList"];
     vcList.delegate = self;
     vcList.type = LIST_TYPE_MAP;
     NSMutableArray *mapTypes = NSMutableArray.alloc.init;
@@ -350,6 +345,7 @@ static ListDialogViewController *vcList;
             self.formsLoaded = YES;
         }
     }
+    [item layoutIfNeeded];
     return item;
 }
 
@@ -370,8 +366,8 @@ static ListDialogViewController *vcList;
         
     }
 }
-- (void)onStoresSelect:(Stores *)stores {
-    self.store = stores;
+- (void)onStoresSelect:(Stores *)store {
+    self.store = store;
     self.lName.text = @"Visit";
     self.lStoreName.text = self.app.settingStoreDisplayLongName ? self.store.name : self.store.shortName;
     self.lStoreAddress.text = self.store.address.length > 0 ? self.store.address : @"No address";
@@ -485,8 +481,8 @@ static ListDialogViewController *vcList;
 - (void)onDropDownSelect:(int)type action:(int)action item:(id)item {
     switch(type) {
         case DROP_DOWN_TYPE_CHECK_OUT_STATUS: {
-            self.visitStatus = [item objectForKey:@"visitStatus"];
-            NSString *notes = [item objectForKey:@"visitNotes"];
+            self.visitStatus = item[@"visitStatus"];
+            NSString *notes = item[@"visitNotes"];
             if(notes != nil) {
                 self.visitNotes = notes;
             }
@@ -591,7 +587,7 @@ static ListDialogViewController *vcList;
     checkIn.visitID = self.visit.visitID;
     checkIn.date = date;
     checkIn.time = time;
-    checkIn.gpsID = [Update gpsSave:self.app.dbTracking location:self.app.location];
+    checkIn.gpsID = [Update gpsSave:self.app.dbTracking dbAlerts:self.app.dbAlerts location:self.app.location];
     checkIn.photo = self.photoFilename;
     checkIn.isSync = NO;
     checkIn.isPhotoUpload = NO;
@@ -702,7 +698,7 @@ static ListDialogViewController *vcList;
     checkOut.checkInID = self.visitCheckIn.checkInID;
     checkOut.date = date;
     checkOut.time = time;
-    checkOut.gpsID = [Update gpsSave:self.app.dbTracking location:self.app.location];
+    checkOut.gpsID = [Update gpsSave:self.app.dbTracking dbAlerts:self.app.dbAlerts location:self.app.location];
     checkOut.photo = self.photoFilename;
     checkOut.isSync = NO;
     checkOut.isPhotoUpload = NO;

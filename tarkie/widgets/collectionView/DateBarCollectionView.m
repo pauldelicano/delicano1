@@ -81,7 +81,7 @@
 }
 
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
-    if([[Time getFormattedDate:DATE_FORMAT date:self.dates[indexPath.row]] isEqualToString:[Time getFormattedDate:DATE_FORMAT date:self.dates[0]]] && self.selectedIndexPath != nil) {
+    if(self.dates[indexPath.row] == self.dates[0] && self.selectedIndexPath != nil) {
         if(self.countLeft == 0) {
             self.isLeft = YES;
             self.isRight = NO;
@@ -109,7 +109,7 @@
             self.countLeft = 0;
         }
     }
-    if([[Time getFormattedDate:DATE_FORMAT date:self.dates[indexPath.row]] isEqualToString:[Time getFormattedDate:DATE_FORMAT date:self.dates[self.dates.count - 1]]]) {
+    if(self.dates[indexPath.row] == self.dates[self.dates.count - 1]) {
         if(self.countRight == 0) {
             self.isRight = YES;
             self.isLeft = NO;

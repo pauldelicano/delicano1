@@ -1,7 +1,7 @@
-#import "AnnouncementItemTableViewCell.h"
+#import "AnnouncementsItemTableViewCell.h"
 #import "View.h"
 
-@implementation AnnouncementItemTableViewCell
+@implementation AnnouncementsItemTableViewCell
 
 - (void)awakeFromNib {
     [super awakeFromNib];

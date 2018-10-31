@@ -13,7 +13,7 @@
 @property (nonatomic) CLAuthorizationStatus authorizationStatus;
 @property (strong, nonatomic) CLLocation *location;
 @property (strong, nonatomic) UNUserNotificationCenter *userNotificationCenter;
-@property (strong, nonatomic) NSString *apiKey, *syncBatchID, *settingDisplayCurrencySymbol, *settingDisplayDateFormat, *settingDisplayTimeFormat, *settingDisplayDistanceUOM, *conventionEmployees, *conventionStores, *conventionTimeIn, *conventionTimeOut, *conventionVisits, *conventionTeams, *conventionInvoice, *conventionDeliveries, *conventionReturns, *conventionSales;
+@property (strong, nonatomic) NSString *apiKey, *syncBatchID, *settingDisplayDateFormat, *settingDisplayTimeFormat, *settingDisplayCurrencyCode, *settingDisplayCurrencySymbol, *settingDisplayDistanceUOM, *conventionEmployees, *conventionStores, *conventionTimeIn, *conventionTimeOut, *conventionVisits, *conventionTeams, *conventionInvoice, *conventionDeliveries, *conventionReturns, *conventionSales;
 @property (nonatomic) Company *company;
 @property (nonatomic) Employees *employee;
 @property (nonatomic) long settingLocationGPSTrackingInterval, settingAttendanceGracePeriodDuration, settingAttendanceOvertimeMinimumDuration, settingVisitsAlertNoCheckOutDistance, settingVisitsAlertNoMovementDuration, settingVisitsAlertOverstayingDuration, settingExpenseCostPerLiter;

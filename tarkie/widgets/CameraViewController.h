@@ -15,10 +15,14 @@ typedef enum {
     CAMERA_ACTION_TIME_OUT,
     CAMERA_ACTION_CHECK_IN,
     CAMERA_ACTION_CHECK_OUT,
-    CAMERA_ACTION_VISIT_PHOTOS
+    CAMERA_ACTION_VISIT_PHOTOS,
+    CAMERA_ACTION_EXPENSE,
+    CAMERA_ACTION_EXPENSE_START,
+    CAMERA_ACTION_EXPENSE_END
 } CameraAction;
 
 @property (assign) id <CameraDelegate> cameraDelegate;
+@property (strong, nonatomic) UIImage *image;
 @property (nonatomic) CameraAction action;
 @property (nonatomic) BOOL isRearCamera;
 

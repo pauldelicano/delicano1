@@ -13,7 +13,7 @@
 
 @property (strong, nonatomic) AppDelegate *app;
 @property (strong, nonatomic) TimeIn *timeIn;
-@property (nonatomic) BOOL viewDidAppear;
+@property (nonatomic) BOOL viewWillAppear;
 
 @end
 
@@ -27,7 +27,7 @@ static MessageDialogViewController *vcMessage;
     self.tvItems.tableFooterView = UIView.alloc.init;
     self.tvItems.estimatedSectionHeaderHeight = 48;
     self.timeIn = [Get timeIn:self.app.db];
-    self.viewDidAppear = NO;
+    self.viewWillAppear = NO;
 }
 
 - (void)viewDidLayoutSubviews {
@@ -38,14 +38,19 @@ static MessageDialogViewController *vcMessage;
     }
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    if(!self.viewDidAppear) {
-        self.viewDidAppear = YES;
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    if(!self.viewWillAppear) {
+        self.viewWillAppear = YES;
         [View setCornerRadiusByWidth:self.tvItems cornerRadius:0.075];
         [View setCornerRadiusByHeight:self.btnClose cornerRadius:1];
         [self onRefresh];
     }
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    self.tvItemsHeight.constant = self.view.frame.size.height;
 }
 
 - (void)onRefresh {
@@ -57,10 +62,9 @@ static MessageDialogViewController *vcMessage;
         case LIST_TYPE_MAP: {
             break;
         }
-    }
-    self.tvItemsHeight.constant = self.view.frame.size.height;
-    if(self.tvItems.contentSize.height < self.tvItemsHeight.constant) {
-        self.tvItemsHeight.constant = self.tvItems.contentSize.height;
+        case LIST_TYPE_EXPENSE_TYPE: {
+            break;
+        }
     }
 }
 
@@ -70,23 +74,30 @@ static MessageDialogViewController *vcMessage;
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     DrawerItemTableViewCell *header = [tableView dequeueReusableCellWithIdentifier:@"header"];
+    header.contentView.subviews[3].backgroundColor = THEME_SEC;
+    header.ivIcon.image = nil;
+    header.lIcon.text = nil;
     switch(self.type) {
         case LIST_TYPE_BREAK: {
-            header.ivIcon.alpha = 1;
-            header.lIcon.alpha = 0;
             header.ivIcon.image = [UIImage imageNamed:@"MenuBreaks"];
             header.lName.text = @"BREAKS";
             break;
         }
         case LIST_TYPE_MAP: {
-            header.ivIcon.alpha = 0;
-            header.lIcon.alpha = 1;
             header.lIcon.text = @"\uf124";
             header.lName.text = @"Open Location";
             break;
         }
+        case LIST_TYPE_EXPENSE_TYPE: {
+            header.lName.text = @"EXPENSE TYPES";
+            break;
+        }
     }
-    header.contentView.subviews[3].backgroundColor = THEME_SEC;
+    if(header.ivIcon.image == nil && header.lIcon.text == nil) {
+        [header.ivIcon removeFromSuperview];
+        [header.lIcon removeFromSuperview];
+    }
+    [header layoutIfNeeded];
     self.tvItems.scrollIndicatorInsets = UIEdgeInsetsMake(header.frame.size.height, 0, 0, 0);
     return header;
 }
@@ -94,34 +105,42 @@ static MessageDialogViewController *vcMessage;
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     switch(self.type) {
         case LIST_TYPE_BREAK: {
-            HomeTableViewCell *item1 = [tableView dequeueReusableCellWithIdentifier:@"item1" forIndexPath:indexPath];
+            HomeTableViewCell *item = [tableView dequeueReusableCellWithIdentifier:@"item1" forIndexPath:indexPath];
             BreakTypes *breakType = (BreakTypes *)self.items[indexPath.row];
-            item1.lName.text = breakType.name;
+            item.lName.text = breakType.name;
             BreakIn *breakIn = [Get breakIn:self.app.db timeInID:self.timeIn.timeInID breakTypeID:breakType.breakTypeID];
-            item1.lName.textColor = breakIn != nil ? [Color colorNamed:@"Grey500"] : [Color colorNamed:@"Grey800"];
+            item.lName.textColor = breakIn != nil ? [Color colorNamed:@"Grey500"] : [Color colorNamed:@"Grey800"];
             if(breakIn != nil) {
-                item1.lName.textColor = [Color colorNamed:@"Grey500"];
-                [item1 setUserInteractionEnabled:NO];
+                item.lName.textColor = [Color colorNamed:@"Grey500"];
+                item.userInteractionEnabled = NO;
             }
             else {
-                item1.lName.textColor = [Color colorNamed:@"Grey800"];
-                [item1 setUserInteractionEnabled:YES];
+                item.lName.textColor = [Color colorNamed:@"Grey800"];
+                item.userInteractionEnabled = YES;
             }
-            return item1;
+            [item layoutIfNeeded];
+            return item;
         }
         case LIST_TYPE_MAP: {
             NSString *mapType = (NSString *)self.items[indexPath.row];
-            DrawerItemTableViewCell *item2 = [tableView dequeueReusableCellWithIdentifier:@"item2" forIndexPath:indexPath];
-            item2.ivIcon.alpha = 1;
-            item2.lIcon.alpha = 0;
+            DrawerItemTableViewCell *item = [tableView dequeueReusableCellWithIdentifier:@"item2" forIndexPath:indexPath];
+            item.ivIcon.alpha = 1;
+            item.lIcon.alpha = 0;
             if([mapType isEqualToString:@"Maps"]) {
-                item2.ivIcon.image = [UIImage imageNamed:@"Maps"];
+                item.ivIcon.image = [UIImage imageNamed:@"Maps"];
             }
             if([mapType isEqualToString:@"Waze"]) {
-                item2.ivIcon.image = [UIImage imageNamed:@"Waze"];
+                item.ivIcon.image = [UIImage imageNamed:@"Waze"];
             }
-            item2.lName.text = mapType;
-            return item2;
+            item.lName.text = mapType;
+            [item layoutIfNeeded];
+            return item;
+        }
+        case LIST_TYPE_EXPENSE_TYPE: {
+            HomeTableViewCell *item = [tableView dequeueReusableCellWithIdentifier:@"item1" forIndexPath:indexPath];
+            item.lName.text = ((ExpenseTypes *)self.items[indexPath.row]).name;
+            [item layoutIfNeeded];
+            return item;
         }
     }
     return nil;
@@ -153,8 +172,12 @@ static MessageDialogViewController *vcMessage;
             [self.delegate onListSelect:self.type item:self.items[indexPath.row]];
             break;
         }
+        case LIST_TYPE_EXPENSE_TYPE: {
+            [View removeChildViewController:self animated:YES];
+            [self.delegate onListSelect:self.type item:self.items[indexPath.row]];
+            break;
+        }
     }
-    
 }
 
 - (IBAction)closeListDialog:(id)sender {

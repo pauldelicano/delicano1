@@ -54,7 +54,7 @@
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     DrawerHeaderTableViewCell *header = [tableView dequeueReusableCellWithIdentifier:@"header"];
-    header.vBackground.backgroundColor = THEME_PRI;
+    header.backgroundView.backgroundColor = THEME_PRI;
     header.ivEmployeePhoto.image = nil;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         UIImage *image = [File saveImageFromURL:[File cachesPath:[NSString stringWithFormat:@"EMPLOYEE_PHOTO_%lld%@", self.employee.employeeID, @".png"]] url:self.employee.photoURL];
@@ -77,13 +77,14 @@
     layer = header.ivCompanyLogo.layer;
     layer.borderColor = UIColor.whiteColor.CGColor;
     layer.borderWidth = (2.0f / 568) * UIScreen.mainScreen.bounds.size.height;
+    [header layoutIfNeeded];
     return header;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     DrawerItemTableViewCell *item = [tableView dequeueReusableCellWithIdentifier:@"item" forIndexPath:indexPath];
     NSDictionary *menu = self.menus[indexPath.row];
-    id icon = [menu objectForKey:@"icon"];
+    id icon = menu[@"icon"];
     if([icon isKindOfClass:UIImage.class]) {
         item.ivIcon.alpha = 1;
         item.lIcon.alpha = 0;
@@ -94,13 +95,14 @@
         item.lIcon.alpha = 1;
         item.lIcon.text = icon;
     }
-    item.lName.text = [menu objectForKey:@"name"];
+    item.lName.text = menu[@"name"];
+    [item layoutIfNeeded];
     return item;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    [self.delegate onDrawerMenuSelect:[[self.menus[indexPath.row] objectForKey:@"ID"] intValue]];
+    [self.delegate onDrawerMenuSelect:[self.menus[indexPath.row][@"ID"] intValue]];
 }
 
 - (void)openDrawer {

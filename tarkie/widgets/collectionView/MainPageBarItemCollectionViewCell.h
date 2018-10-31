@@ -1,6 +1,6 @@
 #import "CollectionViewCell.h"
 
-@interface PageBarItemCollectionViewCell : CollectionViewCell
+@interface MainPageBarItemCollectionViewCell : CollectionViewCell
 
 @property (weak, nonatomic) IBOutlet UIImageView *ivIcon;
 @property (weak, nonatomic) IBOutlet UILabel *lIcon;

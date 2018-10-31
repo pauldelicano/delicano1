@@ -39,6 +39,14 @@
 #import "CheckIn+CoreDataClass.h"
 #import "CheckOut+CoreDataClass.h"
 
+#import "ExpenseTypes+CoreDataClass.h"
+#import "ExpenseTypeCategories+CoreDataClass.h"
+#import "Expense+CoreDataClass.h"
+#import "ExpenseDefault+CoreDataClass.h"
+#import "ExpenseFuelConsumption+CoreDataClass.h"
+#import "ExpenseFuelPurchase+CoreDataClass.h"
+#import "ExpenseReports+CoreDataClass.h"
+
 @interface Get : NSObject
 
 + (int64_t)sequenceID:(NSManagedObjectContext *)db entity:(NSString *)entity attribute:(NSString *)attribute;
@@ -56,6 +64,7 @@
 + (int64_t)settingID:(NSManagedObjectContext *)db settingName:(NSString *)settingName;
 + (SettingsTeams *)settingTeam:(NSManagedObjectContext *)db settingID:(int64_t)settingID teamID:(int64_t)teamID;
 + (BOOL)isSettingEnabled:(NSManagedObjectContext *)db settingID:(int64_t)settingID teamID:(int64_t)teamID;
++ (NSString *)settingCurrencyCode:(NSManagedObjectContext *)db teamID:(int64_t)teamID;
 + (NSString *)settingCurrencySymbol:(NSManagedObjectContext *)db teamID:(int64_t)teamID;
 + (NSString *)settingDateFormat:(NSManagedObjectContext *)db teamID:(int64_t)teamID;
 + (NSString *)settingTimeFormat:(NSManagedObjectContext *)db teamID:(int64_t)teamID;
@@ -130,7 +139,18 @@
 + (long)uploadCheckOutPhotoCount:(NSManagedObjectContext *)db;
 
 //EXPENSE
-
++ (long)expenseTypeCategoriesCount:(NSManagedObjectContext *)db;
++ (ExpenseTypeCategories *)expenseTypeCategory:(NSManagedObjectContext *)db expenseTypeCategoryID:(int64_t)expenseTypeCategoryID;
++ (ExpenseTypes *)expenseType:(NSManagedObjectContext *)db expenseTypeID:(int64_t)expenseTypeID;
++ (Expense *)expense:(NSManagedObjectContext *)db expenseID:(int64_t)expenseID;
++ (ExpenseFuelConsumption *)expenseFuelConsumption:(NSManagedObjectContext *)db expenseID:(int64_t)expenseID;
++ (ExpenseFuelPurchase *)expenseFuelPurchase:(NSManagedObjectContext *)db expenseID:(int64_t)expenseID;
++ (ExpenseDefault *)expenseDefault:(NSManagedObjectContext *)db expenseID:(int64_t)expenseID;
++ (long)expenseTodayCount:(NSManagedObjectContext *)db date:(NSString *)date withoutDeleted:(BOOL)withoutDeleted;
++ (long)syncExpenseCount:(NSManagedObjectContext *)db;
++ (long)updateExpenseCount:(NSManagedObjectContext *)db;
++ (long)deleteExpenseCount:(NSManagedObjectContext *)db;
++ (BOOL)isExpenseItemTagged:(NSManagedObjectContext *)db date:(NSString *)date;
 
 //INVENTORY
 

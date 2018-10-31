@@ -12,7 +12,7 @@
 @property (strong, nonatomic) AppDelegate *app;
 @property (strong, nonatomic) id item;
 @property (nonatomic) CGFloat notesHeight;
-@property (nonatomic) BOOL viewDidAppear;
+@property (nonatomic) BOOL viewWillAppear;
 
 @end
 
@@ -24,7 +24,7 @@
     self.tvItems.tableFooterView = UIView.alloc.init;
     self.notesHeight = self.tfNotesHeight.constant;
     self.tfNotesHeight.constant = 0;
-    self.viewDidAppear = NO;
+    self.viewWillAppear = NO;
 }
 
 - (void)viewDidLayoutSubviews {
@@ -36,25 +36,35 @@
     else {
         self.vScroll.contentInset = UIEdgeInsetsZero;
     }
+    if(self.tvItemsHeight.constant > self.tvItems.contentSize.height) {
+        self.tvItemsHeight.constant = self.tvItems.contentSize.height;
+    }
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    if(!self.viewDidAppear) {
-        self.viewDidAppear = YES;
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    if(!self.viewWillAppear) {
+        self.viewWillAppear = YES;
         self.tfNotes.highlightedBorderColor = THEME_SEC;
         self.btnPositive.backgroundColor = THEME_SEC;
         [self.btnDropDown setTitleColor:THEME_SEC forState:UIControlStateNormal];
         [View setCornerRadiusByWidth:self.lSubject.superview cornerRadius:0.075];
         [View setCornerRadiusByHeight:self.tfDropDown cornerRadius:0.3];
         [View setCornerRadiusByHeight:self.btnDropDown cornerRadius:0.3];
-        [View setCornerRadiusByWidth:self.tfNotes cornerRadius:0.025];
+        [View setCornerRadiusByWidth:self.tfNotes cornerRadius:0.125];
         [View setCornerRadiusByHeight:self.btnNegative cornerRadius:0.2];
         [View setCornerRadiusByHeight:self.btnPositive cornerRadius:0.2];
         CALayer *layer = self.tvItems.layer;
         layer.borderColor = [Color colorNamed:@"Grey500"].CGColor;
         layer.borderWidth = (0.5f / 568) * UIScreen.mainScreen.bounds.size.height;
         [self onRefresh];
+    }
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    if(self.tvItemsHeight.constant > self.tvItems.contentSize.height) {
+        self.tvItemsHeight.constant = self.tvItems.contentSize.height;
     }
 }
 
@@ -91,16 +101,6 @@
     if([self.tfDropDown.text isEqualToString:@"Item 1"]) {
         self.tfDropDown.text = nil;
     }
-    if(self.tvItemsHeight.constant > self.tvItems.contentSize.height) {
-        self.tvItemsHeight.constant = self.tvItems.contentSize.height;
-    }
-    if(self.vContent.frame.size.height < self.vScroll.frame.size.height) {
-        CGFloat inset = self.vScroll.frame.size.height - self.vContent.frame.size.height;
-        self.vScroll.contentInset = UIEdgeInsetsMake(inset * 0.5, 0, inset * 0.5, 0);
-    }
-    else {
-        self.vScroll.contentInset = UIEdgeInsetsZero;
-    }
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -123,6 +123,7 @@
             break;
         }
     }
+    [item layoutIfNeeded];
     return item;
 }
 
@@ -153,7 +154,7 @@
             }
             if(![visitStatus isEqualToString:@"Select Status"]) {
                 NSMutableDictionary *visit = NSMutableDictionary.alloc.init;
-                [visit setObject:visitStatus forKey:@"visitStatus"];
+                visit[@"visitStatus"] = visitStatus;
                 self.item = visit;
             }
             self.tvItems.hidden = !self.tvItems.hidden;
@@ -211,7 +212,7 @@
                 if(visitStatus.length == 0) {
                     return;
                 }
-                [self.item setObject:visitStatus forKey:@"visitStatus"];
+                self.item[@"visitStatus"] = visitStatus;
                 if(([visitStatus isEqualToString:@"completed"] && self.app.settingVisitsNotesForCompleted) || ([visitStatus isEqualToString:@"incomplete"] && self.app.settingVisitsNotesForNotCompleted) || ([visitStatus isEqualToString:@"cancelled"] && self.app.settingVisitsNotesForCanceled)) {
                     NSString *notes = self.tfNotes.text;
                     if([notes isEqualToString:self.tfNotes.placeholder]) {
@@ -220,7 +221,7 @@
                     if(notes.length == 0) {
                         return;
                     }
-                    [self.item setObject:notes forKey:@"visitNotes"];
+                    self.item[@"visitNotes"] = notes;
                 }
                 break;
             }

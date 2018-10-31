@@ -28,6 +28,11 @@
 #import "CheckIn+CoreDataClass.h"
 #import "CheckOut+CoreDataClass.h"
 
+#import "ExpenseTypeCategories+CoreDataClass.h"
+#import "ExpenseTypes+CoreDataClass.h"
+#import "Expense+CoreDataClass.h"
+#import "ExpenseReports+CoreDataClass.h"
+
 #import "Inventories+CoreDataClass.h"
 
 #import "Forms+CoreDataClass.h"
@@ -55,6 +60,7 @@
 + (NSArray<ScheduleTimes *> *)scheduleTimes:(NSManagedObjectContext *)db;
 + (NSArray<Schedules *> *)syncSchedules:(NSManagedObjectContext *)db;
 + (NSArray<Schedules *> *)updateSchedules:(NSManagedObjectContext *)db;
++ (NSArray<TimeIn *> *)timeIn:(NSManagedObjectContext *)db date:(NSString *)date;
 + (NSArray<TimeIn *> *)syncTimeIn:(NSManagedObjectContext *)db;
 + (NSArray<TimeIn *> *)uploadTimeInPhoto:(NSManagedObjectContext *)db;
 + (NSArray<TimeOut *> *)syncTimeOut:(NSManagedObjectContext *)db;
@@ -67,11 +73,12 @@
 + (NSArray<OvertimeReasons *> *)overtimeReasons:(NSManagedObjectContext *)db;
 + (NSArray<Overtime *> *)syncOvertime:(NSManagedObjectContext *)db;
 + (NSArray<Tracking *> *)syncTracking:(NSManagedObjectContext *)db;
++ (NSArray<NSDictionary *> *)activities:(NSManagedObjectContext *)db date:(NSString *)date;
 
 //VISITS
 + (NSArray<Photos *> *)visitPhotos:(NSManagedObjectContext *)db visitID:(int64_t)visitID;
 + (NSArray<Photos *> *)uploadVisitPhotos:(NSManagedObjectContext *)db;
-+ (NSArray<Visits *> *)visits:(NSManagedObjectContext *)db date:(NSDate *)date isNoCheckOutOnly:(BOOL)isNoCheckOutOnly;
++ (NSArray<Visits *> *)visits:(NSManagedObjectContext *)db date:(NSString *)date isNoCheckOutOnly:(BOOL)isNoCheckOutOnly;
 + (NSArray<Visits *> *)syncVisits:(NSManagedObjectContext *)db;
 + (NSArray<Visits *> *)updateVisits:(NSManagedObjectContext *)db;
 + (NSArray<Visits *> *)deleteVisits:(NSManagedObjectContext *)db;
@@ -83,12 +90,19 @@
 + (NSArray<CheckOut *> *)uploadCheckOutPhoto:(NSManagedObjectContext *)db;
 
 //EXPENSE
-
++ (NSArray<ExpenseTypeCategories *> *)expenseTypeCategories:(NSManagedObjectContext *)db;
++ (NSArray<ExpenseTypes *> *)expenseTypes:(NSManagedObjectContext *)db;
++ (NSArray<NSMutableDictionary *> *)expenseItems:(NSManagedObjectContext *)db startDate:(NSString *)startDate endDate:(NSString *)endDate;
++ (NSArray<Expense *> *)expense:(NSManagedObjectContext *)db date:(NSString *)date;
++ (NSArray<ExpenseReports *> *)expenseReports:(NSManagedObjectContext *)db searchFilter:(NSString *)searchFilter;
++ (NSArray<Expense *> *)syncExpenses:(NSManagedObjectContext *)db;
++ (NSArray<Expense *> *)updateExpenses:(NSManagedObjectContext *)db;
++ (NSArray<Expense *> *)deleteExpenses:(NSManagedObjectContext *)db;
 
 //INVENTORY
-+ (NSArray<Inventories *> *)inventories:(NSManagedObjectContext *)db date:(NSDate *)date;
++ (NSArray<Inventories *> *)inventories:(NSManagedObjectContext *)db date:(NSString *)date;
 
 //FORMS
-+ (NSArray<Forms *> *)forms:(NSManagedObjectContext *)db date:(NSDate *)date;
++ (NSArray<Forms *> *)forms:(NSManagedObjectContext *)db date:(NSString *)date;
 
 @end

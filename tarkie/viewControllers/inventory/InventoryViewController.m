@@ -2,7 +2,7 @@
 
 @interface InventoryViewController()
 
-@property (nonatomic) BOOL viewDidAppear;
+@property (nonatomic) BOOL viewWillAppear;
 
 @end
 
@@ -10,13 +10,13 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.viewDidAppear = NO;
+    self.viewWillAppear = NO;
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    if(!self.viewDidAppear) {
-        self.viewDidAppear = YES;
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    if(!self.viewWillAppear) {
+        self.viewWillAppear = YES;
     }
     [self onRefresh];
 }

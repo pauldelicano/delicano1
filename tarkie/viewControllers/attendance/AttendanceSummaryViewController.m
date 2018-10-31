@@ -60,9 +60,9 @@
         self.btnCancel.hidden = NO;
         self.btnTimeOut.hidden = NO;
     }
-    self.lTotalWorkHours.text = [Time secondsToHoursMinutes:self.workHours];
-    self.lTotalBreak.text = [Time secondsToHoursMinutes:self.breakHours];
-    self.lTotalNetWorkHours.text = [Time secondsToHoursMinutes:self.workHours - self.breakHours];
+    self.lTotalWorkHours.text = [Time secondsToDHMS:self.workHours];
+    self.lTotalBreak.text = [Time secondsToDHMS:self.breakHours];
+    self.lTotalNetWorkHours.text = [Time secondsToDHMS:self.workHours - self.breakHours];
 }
 
 - (IBAction)back:(id)sender {

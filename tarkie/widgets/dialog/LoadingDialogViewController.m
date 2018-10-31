@@ -12,7 +12,7 @@
 @property (strong, nonatomic) NSString *loadingSubject, *loadingMessage;
 @property (nonatomic) UIBackgroundTaskIdentifier background;
 @property (nonatomic) long progress;
-@property (nonatomic) BOOL viewDidAppear;
+@property (nonatomic) BOOL viewWillAppear;
 
 @end
 
@@ -27,7 +27,7 @@ static MessageDialogViewController *vcMessage;
     self.process = Process.alloc.init;
     self.process.delegate = self;
     self.process.isCanceled = NO;
-    self.viewDidAppear = NO;
+    self.viewWillAppear = NO;
 }
 
 - (void)viewDidLayoutSubviews {
@@ -41,10 +41,10 @@ static MessageDialogViewController *vcMessage;
     }
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    if(!self.viewDidAppear) {
-        self.viewDidAppear = YES;
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    if(!self.viewWillAppear) {
+        self.viewWillAppear = YES;
         self.lSubject.textColor = THEME_PRI;
         self.vCircularProgressBar.textColor = THEME_PRI;
         self.vCircularProgressBar.progressTintColor = THEME_SEC;
@@ -156,13 +156,6 @@ static MessageDialogViewController *vcMessage;
     }
     self.lSubject.text = self.loadingSubject;
     self.progress = 0;
-    if(self.vContent.frame.size.height < self.vScroll.frame.size.height) {
-        CGFloat inset = self.vScroll.frame.size.height - self.vContent.frame.size.height;
-        self.vScroll.contentInset = UIEdgeInsetsMake(inset * 0.5, 0, inset * 0.5, 0);
-    }
-    else {
-        self.vScroll.contentInset = UIEdgeInsetsZero;
-    }
 }
 
 - (IBAction)closeLoadingDialog:(id)sender {

@@ -15,6 +15,7 @@
 
 + (NSString *)getFormattedDate:(NSString *)format date:(NSDate *)date {
     NSDateFormatter *dateFormatter = NSDateFormatter.alloc.init;
+    dateFormatter.locale = [NSLocale.alloc initWithLocaleIdentifier:@"en_US_POSIX"];
     dateFormatter.dateFormat = format;
     return [dateFormatter stringFromDate:date];
 }
@@ -35,7 +36,7 @@
     return [NSDate dateWithTimeIntervalSinceReferenceDate:floor([date timeIntervalSinceReferenceDate] / 60.0) * 60.0];
 }
 
-+ (NSString *)secondsToHoursMinutes:(NSTimeInterval)totalSeconds {
++ (NSString *)secondsToDHMS:(NSTimeInterval)totalSeconds {
     if(totalSeconds < 1) {
         return @"0s";
     }

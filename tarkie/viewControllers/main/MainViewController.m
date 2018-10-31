@@ -26,10 +26,8 @@
 
 @property (strong, nonatomic) AppDelegate *app;
 @property (strong, nonatomic) CATransition *transition;
-@property (strong, nonatomic) DrawerViewController *vcDrawer;
 @property (strong, nonatomic) UIPageViewController *pvcMain;
 @property (strong, nonatomic) NSMutableArray<NSDictionary *> *pages;
-@property (strong, nonatomic) NSMutableArray<ViewController *> *viewControllers;
 @property (strong, nonatomic) Stores *store;
 @property (strong, nonatomic) ScheduleTimes *scheduleTime;
 @property (strong, nonatomic) UIImage *photo, *signature;
@@ -44,7 +42,6 @@
 
 static MessageDialogViewController *vcSystemMessage, *vcMessage;
 static LoadingDialogViewController *vcLoading;
-static ListDialogViewController *vcList;
 static NSMutableArray<NSString *> *notificationRequestIdentifiers;
 
 - (void)viewDidLoad {
@@ -55,7 +52,7 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
     self.transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
     self.transition.type = kCATransitionMoveIn;
     self.transition.subtype = kCATransitionFromRight;
-    self.cvPageBar.pageBarDelegate = self;
+    self.cvMainPageBar.mainPageBarDelegate = self;
     self.pages = NSMutableArray.alloc.init;
     self.viewControllers = NSMutableArray.alloc.init;
     notificationRequestIdentifiers = NSMutableArray.alloc.init;
@@ -93,7 +90,7 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
         self.viewWillAppear = YES;
         self.vStatusBar.backgroundColor = THEME_PRI_DARK;
         self.vNavBar.backgroundColor = THEME_PRI;
-        self.cvPageBar.backgroundColor = THEME_PRI;
+        self.cvMainPageBar.backgroundColor = THEME_PRI;
         self.vBottomBar.backgroundColor = THEME_PRI;
         [self.btnNavBarButtonsVisitsAddVisit setTitleColor:THEME_PRI forState:UIControlStateNormal];
         [self.btnNavBarButtonsExpenseNewReport setTitleColor:THEME_PRI forState:UIControlStateNormal];
@@ -119,11 +116,6 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    [NSNotificationCenter.defaultCenter removeObserver:self name:@"UserNotificationCenterWillPresentNotification" object:nil];
-    [NSNotificationCenter.defaultCenter removeObserver:self name:@"UserNotificationCenterDidReceiveNotificationResponse" object:nil];
-    [NSNotificationCenter.defaultCenter removeObserver:self name:NSSystemClockDidChangeNotification object:nil];
-    [NSNotificationCenter.defaultCenter removeObserver:self name:NSSystemTimeZoneDidChangeNotification object:nil];
-    [NSNotificationCenter.defaultCenter removeObserver:self name:@"UserNotificationCenterDidUpdateLocations" object:nil];
     [NSNotificationCenter.defaultCenter removeObserver:self name:UIApplicationDidBecomeActiveNotification object:nil];
 }
 
@@ -134,6 +126,7 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
     self.app.company = [Get company:self.app.db];
     self.app.employee = [Get employee:self.app.db employeeID:[Get userID:self.app.db]];
 
+    self.app.settingDisplayCurrencyCode = [Get settingCurrencyCode:self.app.db teamID:self.app.employee.teamID];
     self.app.settingDisplayCurrencySymbol = [Get settingCurrencySymbol:self.app.db teamID:self.app.employee.teamID];
     self.app.settingDisplayDateFormat = [Get settingDateFormat:self.app.db teamID:self.app.employee.teamID];
     self.app.settingDisplayTimeFormat = [Get settingTimeFormat:self.app.db teamID:self.app.employee.teamID];
@@ -165,7 +158,7 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
     self.app.settingAttendanceNotificationTimeOut = [Get isSettingEnabled:self.app.db settingID:SETTING_ATTENDANCE_NOTIFICATION_TIME_OUT teamID:self.app.employee.teamID];
 
     self.app.settingVisitsAdd = [Get isSettingEnabled:self.app.db settingID:SETTING_VISITS_ADD teamID:self.app.employee.teamID];
-    self.app.settingVisitsEditAfterCheckOut = [Get isSettingEnabled:self.app.db settingID:SETTING_VISITS_EDIT_AFTER_CHECK_OUT teamID:self.app.employee.teamID];
+    self.app.settingVisitsEditAfterCheckOut = ![Get isSettingEnabled:self.app.db settingID:SETTING_VISITS_EDIT_AFTER_CHECK_OUT teamID:self.app.employee.teamID];
     self.app.settingVisitsReschedule = [Get isSettingEnabled:self.app.db settingID:SETTING_VISITS_RESCHEDULE teamID:self.app.employee.teamID];
     self.app.settingVisitsDelete = [Get isSettingEnabled:self.app.db settingID:SETTING_VISITS_DELETE teamID:self.app.employee.teamID];
     self.app.settingVisitsInvoice = [Get isSettingEnabled:self.app.db settingID:SETTING_VISITS_INVOICE teamID:self.app.employee.teamID];
@@ -229,29 +222,29 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
     [self.viewControllers removeAllObjects];
     [self.pages addObjectsFromArray:[Load modulePages:self.app.db]];
     for(int x = 0; x < self.pages.count; x++) {
-        [self.viewControllers addObject:[self.storyboard instantiateViewControllerWithIdentifier:[self.pages[x] objectForKey:@"viewController"]]];
+        [self.viewControllers addObject:[self.storyboard instantiateViewControllerWithIdentifier:self.pages[x][@"viewController"]]];
     }
 
-    self.cvPageBar.pages = self.pages;
-    [self.cvPageBar reloadData];
+    self.cvMainPageBar.pages = self.pages;
+    [self.cvMainPageBar reloadData];
 
     [self.app.userNotificationCenter removePendingNotificationRequestsWithIdentifiers:notificationRequestIdentifiers];
     [notificationRequestIdentifiers removeAllObjects];
     for(Announcements *announcement in [Load announcements:self.app.db searchFilter:nil isScheduled:NO]) {
         NSMutableDictionary *userInfo = NSMutableDictionary.alloc.init;
-        [userInfo setObject:@"ANNOUNCEMENT" forKey:@"NOTIFICATION_TYPE"];
-        [userInfo setObject:[NSString stringWithFormat:@"%lld", announcement.announcementID] forKey:@"NOTIFICATION_ID"];
+        userInfo[@"NOTIFICATION_TYPE"] = @"ANNOUNCEMENT";
+        userInfo[@"NOTIFICATION_ID"] = [NSString stringWithFormat:@"%lld", announcement.announcementID];
         UNMutableNotificationContent *objNotificationContent = UNMutableNotificationContent.alloc.init;
         objNotificationContent.title = announcement.subject;
         objNotificationContent.body = announcement.message;
         objNotificationContent.sound = [UNNotificationSound soundNamed:@"Announcement.m4a"];
         objNotificationContent.userInfo = userInfo;
-        [self.app.userNotificationCenter addNotificationRequest:[UNNotificationRequest requestWithIdentifier:[userInfo objectForKey:@"NOTIFICATION_ID"] content:objNotificationContent trigger:[UNTimeIntervalNotificationTrigger triggerWithTimeInterval:[[Time getDateFromString:[NSString stringWithFormat:@"%@ %@", announcement.scheduledDate, announcement.scheduledTime]] timeIntervalSinceNow] repeats:NO]] withCompletionHandler:^(NSError * _Nullable error) {
+        [self.app.userNotificationCenter addNotificationRequest:[UNNotificationRequest requestWithIdentifier:userInfo[@"NOTIFICATION_ID"] content:objNotificationContent trigger:[UNTimeIntervalNotificationTrigger triggerWithTimeInterval:[[Time getDateFromString:[NSString stringWithFormat:@"%@ %@", announcement.scheduledDate, announcement.scheduledTime]] timeIntervalSinceNow] repeats:NO]] withCompletionHandler:^(NSError * _Nullable error) {
             if(error) {
                 NSLog(@"error: main addNotificationRequest - %@", error.localizedDescription);
                 return;
             }
-            [notificationRequestIdentifiers addObject:[NSString stringWithFormat:@"%@_%@", [userInfo objectForKey:@"NOTIFICATION_TYPE"], [userInfo objectForKey:@"NOTIFICATION_ID"]]];
+            [notificationRequestIdentifiers addObject:[NSString stringWithFormat:@"%@_%@", userInfo[@"NOTIFICATION_TYPE"], userInfo[@"NOTIFICATION_ID"]]];
         }];
     }
 }
@@ -287,8 +280,8 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
         TimeOut *timeOut = [Get timeOut:self.app.db timeInID:timeIn.timeInID];
         NSDate *scheduleTimeIn = [Time getDateFromString:[NSString stringWithFormat:@"%@ %@", schedule.scheduleDate, schedule.timeIn]];
         NSDate *scheduleTimeOut = [Time getDateFromString:[NSString stringWithFormat:@"%@ %@", schedule.scheduleDate, schedule.timeOut]];
-        NSDate *actualTimeIn = [Time dateRemoveSeconds:[Time getDateFromString:[NSString stringWithFormat:@"%@ %@", timeIn.date, timeIn.time]]];
-        NSDate *actualTimeOut = [Time dateRemoveSeconds:[Time getDateFromString:[NSString stringWithFormat:@"%@ %@", timeOut.date, timeOut.time]]];
+        NSDate *actualTimeIn = [Time getDateFromString:[NSString stringWithFormat:@"%@ %@", timeIn.date, timeIn.time]];
+        NSDate *actualTimeOut = [Time getDateFromString:[NSString stringWithFormat:@"%@ %@", timeOut.date, timeOut.time]];
         if([scheduleTimeOut timeIntervalSinceDate:scheduleTimeIn] < 0) {
             scheduleTimeOut = [scheduleTimeOut dateByAddingTimeInterval:60 * 60 * 24];
         }
@@ -326,9 +319,10 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
         Alerts *alert = [Get alert:self.app.dbAlerts alertTypeID:ALERT_TYPE_LOW_BATTERY];
         if(alert == nil) {
             NSLog(@"alert: ALERT_TYPE_LOW_BATTERY");
-            [Update alertSave:self.app.dbAlerts alertTypeID:ALERT_TYPE_LOW_BATTERY gpsID:[Update gpsSave:self.app.dbTracking location:self.app.location] value:[NSString stringWithFormat:@"%d", batteryLevel]];
+            [Update alertSave:self.app.dbAlerts alertTypeID:ALERT_TYPE_LOW_BATTERY gpsID:[Update gpsSave:self.app.dbTracking dbAlerts:self.app.dbAlerts location:self.app.location] value:[NSString stringWithFormat:@"%d", batteryLevel]];
         }
     }
+    [self updateSyncDataCount];
     if(self.isLoading) {
         return NO;
     }
@@ -371,39 +365,54 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
 
 - (void)willPresentNotification:(NSNotification *)notification {
     NSDictionary *userInfo = notification.userInfo;
-    if([[userInfo objectForKey:@"NOTIFICATION_TYPE"] isEqualToString:@"ANNOUNCEMENT"]) {
+    if([userInfo[@"NOTIFICATION_TYPE"] isEqualToString:@"ANNOUNCEMENT"]) {
         [self updateUnSeenAnnouncementsCount];
     }
-    if([[userInfo objectForKey:@"NOTIFICATION_TYPE"] isEqualToString:@"BREAK"]) {
+    if([userInfo[@"NOTIFICATION_TYPE"] isEqualToString:@"BREAK"]) {
         
     }
 }
 
 - (void)didReceiveNotificationResponse:(NSNotification *)notification {
     NSDictionary *userInfo = notification.userInfo;
-    if([[userInfo objectForKey:@"NOTIFICATION_TYPE"] isEqualToString:@"ANNOUNCEMENT"]) {
+    if([userInfo[@"NOTIFICATION_TYPE"] isEqualToString:@"ANNOUNCEMENT"]) {
         AnnouncementDetailsViewController *vcAnnouncementDetails = [self.storyboard instantiateViewControllerWithIdentifier:@"vcAnnouncementDetails"];
-        vcAnnouncementDetails.announcement = [Get announcement:self.app.db announcementID:[[userInfo objectForKey:@"NOTIFICATION_ID"] intValue]];
+        vcAnnouncementDetails.announcement = [Get announcement:self.app.db announcementID:[userInfo[@"NOTIFICATION_ID"] longLongValue]];
         [self.navigationController pushViewController:vcAnnouncementDetails animated:YES];
     }
-    if([[userInfo objectForKey:@"NOTIFICATION_TYPE"] isEqualToString:@"BREAK"]) {
+    if([userInfo[@"NOTIFICATION_TYPE"] isEqualToString:@"BREAK"]) {
         
     }
 }
 
 - (void)systemClockDidChange {
-    TimeSecurity *timeSecurity = [Get timeSecurity:self.app.db];
-    double interval = fabs([[[Time getDateFromString:[NSString stringWithFormat:@"%@ %@", timeSecurity.serverDate, timeSecurity.serverTime]] dateByAddingTimeInterval:fabs(timeSecurity.upTime - [Time getUptime])] timeIntervalSinceNow]);
-    if(interval > 60) {
+    TimeSecurity *timeSecurity = [Get timeSecurity:self.app.dbAlerts];
+    NSDate *server = [Time getDateFromString:[NSString stringWithFormat:@"%@ %@", timeSecurity.serverDate, timeSecurity.serverTime]];
+    NSDate *newServer = [server dateByAddingTimeInterval:fabs(timeSecurity.upTime - [Time getUptime])];
+    if(fabs([newServer timeIntervalSinceNow]) > 60) {
         if(!timeSecurity.didChange) {
             timeSecurity.didChange = YES;
-            [Update save:self.app.db];
+            if(self.isTimeIn) {
+                NSLog(@"alert: ALERT_TYPE_CHANGED_DATE_TIME");
+                Alerts *alert = [NSEntityDescription insertNewObjectForEntityForName:@"Alerts" inManagedObjectContext:self.app.dbAlerts];
+                alert.alertID = [Get sequenceID:self.app.dbAlerts entity:@"Alerts" attribute:@"alertID"] + 1;
+                alert.syncBatchID = [Get syncBatch:self.app.dbAlerts].syncBatchID;
+                alert.employeeID = self.app.employee.employeeID;
+                alert.timeInID = [Get timeIn:self.app.dbAlerts].timeInID;
+                alert.alertTypeID = ALERT_TYPE_CHANGED_DATE_TIME;
+                alert.date = [Time getFormattedDate:DATE_FORMAT date:newServer];
+                alert.time = [Time getFormattedDate:TIME_FORMAT date:newServer];
+                alert.gpsID = [Update gpsSave:self.app.dbTracking dbAlerts:self.app.dbAlerts location:self.app.location];
+                alert.value = @"";
+                alert.isSync = NO;
+            }
+            [Update save:self.app.dbAlerts];
         }
     }
     else {
         if(timeSecurity.didChange) {
             timeSecurity.didChange = NO;
-            [Update save:self.app.db];
+            [Update save:self.app.dbAlerts];
         }
     }
 }
@@ -465,7 +474,11 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
 }
 
 - (IBAction)historyDate:(id)sender {
-    NSLog(@"paul: historyDate");
+    NSLog(@"paul: historyDate");    
+    if([self.viewControllers[self.currentPage] isKindOfClass:HistoryViewController.class]) {
+        HistoryViewController *vcHistory = (HistoryViewController *)self.viewControllers[self.currentPage];
+        [vcHistory onCalendarPick:[Time getDateFromString:@"2018-10-20 09:00:00"] type:0];
+    }
 }
 
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerBeforeViewController:(UIViewController *)viewController {
@@ -489,19 +502,18 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
 - (void)pageViewController:(UIPageViewController *)pageViewController didFinishAnimating:(BOOL)finished previousViewControllers:(NSArray<UIViewController *> *)previousViewControllers transitionCompleted:(BOOL)completed {
     if(finished && completed) {
         NSIndexPath *indexPath = [NSIndexPath indexPathForRow:self.nextPage inSection:0];
-        [self.cvPageBar selectItemAtIndexPath:indexPath animated:NO scrollPosition:UICollectionViewScrollPositionLeft];
-        [self.cvPageBar collectionView:self.cvPageBar didSelectItemAtIndexPath:indexPath];
+        [self.cvMainPageBar selectItemAtIndexPath:indexPath animated:NO scrollPosition:UICollectionViewScrollPositionLeft];
+        [self.cvMainPageBar collectionView:self.cvMainPageBar didSelectItemAtIndexPath:indexPath];
     }
 }
 
-- (void)onPageBarSelect:(long)page {
+- (void)onMainPageBarSelect:(long)page {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         self.currentPage = page;
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.pvcMain setViewControllers:@[self.viewControllers[self.currentPage]] direction:UIPageViewControllerNavigationDirectionForward animated:NO completion:nil];
             self.vNavBarButtonsHome.hidden = ![self.viewControllers[self.currentPage] isKindOfClass:HomeViewController.class];
-//            self.vNavBarButtonsVisits.hidden = ![self.viewControllers[self.currentPage] isKindOfClass:VisitsViewController.class];
-            self.vNavBarButtonsVisits.hidden = YES;
+            self.vNavBarButtonsVisits.hidden = ![self.viewControllers[self.currentPage] isKindOfClass:VisitsViewController.class];
             self.vNavBarButtonsExpense.hidden = ![self.viewControllers[self.currentPage] isKindOfClass:ExpenseViewController.class];
             self.vNavBarButtonsInventory.hidden = ![self.viewControllers[self.currentPage] isKindOfClass:InventoryViewController.class];
             self.vNavBarButtonsForms.hidden = ![self.viewControllers[self.currentPage] isKindOfClass:FormsViewController.class];
@@ -593,7 +605,7 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
                 [View addChildViewController:self childViewController:vcMessage animated:YES];
                 return;
             }
-            vcList = [self.storyboard instantiateViewControllerWithIdentifier:@"vcList"];
+            ListDialogViewController *vcList = [self.storyboard instantiateViewControllerWithIdentifier:@"vcList"];
             vcList.delegate = self;
             vcList.type = LIST_TYPE_BREAK;
             vcList.items = [Load breakTypes:self.app.db];
@@ -696,7 +708,7 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
             vcMessage.positiveTarget = ^{
                 [View removeChildViewController:vcMessage animated:YES];
                 NSLog(@"alert: ALERT_TYPE_LOGOUT");
-                [Update alertSave:self.app.dbAlerts alertTypeID:ALERT_TYPE_LOGOUT gpsID:[Update gpsSave:self.app.dbTracking location:self.app.location] value:nil];
+                [Update alertSave:self.app.dbAlerts alertTypeID:ALERT_TYPE_LOGOUT gpsID:[Update gpsSave:self.app.dbTracking dbAlerts:self.app.dbAlerts location:self.app.location] value:nil];
                 [Update usersLogout:self.app.db];
                 [self.navigationController popViewControllerAnimated:NO];
             };
@@ -877,14 +889,13 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
             BreakIn *breakIn = [NSEntityDescription insertNewObjectForEntityForName:@"BreakIn" inManagedObjectContext:self.app.db];
             breakIn.breakInID = [Get sequenceID:self.app.db entity:@"BreakIn" attribute:@"breakInID"] + 1;
             breakIn.syncBatchID = self.app.syncBatchID;
-            breakIn.employeeID = self.app.employee.employeeID;
             TimeIn *timeIn = [Get timeIn:self.app.db];
             breakIn.timeInID = timeIn.timeInID;
             NSDate *currentDate = NSDate.date;
             breakIn.date = [Time getFormattedDate:DATE_FORMAT date:currentDate];
             breakIn.time = [Time getFormattedDate:TIME_FORMAT date:currentDate];
             breakIn.breakTypeID = breakType.breakTypeID;
-            breakIn.gpsID = [Update gpsSave:self.app.dbTracking location:self.app.location];
+            breakIn.gpsID = [Update gpsSave:self.app.dbTracking dbAlerts:self.app.dbAlerts location:self.app.location];
             breakIn.isBreakOut = NO;
             breakIn.isSync = NO;
             timeIn.isBreak = YES;
@@ -908,13 +919,18 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
     breakOut.date = [Time getFormattedDate:DATE_FORMAT date:currentDate];
     breakOut.time = [Time getFormattedDate:TIME_FORMAT date:currentDate];
     breakOut.breakInID = breakIn.breakInID;
-    breakOut.gpsID = [Update gpsSave:self.app.dbTracking location:self.app.location];
+    breakOut.gpsID = [Update gpsSave:self.app.dbTracking dbAlerts:self.app.dbAlerts location:self.app.location];
     breakOut.isSync = NO;
     breakIn.isBreakOut = YES;
     TimeIn *timeIn = [Get timeIn:self.app.db];
     timeIn.isBreak = NO;
     if([Update save:self.app.db]) {
+        [self updateSyncDataCount];
         [self updateTimeInOut];
+        if([self.viewControllers[self.currentPage] isKindOfClass:HistoryViewController.class]) {
+            HistoryViewController *vcHistory = (HistoryViewController *)self.viewControllers[self.currentPage];
+            [(ViewController *)vcHistory.pvcHistory.viewControllers.lastObject onRefresh];
+        }
     }
 }
 
@@ -955,18 +971,12 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
 }
 
 - (BOOL)timeSecurity {
-    TimeSecurity *timeSecurity = [Get timeSecurity:self.app.db];
+    TimeSecurity *timeSecurity = [Get timeSecurity:self.app.dbAlerts];
     NSDate *server = [Time getDateFromString:[NSString stringWithFormat:@"%@ %@", timeSecurity.serverDate, timeSecurity.serverTime]];
     NSDate *newServer = [server dateByAddingTimeInterval:fabs(timeSecurity.upTime - [Time getUptime])];
     double interval = fabs([newServer timeIntervalSinceNow]);
     NSLog(@"info: timeSecurity - %f sec, %@ - %@", interval, NSDate.date, newServer);
     if(timeSecurity == nil || interval > 60) {
-        if(self.isTimeIn && timeSecurity.didChange) {
-            timeSecurity.didChange = NO;
-            NSLog(@"alert: ALERT_TYPE_CHANGED_DATE_TIME");
-            [Update alertSave:self.app.dbAlerts alertTypeID:ALERT_TYPE_CHANGED_DATE_TIME gpsID:[Update gpsSave:self.app.dbTracking location:self.app.location] value:nil];
-            [self updateSyncDataCount];
-        }
         vcSystemMessage = [self.storyboard instantiateViewControllerWithIdentifier: @"vcMessage"];
         vcSystemMessage.subject = @"Time Security";
         vcSystemMessage.message = @"Device and server time do not match.";
@@ -1159,17 +1169,17 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
     timeIn.employeeID = self.app.employee.employeeID;
     timeIn.date = date;
     timeIn.time = time;
-    timeIn.gpsID = [Update gpsSave:self.app.dbTracking location:self.app.location];
+    timeIn.gpsID = [Update gpsSave:self.app.dbTracking dbAlerts:self.app.dbAlerts location:self.app.location];
     timeIn.batteryLevel = [NSString stringWithFormat:@"%d", (int)floor(UIDevice.currentDevice.batteryLevel * 100)];
     timeIn.isSync = NO;
     timeIn.isPhotoUpload = NO;
-    timeIn.isPhotoExists = NO;
     timeIn.isPhotoDelete = NO;
     timeIn.isBreak = NO;
     timeIn.isOvertime = NO;
     if([Update save:self.app.db]) {
         NSLog(@"alert: ALERT_TYPE_TIME_IN_BATTERY_LEVEL");
         [Update alertSave:self.app.dbAlerts alertTypeID:ALERT_TYPE_TIME_IN_BATTERY_LEVEL gpsID:timeIn.gpsID value:timeIn.batteryLevel];
+        [self updateSyncDataCount];
         [self cancelTimeIn];
         [self updateTimeInOut];
         [self.app startUpdatingLocation];
@@ -1236,11 +1246,11 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
         vcAttendanceSummary.delegate = self;
         vcAttendanceSummary.timeIn = [NSString stringWithFormat:@"%@ %@", [Time formatDate:self.app.settingDisplayDateFormat date:timeIn.date], [Time formatTime:self.app.settingDisplayTimeFormat time:timeIn.time]];
         vcAttendanceSummary.timeOut = [Time getFormattedDate:[NSString stringWithFormat:@"%@ %@", self.app.settingDisplayDateFormat, self.app.settingDisplayTimeFormat] date:self.currentDate];
-        vcAttendanceSummary.workHours = [[Time dateRemoveSeconds:self.currentDate] timeIntervalSinceDate:[Time dateRemoveSeconds:[Time getDateFromString:[NSString stringWithFormat:@"%@ %@", timeIn.date, timeIn.time]]]];
+        vcAttendanceSummary.workHours = [self.currentDate timeIntervalSinceDate:[Time getDateFromString:[NSString stringWithFormat:@"%@ %@", timeIn.date, timeIn.time]]];
         vcAttendanceSummary.breakHours = 0;
         for(BreakIn *breakIn in [Load breakIn:self.app.db timeInID:timeIn.timeInID]) {
             BreakOut *breakOut = [Get breakOut:self.app.db breakInID:breakIn.breakInID];
-            vcAttendanceSummary.breakHours += [[Time dateRemoveSeconds:[Time getDateFromString:[NSString stringWithFormat:@"%@ %@", breakOut.date, breakOut.time]]] timeIntervalSinceDate:[Time dateRemoveSeconds:[Time getDateFromString:[NSString stringWithFormat:@"%@ %@", breakIn.date, breakIn.time]]]];
+            vcAttendanceSummary.breakHours += [[Time getDateFromString:[NSString stringWithFormat:@"%@ %@", breakOut.date, breakOut.time]] timeIntervalSinceDate:[Time getDateFromString:[NSString stringWithFormat:@"%@ %@", breakIn.date, breakIn.time]]];
         }
         vcAttendanceSummary.isHistory = NO;
         [self.navigationController pushViewController:vcAttendanceSummary animated:YES];
@@ -1273,19 +1283,18 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
     timeOut.timeInID = timeIn.timeInID;
     timeOut.date = date;
     timeOut.time = time;
-    timeOut.gpsID = [Update gpsSave:self.app.dbTracking location:self.app.location];
+    timeOut.gpsID = [Update gpsSave:self.app.dbTracking dbAlerts:self.app.dbAlerts location:self.app.location];
     timeOut.batteryLevel = [NSString stringWithFormat:@"%d", (int)floor(UIDevice.currentDevice.batteryLevel * 100)];
     timeOut.isSync = NO;
     timeOut.isPhotoUpload = NO;
-    timeOut.isPhotoExists = NO;
     timeOut.isPhotoDelete = NO;
     timeOut.isSignatureUpload = NO;
     if(self.app.employee.withOvertime) {
         Schedules *schedule = [Get schedule:self.app.db scheduleID:timeIn.scheduleID];
         NSDate *scheduleTimeIn = [Time getDateFromString:[NSString stringWithFormat:@"%@ %@", schedule.scheduleDate, schedule.timeIn]];
         NSDate *scheduleTimeOut = [Time getDateFromString:[NSString stringWithFormat:@"%@ %@", schedule.scheduleDate, schedule.timeOut]];
-        NSDate *actualTimeIn = [Time dateRemoveSeconds:[Time getDateFromString:[NSString stringWithFormat:@"%@ %@", timeIn.date, timeIn.time]]];
-        NSDate *actualTimeOut = [Time dateRemoveSeconds:[Time getDateFromString:[NSString stringWithFormat:@"%@ %@", timeOut.date, timeOut.time]]];
+        NSDate *actualTimeIn = [Time getDateFromString:[NSString stringWithFormat:@"%@ %@", timeIn.date, timeIn.time]];
+        NSDate *actualTimeOut = [Time getDateFromString:[NSString stringWithFormat:@"%@ %@", timeOut.date, timeOut.time]];
         if([scheduleTimeOut timeIntervalSinceDate:scheduleTimeIn] < 0) {
             scheduleTimeOut = [scheduleTimeOut dateByAddingTimeInterval:60 * 60 * 24];
         }
@@ -1296,6 +1305,7 @@ static NSMutableArray<NSString *> *notificationRequestIdentifiers;
     if([Update save:self.app.db]) {
         NSLog(@"alert: ALERT_TYPE_TIME_OUT_BATTERY_LEVEL");
         [Update alertSave:self.app.dbAlerts alertTypeID:ALERT_TYPE_TIME_OUT_BATTERY_LEVEL gpsID:timeOut.gpsID value:timeOut.batteryLevel];
+        [self updateSyncDataCount];
         [self cancelTimeOut];
         [self updateTimeInOut];
         [self.app stopUpdatingLocation];

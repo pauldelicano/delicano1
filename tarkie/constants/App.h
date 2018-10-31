@@ -6,12 +6,18 @@
 #define API_KEY @"V0gu1964h5j762s7WiG52i45CMg1s9Xo8dbX565P20m3w7U7CA"
 
 #ifdef FLAVOR_TARKIE
-    #define APP_LOGO [UIImage imageNamed:@"AppLogo.tarkie"]
-    #define APP_LOGO_WHITE [UIImage imageNamed:@"AppLogoWhite.tarkie"]
-    #define APP_NAME @"Tarkie"
-    #define THEME_PRI [Color colorNamed:@"ThemePri.sevie"]
-    #define THEME_SEC [Color colorNamed:@"ThemeSec.sevie"]
-    #define THEME_PRI_DARK [Color colorNamed:@"ThemePriDark.sevie"]
+//    #define APP_LOGO [UIImage imageNamed:@"AppLogo.tarkie"]
+//    #define APP_LOGO_WHITE [UIImage imageNamed:@"AppLogoWhite.tarkie"]
+//    #define APP_NAME @"Tarkie"
+//    #define THEME_PRI [Color colorNamed:@"ThemePri.sevie"]
+//    #define THEME_SEC [Color colorNamed:@"ThemeSec.sevie"]
+//    #define THEME_PRI_DARK [Color colorNamed:@"ThemePriDark.sevie"]
+    #define APP_LOGO [UIImage imageNamed:@"AppLogo.timsie"]
+    #define APP_LOGO_WHITE [UIImage imageNamed:@"AppLogo.timsie"]
+    #define APP_NAME @"Timsie"
+    #define THEME_PRI [Color colorNamed:@"ThemePri.timsie"]
+    #define THEME_SEC [Color colorNamed:@"ThemeSec.timsie"]
+    #define THEME_PRI_DARK [Color colorNamed:@"ThemePriDark.timsie"]
 #elif FLAVOR_SEVIE
     #define APP_LOGO [UIImage imageNamed:@"AppLogo.sevie"]
     #define APP_LOGO_WHITE [UIImage imageNamed:@"AppLogo.sevie"]
@@ -229,5 +235,11 @@ typedef enum {
     ALERT_TYPE_OVERSTAYING_VISIT = 23,
     ALERT_TYPE_ON_THE_WAY = 24
 } AlertType;
+
+typedef enum {
+    CALENDAR_TYPE_START_DATE = 0,
+    CALENDAR_TYPE_END_DATE = 1
+} CalendarType;
+
 
 @end

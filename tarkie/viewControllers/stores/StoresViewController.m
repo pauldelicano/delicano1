@@ -94,21 +94,23 @@
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     HomeTableViewCell *header = [tableView dequeueReusableCellWithIdentifier:@"header"];
+    header.contentView.subviews[2].backgroundColor = THEME_SEC;
+    header.lName.textColor = THEME_SEC;
     Stores *store = self.storesSectioned[section].firstObject;
     NSString *letter = [self.app.settingStoreDisplayLongName ? store.name : store.shortName substringToIndex:1].lowercaseString;
     if([letter rangeOfCharacterFromSet:self.validChars].location == NSNotFound) {
         letter = @"#";
     }
     header.lName.text = letter.uppercaseString;
-    header.lName.textColor = THEME_SEC;
-    header.contentView.subviews[2].backgroundColor = THEME_SEC;
-    return header.contentView;
+    [header layoutIfNeeded];
+    return header;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     HomeTableViewCell *item = [tableView dequeueReusableCellWithIdentifier:@"item" forIndexPath:indexPath];
     Stores *store = self.storesSectioned[indexPath.section][indexPath.row];
     item.lName.text = self.app.settingStoreDisplayLongName ? store.name : store.shortName;
+    [item layoutIfNeeded];
     return item;
 }
 
@@ -130,7 +132,7 @@
     }
 }
 
-- (void)onTextFieldTextChanged:(NSString *)text {
+- (void)onTextFieldTextChanged:(UITextField *)textfield text:(NSString *)text {
     self.searchFilter = text;
     [self onRefresh];
 }

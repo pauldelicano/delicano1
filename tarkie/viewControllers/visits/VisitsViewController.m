@@ -56,7 +56,7 @@
     }
     self.lDate.text = [Time getFormattedDate:self.app.settingDisplayDateFormat date:self.selectedDate];
     [self.visits removeAllObjects];
-    [self.visits addObjectsFromArray:[Load visits:self.app.db date:self.selectedDate isNoCheckOutOnly:NO]];
+    [self.visits addObjectsFromArray:[Load visits:self.app.db date:[Time getFormattedDate:DATE_FORMAT date:self.selectedDate] isNoCheckOutOnly:NO]];
     [self.tvVisits reloadData];
 }
 
@@ -84,13 +84,9 @@
         }
     }
     item.lStatus.text = visit.isCheckIn ? [NSString stringWithFormat:@"%@ - %@", checkin, checkout] : @"ACTIVE";
-    return item;
-}
-
-- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
-    VisitsTableViewCell *item = (VisitsTableViewCell *)cell;
-    Visits *visit = self.visits[indexPath.row];
     item.lStatus.textColor = visit.isCheckIn && visit.isCheckOut ? [Color colorNamed:@"ThemeSec.sevie"] : [Color colorNamed:@"Yellow800"];
+    [item layoutIfNeeded];
+    return item;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {

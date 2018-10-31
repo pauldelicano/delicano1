@@ -5,7 +5,7 @@
 
 @interface AuthorizationViewController()
 
-@property (nonatomic) BOOL viewDidAppear;
+@property (nonatomic) BOOL viewWillAppear;
 
 @end
 
@@ -16,36 +16,24 @@ static LoadingDialogViewController *vcLoading;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.viewDidAppear = NO;
+    self.viewWillAppear = NO;
 }
 
-- (void)viewDidLayoutSubviews {
-    [super viewDidLayoutSubviews];
-    if(self.vContent.frame.size.height < self.vScroll.frame.size.height) {
-        CGFloat inset = self.vScroll.frame.size.height - self.vContent.frame.size.height;
-        self.vScroll.contentInset = UIEdgeInsetsMake(inset * 0.4, 0, inset * 0.6, 0);
-    }
-    else {
-        self.vScroll.contentInset = UIEdgeInsetsZero;
-    }
-}
-
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    if(!self.viewDidAppear) {
-        self.viewDidAppear = YES;
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    if(!self.viewWillAppear) {
+        self.viewWillAppear = YES;
         self.ivAppLogo.image = APP_LOGO;
         self.tfAuthorizationCode.highlightedBorderColor = THEME_SEC;
         self.btnAuthorize.backgroundColor = THEME_SEC;
         [View setCornerRadiusByWidth:self.btnAuthorize.superview cornerRadius:0.075];
         [View setCornerRadiusByHeight:self.tfAuthorizationCode cornerRadius:0.3];
         [View setCornerRadiusByHeight:self.btnAuthorize cornerRadius:0.2];
-        [self onRefresh];
     }
 }
 
-- (void)onRefresh {
-    [super onRefresh];
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
     if(self.vContent.frame.size.height < self.vScroll.frame.size.height) {
         CGFloat inset = self.vScroll.frame.size.height - self.vContent.frame.size.height;
         self.vScroll.contentInset = UIEdgeInsetsMake(inset * 0.4, 0, inset * 0.6, 0);
@@ -89,10 +77,10 @@ static LoadingDialogViewController *vcLoading;
         return;
     }
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
-    [params setObject:deviceID forKey:@"tablet_id"];
-    [params setObject:authorizationCode forKey:@"authorization_code"];
-    [params setObject:API_KEY forKey:@"api_key"];
-    [params setObject:@"IOS" forKey:@"device_type"];
+    params[@"tablet_id"] = deviceID;
+    params[@"authorization_code"] = authorizationCode;
+    params[@"api_key"] = API_KEY;
+    params[@"device_type"] = @"IOS";
     vcLoading = [self.storyboard instantiateViewControllerWithIdentifier:@"vcLoading"];
     vcLoading.delegate = self;
     vcLoading.action = LOADING_ACTION_AUTHORIZE;

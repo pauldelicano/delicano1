@@ -9,7 +9,7 @@
 @property (strong, nonatomic) AppDelegate *app;
 @property (nonatomic) NSTimer *timer;
 @property (nonatomic) long count;
-@property (nonatomic) BOOL viewDidAppear;
+@property (nonatomic) BOOL viewWillAppear, viewDidAppear;
 
 @end
 
@@ -20,6 +20,7 @@ static MessageDialogViewController *vcMessage;
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.app = (AppDelegate *)UIApplication.sharedApplication.delegate;
+    self.viewWillAppear = NO;
     self.viewDidAppear = NO;
 }
 
@@ -34,24 +35,24 @@ static MessageDialogViewController *vcMessage;
     }
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    if(!self.viewDidAppear) {
-        self.viewDidAppear = YES;
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    if(!self.viewWillAppear) {
+        self.viewWillAppear = YES;
         self.lSubject.textColor = THEME_PRI;
         self.lTimer.textColor = THEME_PRI;
         [View setCornerRadiusByWidth:self.lSubject.superview cornerRadius:0.075];
+    }
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];;
+    if(!self.viewDidAppear) {
+        self.viewDidAppear = YES;
         self.count = 10;
         [self onRefresh];
         [self startTimer];
         [self spin];
-        if(self.vContent.frame.size.height < self.vScroll.frame.size.height) {
-            CGFloat inset = self.vScroll.frame.size.height - self.vContent.frame.size.height;
-            self.vScroll.contentInset = UIEdgeInsetsMake(inset * 0.5, 0, inset * 0.5, 0);
-        }
-        else {
-            self.vScroll.contentInset = UIEdgeInsetsZero;
-        }
     }
 }
 

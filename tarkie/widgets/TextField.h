@@ -3,7 +3,7 @@
 @protocol TextFieldDelegate
 @optional
 
-- (void)onTextFieldTextChanged:(NSString *)text;
+- (void)onTextFieldTextChanged:(UITextField *)textfield text:(NSString *)text;
 
 @end
 

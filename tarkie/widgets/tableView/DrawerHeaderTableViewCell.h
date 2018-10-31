@@ -2,7 +2,6 @@
 
 @interface DrawerHeaderTableViewCell : TableViewCell
 
-@property (weak, nonatomic) IBOutlet UIView *vBackground;
 @property (weak, nonatomic) IBOutlet UIImageView *ivEmployeePhoto;
 @property (weak, nonatomic) IBOutlet UIImageView *ivCompanyLogo;
 @property (weak, nonatomic) IBOutlet UILabel *lName;

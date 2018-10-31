@@ -10,7 +10,7 @@
 
 @property (strong, nonatomic) AppDelegate *app;
 @property (strong, nonatomic) Company *company;
-@property (nonatomic) BOOL viewDidAppear;
+@property (nonatomic) BOOL viewWillAppear;
 
 @end
 
@@ -23,24 +23,13 @@ static LoadingDialogViewController *vcLoading;
     [super viewDidLoad];
     self.app = (AppDelegate *)UIApplication.sharedApplication.delegate;
     self.ivCompanyLogo.image = nil;
-    self.viewDidAppear = NO;
+    self.viewWillAppear = NO;
 }
 
-- (void)viewDidLayoutSubviews {
-    [super viewDidLayoutSubviews];
-    if(self.vContent.frame.size.height < self.vScroll.frame.size.height) {
-        CGFloat inset = self.vScroll.frame.size.height - self.vContent.frame.size.height;
-        self.vScroll.contentInset = UIEdgeInsetsMake(inset * 0.4, 0, inset * 0.6, 0);
-    }
-    else {
-        self.vScroll.contentInset = UIEdgeInsetsZero;
-    }
-}
-
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    if(!self.viewDidAppear) {
-        self.viewDidAppear = YES;
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    if(!self.viewWillAppear) {
+        self.viewWillAppear = YES;
         self.tfUsername.highlightedBorderColor = THEME_SEC;
         self.tfPassword.highlightedBorderColor = THEME_SEC;
         self.btnLogin.backgroundColor = THEME_SEC;
@@ -49,6 +38,17 @@ static LoadingDialogViewController *vcLoading;
         [View setCornerRadiusByHeight:self.tfPassword cornerRadius:0.3];
         [View setCornerRadiusByHeight:self.btnLogin cornerRadius:0.2];
         [self onRefresh];
+    }
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    if(self.vContent.frame.size.height < self.vScroll.frame.size.height) {
+        CGFloat inset = self.vScroll.frame.size.height - self.vContent.frame.size.height;
+        self.vScroll.contentInset = UIEdgeInsetsMake(inset * 0.4, 0, inset * 0.6, 0);
+    }
+    else {
+        self.vScroll.contentInset = UIEdgeInsetsZero;
     }
 }
 
@@ -61,13 +61,6 @@ static LoadingDialogViewController *vcLoading;
             self.ivCompanyLogo.image = image;
         });
     });
-    if(self.vContent.frame.size.height < self.vScroll.frame.size.height) {
-        CGFloat inset = self.vScroll.frame.size.height - self.vContent.frame.size.height;
-        self.vScroll.contentInset = UIEdgeInsetsMake(inset * 0.4, 0, inset * 0.6, 0);
-    }
-    else {
-        self.vScroll.contentInset = UIEdgeInsetsZero;
-    }
 }
 
 - (IBAction)login:(id)sender {
@@ -98,9 +91,9 @@ static LoadingDialogViewController *vcLoading;
     self.app.moduleInventory = [Get isModuleEnabled:self.app.db moduleID:MODULE_INVENTORY];
     self.app.moduleForms = [Get isModuleEnabled:self.app.db moduleID:MODULE_FORMS];
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
-    [params setObject:[Get apiKey:self.app.db] forKey:@"api_key"];
-    [params setObject:username forKey:@"employee_number"];
-    [params setObject:password forKey:@"password"];
+    params[@"api_key"] = [Get apiKey:self.app.db];
+    params[@"employee_number"] = username;
+    params[@"password"] = password;
     vcLoading = [self.storyboard instantiateViewControllerWithIdentifier:@"vcLoading"];
     vcLoading.delegate = self;
     vcLoading.action = LOADING_ACTION_LOGIN;

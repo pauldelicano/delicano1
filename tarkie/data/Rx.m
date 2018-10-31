@@ -16,35 +16,35 @@ static BOOL isCanceled;
     BOOL result = NO;
     int64_t userID = [Get userID:db];
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
-    [params setObject:[Get apiKey:db] forKey:@"api_key"];
-    [params setObject:[NSString stringWithFormat:@"%lld", userID] forKey:@"employee_id"];
-    [params setObject:@"pending" forKey:@"get_by"];
+    params[@"api_key"] = [Get apiKey:db];
+    params[@"employee_id"] = [NSString stringWithFormat:@"%lld", userID];
+    params[@"get_by"] = @"pending";
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @"get-adminpanel-patch"] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
             Sqlite *sqlite = Sqlite.alloc.init;
             [sqlite openConnection];
             for(int x = 0; x < data.count && !isCanceled; x++) {
-                int64_t patchID = [[data[x] objectForKey:@"patch_id"] intValue];
-                NSString *query = [data[x] objectForKey:@"query"];
+                int64_t patchID = [data[x][@"patch_id"] longLongValue];
+                NSString *query = data[x][@"query"];
                 Patches *patch = [Get patch:db patchID:patchID];
                 if(patch == nil) {
                     patch = [NSEntityDescription insertNewObjectForEntityForName:@"Patches" inManagedObjectContext:db];
                     patch.patchID = patchID;
                 }
-                patch.date = [data[x] objectForKey:@"date_created"];
-                patch.time = [data[x] objectForKey:@"time_created"];
+                patch.date = data[x][@"date_created"];
+                patch.time = data[x][@"time_created"];
                 patch.employeeID = userID;
                 patch.query = query;
-                patch.isDone = [[data[x] objectForKey:@"is_done"] intValue] == 1;
-                patch.isDone = [sqlite executeQuery:[data[x] objectForKey:@"query"]];
+                patch.isDone = [data[x][@"is_done"] intValue] == 1;
+                patch.isDone = [sqlite executeQuery:data[x][@"query"]];
                 patch.isSync = NO;
             }
             [sqlite closeConnection];
@@ -68,26 +68,26 @@ static BOOL isCanceled;
 + (BOOL)company:(NSManagedObjectContext *)db delegate:(id)delegate {
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
-    [params setObject:[Get apiKey:db] forKey:@"api_key"];
+    params[@"api_key"] = [Get apiKey:db];
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @"get-company"] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
             Company *company = [Get company:db];
             if(company == nil) {
                 company = [NSEntityDescription insertNewObjectForEntityForName:@"Company" inManagedObjectContext:db];
             }
             for(int x = 0; x < data.count && !isCanceled; x++) {
-                company.companyID = [[data[x] objectForKey:@"company_id"] intValue];
-                company.name = [data[x] objectForKey:@"company_name"];
-                company.logoURL = [data[x] objectForKey:@"company_logo"];
-                NSArray *modules = [data[x] objectForKey:@"modules"];
+                company.companyID = [data[x][@"company_id"] longLongValue];
+                company.name = data[x][@"company_name"];
+                company.logoURL = data[x][@"company_logo"];
+                NSArray *modules = data[x][@"modules"];
                 for(int y = 1; y <= MODULE_FORMS; y++) {
                     Modules *module = [Get module:db moduleID:y];
                     if(module == nil) {
@@ -146,35 +146,35 @@ static BOOL isCanceled;
 + (BOOL)employees:(NSManagedObjectContext *)db delegate:(id)delegate {
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
-    [params setObject:[Get apiKey:db] forKey:@"api_key"];
+    params[@"api_key"] = [Get apiKey:db];
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @"get-employee-details"] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
             [Update employeesDeactivate:db];
             for(int x = 0; x < data.count && !isCanceled; x++) {
-                int64_t employeeID = [[data[x] objectForKey:@"employee_id"] intValue];
+                int64_t employeeID = [data[x][@"employee_id"] longLongValue];
                 Employees *employee = [Get employee:db employeeID:employeeID];
                 if(employee == nil) {
                     employee = [NSEntityDescription insertNewObjectForEntityForName:@"Employees" inManagedObjectContext:db];
                     employee.employeeID = employeeID;
                 }
-                employee.firstName = [data[x] objectForKey:@"firstname"];
-                employee.lastName = [data[x] objectForKey:@"lastname"];
-                employee.employeeNumber = [data[x] objectForKey:@"employee_number"];
-                employee.photoURL = [data[x] objectForKey:@"picture_url"];
-                employee.teamID = [[data[x] objectForKey:@"team_id"] intValue];
-                employee.storeID = [[data[x] objectForKey:@"store_id"] intValue];
-                employee.withLate = [[data[x] objectForKey:@"eligible_for_late"] intValue] == 1;
-                employee.withOvertime = [[data[x] objectForKey:@"eligible_for_ot"] intValue] == 1;
-                employee.isApprover = [[data[x] objectForKey:@"is_approver"] intValue] == 1;
-                employee.isActive = [[data[x] objectForKey:@"is_active"] isEqualToString:@"yes"];
+                employee.firstName = data[x][@"firstname"];
+                employee.lastName = data[x][@"lastname"];
+                employee.employeeNumber = data[x][@"employee_number"];
+                employee.photoURL = data[x][@"picture_url"];
+                employee.teamID = [data[x][@"team_id"] longLongValue];
+                employee.storeID = [data[x][@"store_id"] longLongValue];
+                employee.withLate = [data[x][@"eligible_for_late"] intValue] == 1;
+                employee.withOvertime = [data[x][@"eligible_for_ot"] intValue] == 1;
+                employee.isApprover = [data[x][@"is_approver"] intValue] == 1;
+                employee.isActive = [data[x][@"is_active"] isEqualToString:@"yes"];
             }
             if(![Update save:db]) {
                 message = @"";
@@ -199,21 +199,21 @@ static BOOL isCanceled;
 + (BOOL)settings:(NSManagedObjectContext *)db delegate:(id)delegate {
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
-    [params setObject:[Get apiKey:db] forKey:@"api_key"];
+    params[@"api_key"] = [Get apiKey:db];
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @"get-settings"] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
             NSNumber *teamID = [NSNumber numberWithUnsignedLongLong:[Get employee:db employeeID:[Get userID:db]].teamID];
             for(int x = 0; x < data.count && !isCanceled; x++) {
-                NSString *settingName = [data[x] objectForKey:@"settings_code"];
-                int64_t settingID = [[data[x] objectForKey:@"settings_id"] intValue];
+                NSString *settingName = data[x][@"settings_code"];
+                int64_t settingID = [data[x][@"settings_id"] longLongValue];
                 settingID = [Get settingID:db settingName:settingName];
                 Settings *setting = [Get setting:db settingID:settingID];
                 if(setting == nil) {
@@ -221,15 +221,15 @@ static BOOL isCanceled;
                     setting.settingID = settingID;
                 }
                 setting.name = settingName;
-                SettingsTeams *settingTeam = [Get settingTeam:db settingID:settingID teamID:teamID.intValue];
+                SettingsTeams *settingTeam = [Get settingTeam:db settingID:settingID teamID:teamID.longLongValue];
                 if(settingTeam == nil) {
                     settingTeam = [NSEntityDescription insertNewObjectForEntityForName:@"SettingsTeams" inManagedObjectContext:db];
                     settingTeam.settingID = settingID;
-                    settingTeam.teamID = teamID.intValue;
+                    settingTeam.teamID = teamID.longLongValue;
                 }
-                NSString *value = [data[x] objectForKey:@"settings_value"];
+                NSString *value = data[x][@"settings_value"];
                 if(![value isEqualToString:@"no"]) {
-                    id team = [data[x] objectForKey:@"team_id"];
+                    id team = data[x][@"team_id"];
                     if(([team isKindOfClass:NSArray.class] && [team indexOfObject:teamID] == -1) || ([team isKindOfClass:NSString.class] && ![team isEqualToString:@"allteams"])) {
                         value = @"no";
                     }
@@ -256,16 +256,16 @@ static BOOL isCanceled;
 + (BOOL)conventions:(NSManagedObjectContext *)db delegate:(id)delegate {
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
-    [params setObject:[Get apiKey:db] forKey:@"api_key"];
+    params[@"api_key"] = [Get apiKey:db];
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @"get-naming-convention"] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
             for(int x = 0; x < data.count && !isCanceled; x++) {
                 for(int y = 1; y <= CONVENTION_SALES; y++) {
@@ -329,7 +329,7 @@ static BOOL isCanceled;
                         }
                     }
                     if(convention.name != nil) {
-                        NSString *value = [data[x] objectForKey:convention.name];
+                        NSString *value = data[x][convention.name];
                         if(value.length > 0 && ![value isEqualToString:@"keep"]) {
                             convention.value = value;
                         }
@@ -356,23 +356,23 @@ static BOOL isCanceled;
 + (BOOL)serverTime:(NSManagedObjectContext *)db delegate:(id)delegate {
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
-    [params setObject:[Get apiKey:db] forKey:@"api_key"];
+    params[@"api_key"] = [Get apiKey:db];
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @"get-server-time"] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
             for(int x = 0; x < data.count && !isCanceled; x++) {
                 TimeSecurity *timeSecurity = [Get timeSecurity:db];
                 if(timeSecurity == nil) {
                     timeSecurity = [NSEntityDescription insertNewObjectForEntityForName:@"TimeSecurity" inManagedObjectContext:db];
                 }
-                NSDate *server = [Time getDateFromString:[data[x] objectForKey:@"date_time"]];
+                NSDate *server = [Time getDateFromString:data[x][@"date_time"]];
                 timeSecurity.serverDate = [Time getFormattedDate:DATE_FORMAT date:server];
                 timeSecurity.serverTime = [Time getFormattedDate:TIME_FORMAT date:server];
                 timeSecurity.upTime = [Time getUptime];
@@ -397,22 +397,23 @@ static BOOL isCanceled;
 + (BOOL)syncBatchID:(NSManagedObjectContext *)db delegate:(id)delegate {
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
+    params[@"api_key"] = [Get apiKey:db];
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @"get-sync-batch-id"] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
             for(int x = 0; x < data.count && !isCanceled; x++) {
                 SyncBatch *syncBatch = [Get syncBatch:db];
                 if(syncBatch == nil) {
                     syncBatch = [NSEntityDescription insertNewObjectForEntityForName:@"SyncBatch" inManagedObjectContext:db];
                 }
-                syncBatch.syncBatchID = [[data[x] objectForKey:@"sync_batch_id"] stringValue];
+                syncBatch.syncBatchID = [data[x][@"sync_batch_id"] stringValue];
                 NSDate *currentDate = NSDate.date;
                 syncBatch.date = [Time getFormattedDate:DATE_FORMAT date:currentDate];
                 syncBatch.time = [Time getFormattedDate:TIME_FORMAT date:currentDate];
@@ -437,45 +438,45 @@ static BOOL isCanceled;
 + (BOOL)announcements:(NSManagedObjectContext *)db delegate:(id)delegate {
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
-    [params setObject:[Get apiKey:db] forKey:@"api_key"];
+    params[@"api_key"] = [Get apiKey:db];
     int64_t userID = [Get userID:db];
-    [params setObject:[NSString stringWithFormat:@"%lld", [Get employee:db employeeID:userID].teamID] forKey:@"team_id"];
+    params[@"team_id"] = [NSString stringWithFormat:@"%lld", [Get employee:db employeeID:userID].teamID];
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @"get-announcements-for-app"] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
             [Update announcementsDeactivate:db];
             for(int x = 0; x < data.count && !isCanceled; x++) {
-                int64_t announcementID = [[data[x] objectForKey:@"announcement_id"] intValue];
+                int64_t announcementID = [data[x][@"announcement_id"] longLongValue];
                 Announcements *announcement = [Get announcement:db announcementID:announcementID];
                 if(announcement == nil) {
                     announcement = [NSEntityDescription insertNewObjectForEntityForName:@"Announcements" inManagedObjectContext:db];
                     announcement.announcementID = announcementID;
                     announcement.isSeen = NO;
-                    if([[Time getDateFromString:[NSString stringWithFormat:@"%@ %@", [data[x] objectForKey:@"date_to_show"], [data[x] objectForKey:@"time_to_show"]]] earlierDate:NSDate.date]) {
+                    if([[Time getDateFromString:[NSString stringWithFormat:@"%@ %@", data[x][@"date_to_show"], data[x][@"time_to_show"]]] earlierDate:NSDate.date]) {
                         announcement.isSeen = YES;
                     }
                 }
                 else {
-                    if(![announcement.subject isEqualToString:[data[x] objectForKey:@"title"]] || ![announcement.message isEqualToString:[data[x] objectForKey:@"body"]] || ![announcement.scheduledDate isEqualToString:[data[x] objectForKey:@"date_to_show"]] || ![announcement.scheduledTime isEqualToString:[data[x] objectForKey:@"time_to_show"]]) {
+                    if(![announcement.subject isEqualToString:data[x][@"title"]] || ![announcement.message isEqualToString:data[x][@"body"]] || ![announcement.scheduledDate isEqualToString:data[x][@"date_to_show"]] || ![announcement.scheduledTime isEqualToString:data[x][@"time_to_show"]]) {
                         announcement.isSeen = NO;
                     }
                 }
-                announcement.subject = [data[x] objectForKey:@"title"];
-                announcement.message = [data[x] objectForKey:@"body"];
-                announcement.createdDate = [data[x] objectForKey:@"date_created"];
-                announcement.createdTime = [data[x] objectForKey:@"time_created"];
-                announcement.scheduledDate = [data[x] objectForKey:@"date_to_show"];
-                announcement.scheduledTime = [data[x] objectForKey:@"time_to_show"];
+                announcement.subject = data[x][@"title"];
+                announcement.message = data[x][@"body"];
+                announcement.createdDate = data[x][@"date_created"];
+                announcement.createdTime = data[x][@"time_created"];
+                announcement.scheduledDate = data[x][@"date_to_show"];
+                announcement.scheduledTime = data[x][@"time_to_show"];
                 announcement.employeeID = userID;
-                announcement.createdByID = [[data[x] objectForKey:@"employee_id"] intValue];
-                announcement.isActive = [[data[x] objectForKey:@"is_active"] intValue] == 1;
+                announcement.createdByID = [data[x][@"employee_id"] longLongValue];
+                announcement.isActive = [data[x][@"is_active"] intValue] == 1;
             }
             if(![Update save:db]) {
                 message = @"";
@@ -497,22 +498,22 @@ static BOOL isCanceled;
 + (BOOL)stores:(NSManagedObjectContext *)db delegate:(id)delegate {
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
-    [params setObject:[Get apiKey:db] forKey:@"api_key"];
+    params[@"api_key"] = [Get apiKey:db];
     int64_t userID = [Get userID:db];
-    [params setObject:[NSString stringWithFormat:@"%lld", userID] forKey:@"employee_id"];
+    params[@"employee_id"] = [NSString stringWithFormat:@"%lld", userID];
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @"get-stores-for-app"] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
             [Update storesDeactivate:db];
             for(int x = 0; x < data.count && !isCanceled; x++) {
-                int64_t webStoreID = [[data[x] objectForKey:@"store_id"] intValue];
+                int64_t webStoreID = [data[x][@"store_id"] longLongValue];
                 Stores *store = [Get store:db webStoreID:webStoreID];
                 if(store == nil) {
                     store = [NSEntityDescription insertNewObjectForEntityForName:@"Stores" inManagedObjectContext:db];
@@ -521,19 +522,19 @@ static BOOL isCanceled;
                     store.employeeID = userID;
                     store.isFromWeb = YES;
                 }
-                store.name = [data[x] objectForKey:@"store_name"];
-                store.shortName = [data[x] objectForKey:@"short_name"];
-                store.contactNumber = [data[x] objectForKey:@"contact_number"];
-                store.email = [data[x] objectForKey:@"email"];
-                store.address = [data[x] objectForKey:@"address"];
-                store.class1ID = [[data[x] objectForKey:@"store_class_1_id"] intValue];
-                store.class2ID = [[data[x] objectForKey:@"store_class_2_id"] intValue];
-                store.class3ID = [[data[x] objectForKey:@"store_class_3_id"] intValue];
-                store.latitude = [[data[x] objectForKey:@"latitude"] doubleValue];
-                store.longitude = [[data[x] objectForKey:@"longitude"] doubleValue];
-                store.geoFenceRadius = [[data[x] objectForKey:@"geo_fence_radius"] intValue];
+                store.name = data[x][@"store_name"];
+                store.shortName = data[x][@"short_name"];
+                store.contactNumber = data[x][@"contact_number"];
+                store.email = data[x][@"email"];
+                store.address = data[x][@"address"];
+                store.class1ID = [data[x][@"store_class_1_id"] longLongValue];
+                store.class2ID = [data[x][@"store_class_2_id"] longLongValue];
+                store.class3ID = [data[x][@"store_class_3_id"] longLongValue];
+                store.latitude = [data[x][@"latitude"] doubleValue];
+                store.longitude = [data[x][@"longitude"] doubleValue];
+                store.geoFenceRadius = [data[x][@"geo_fence_radius"] longLongValue];
                 store.isTag = YES;
-                store.isActive = [[data[x] objectForKey:@"is_active"] isEqualToString:@"1"];
+                store.isActive = [data[x][@"is_active"] isEqualToString:@"1"];
                 store.isSync = YES;
                 store.isUpdate = YES;
                 store.isWebUpdate = YES;
@@ -558,20 +559,20 @@ static BOOL isCanceled;
 + (BOOL)storeContacts:(NSManagedObjectContext *)db delegate:(id)delegate {
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
-    [params setObject:[Get apiKey:db] forKey:@"api_key"];
+    params[@"api_key"] = [Get apiKey:db];
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @"get-store-contact-person-for-app"] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
             [Update storeContactsDeactivate:db];
             for(int x = 0; x < data.count && !isCanceled; x++) {
-                int64_t webStoreContactID = [[data[x] objectForKey:@"contact_id"] intValue];
+                int64_t webStoreContactID = [data[x][@"contact_id"] longLongValue];
                 StoreContacts *storeContact = [Get storeContact:db webStoreContactID:webStoreContactID];
                 if(storeContact == nil) {
                     storeContact = [NSEntityDescription insertNewObjectForEntityForName:@"StoreContacts" inManagedObjectContext:db];
@@ -580,14 +581,14 @@ static BOOL isCanceled;
                     storeContact.employeeID = [Get userID:db];
                     storeContact.isFromWeb = YES;
                 }
-                storeContact.storeID = [[data[x] objectForKey:@"store_id"] intValue];
-                storeContact.name = [data[x] objectForKey:@"name"];
-                storeContact.designation = [data[x] objectForKey:@"designation"];
-                storeContact.email = [data[x] objectForKey:@"email"];
-                storeContact.birthdate = [data[x] objectForKey:@"birthdate"];
-                storeContact.mobileNumber = [data[x] objectForKey:@"mobile"];
-                storeContact.landlineNumber = [data[x] objectForKey:@"telephone"];
-                storeContact.remarks = [data[x] objectForKey:@"remarks"];
+                storeContact.storeID = [data[x][@"store_id"] longLongValue];
+                storeContact.name = data[x][@"name"];
+                storeContact.designation = data[x][@"designation"];
+                storeContact.email = data[x][@"email"];
+                storeContact.birthdate = data[x][@"birthdate"];
+                storeContact.mobileNumber = data[x][@"mobile"];
+                storeContact.landlineNumber = data[x][@"telephone"];
+                storeContact.remarks = data[x][@"remarks"];
                 storeContact.isActive = YES;
                 storeContact.isSync = YES;
                 storeContact.isUpdate = YES;
@@ -613,19 +614,19 @@ static BOOL isCanceled;
 + (BOOL)storeCustomFields:(NSManagedObjectContext *)db delegate:(id)delegate {
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
-    [params setObject:[Get apiKey:db] forKey:@"api_key"];
-//    [params setObject:@"" forKey:@"sync_date"];
-//    [params setObject:@"" forKey:@"limit"];
-//    [params setObject:@"" forKey:@"offset"];
+    params[@"api_key"] = [Get apiKey:db];
+//    params[@"sync_date"] = @"";
+//    params[@"limit"] = @"";
+//    params[@"offset"] = @"";
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @"get-custom-field-data"] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
             if(![Update save:db]) {
                 message = @"";
@@ -647,17 +648,17 @@ static BOOL isCanceled;
 + (BOOL)storeCustomFieldsPages:(NSManagedObjectContext *)db delegate:(id)delegate {
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
-    [params setObject:[Get apiKey:db] forKey:@"api_key"];
-//    [params setObject:@"" forKey:@"sync_date"];
+    params[@"api_key"] = [Get apiKey:db];
+//    params[@"sync_date"] = @"";
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @"get-custom-field-data-count"] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
             if(![Update save:db]) {
                 message = @"";
@@ -679,28 +680,28 @@ static BOOL isCanceled;
 + (BOOL)scheduleTimes:(NSManagedObjectContext *)db delegate:(id)delegate {
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
-    [params setObject:[Get apiKey:db] forKey:@"api_key"];
+    params[@"api_key"] = [Get apiKey:db];
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @"get-schedule-time"] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
             [Update scheduleTimesDeactivate:db];
             for(int x = 0; x < data.count && !isCanceled; x++) {
-                int64_t scheduleTimeID = [[data[x] objectForKey:@"time_schedule_id"] intValue];
+                int64_t scheduleTimeID = [data[x][@"time_schedule_id"] longLongValue];
                 ScheduleTimes *scheduleTime = [Get scheduleTime:db scheduleTimeID:scheduleTimeID];
                 if(scheduleTime == nil) {
                     scheduleTime = [NSEntityDescription insertNewObjectForEntityForName:@"ScheduleTimes" inManagedObjectContext:db];
                     scheduleTime.scheduleTimeID = scheduleTimeID;
                 }
-                scheduleTime.timeIn = [data[x] objectForKey:@"time_in"];
-                scheduleTime.timeOut = [data[x] objectForKey:@"time_out"];
-                scheduleTime.isActive = [[data[x] objectForKey:@"is_active"] isEqualToString:@"1"];
+                scheduleTime.timeIn = data[x][@"time_in"];
+                scheduleTime.timeOut = data[x][@"time_out"];
+                scheduleTime.isActive = [data[x][@"is_active"] isEqualToString:@"1"];
             }
             if(![Update save:db]) {
                 message = @"";
@@ -722,28 +723,28 @@ static BOOL isCanceled;
 + (BOOL)schedules:(NSManagedObjectContext *)db isToday:(BOOL)isToday delegate:(id)delegate {
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
-    [params setObject:[Get apiKey:db] forKey:@"api_key"];
+    params[@"api_key"] = [Get apiKey:db];
     int64_t userID = [Get userID:db];
-    [params setObject:[NSString stringWithFormat:@"%lld", userID] forKey:@"employee_id"];
+    params[@"employee_id"] = [NSString stringWithFormat:@"%lld", userID];
     NSDate *currentDate = NSDate.date;
-    [params setObject:[Time getFormattedDate:DATE_FORMAT date:currentDate] forKey:@"start_date"];
-    [params setObject:[Time getFormattedDate:DATE_FORMAT date:isToday ? currentDate : [currentDate dateByAddingTimeInterval:60 * 60 * 24 * 15]] forKey:@"end_date"];
+    params[@"start_date"] = [Time getFormattedDate:DATE_FORMAT date:currentDate];
+    params[@"end_date"] = [Time getFormattedDate:DATE_FORMAT date:isToday ? currentDate : [currentDate dateByAddingTimeInterval:60 * 60 * 24 * 15]];
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @"get-schedule"] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
             if(!isToday) {
                 [Update schedulesDeactivate:db];
             }
             for(int x = 0; x < data.count && !isCanceled; x++) {
-                int64_t webScheduleID = [[data[x] objectForKey:@"schedule_id"] intValue];
-                NSString *scheduleDate = [data[x] objectForKey:@"date"];
+                int64_t webScheduleID = [data[x][@"schedule_id"] longLongValue];
+                NSString *scheduleDate = data[x][@"date"];
                 Schedules *schedule = [Get schedule:db webScheduleID:webScheduleID scheduleDate:scheduleDate];
                 if(schedule == nil) {
                     schedule = [NSEntityDescription insertNewObjectForEntityForName:@"Schedules" inManagedObjectContext:db];
@@ -757,10 +758,10 @@ static BOOL isCanceled;
                 if(!isToday) {
                     schedule.webScheduleID = webScheduleID;
                     schedule.scheduleDate = scheduleDate;
-                    schedule.timeIn = [data[x] objectForKey:@"time_in"];
-                    schedule.timeOut = [data[x] objectForKey:@"time_out"];
-                    schedule.shiftTypeID = [[data[x] objectForKey:@"shift_type_id"] intValue];
-                    schedule.isDayOff = [[data[x] objectForKey:@"is_day_off"] isEqualToString:@"1"];
+                    schedule.timeIn = data[x][@"time_in"];
+                    schedule.timeOut = data[x][@"time_out"];
+                    schedule.shiftTypeID = [data[x][@"shift_type_id"] longLongValue];
+                    schedule.isDayOff = [data[x][@"is_day_off"] isEqualToString:@"1"];
                     schedule.isActive = YES;
                 }
                 schedule.isSync = YES;
@@ -785,27 +786,27 @@ static BOOL isCanceled;
 + (BOOL)breakTypes:(NSManagedObjectContext *)db delegate:(id)delegate {
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
-    [params setObject:[Get apiKey:db] forKey:@"api_key"];
+    params[@"api_key"] = [Get apiKey:db];
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @"get-breaks"] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
             [Update breakTypesDeactivate:db];
             for(int x = 0; x < data.count && !isCanceled; x++) {
-                int64_t breakTypeID = [[data[x] objectForKey:@"break_id"] intValue];
+                int64_t breakTypeID = [data[x][@"break_id"] longLongValue];
                 BreakTypes *breakType = [Get breakType:db breakTypeID:breakTypeID];
                 if(breakType == nil) {
                     breakType = [NSEntityDescription insertNewObjectForEntityForName:@"BreakTypes" inManagedObjectContext:db];
                     breakType.breakTypeID = breakTypeID;
                 }
-                breakType.name = [data[x] objectForKey:@"break_name"];
-                breakType.duration = [[data[x] objectForKey:@"duration"] intValue];
+                breakType.name = data[x][@"break_name"];
+                breakType.duration = [data[x][@"duration"] longLongValue];
                 breakType.isActive = YES;
             }
             if(![Update save:db]) {
@@ -828,26 +829,27 @@ static BOOL isCanceled;
 + (BOOL)overtimeReasons:(NSManagedObjectContext *)db delegate:(id)delegate {
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
-    [params setObject:[Get apiKey:db] forKey:@"api_key"];
+    params[@"api_key"] = [Get apiKey:db];
+    params[@"api_key"] = [Get apiKey:db];
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @"get-overtime-reasons"] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
             [Update overtimeReasonsDeactivate:db];
             for(int x = 0; x < data.count && !isCanceled; x++) {
-                int64_t overtimeReasonID = [[data[x] objectForKey:@"overtime_reason_id"] intValue];
+                int64_t overtimeReasonID = [data[x][@"overtime_reason_id"] longLongValue];
                 OvertimeReasons *overtimeReason = [Get overtimeReason:db overtimeReasonID:overtimeReasonID];
                 if(overtimeReason == nil) {
                     overtimeReason = [NSEntityDescription insertNewObjectForEntityForName:@"OvertimeReasons" inManagedObjectContext:db];
                     overtimeReason.overtimeReasonID = overtimeReasonID;
                 }
-                overtimeReason.name = [data[x] objectForKey:@"overtime_reason"];
+                overtimeReason.name = data[x][@"overtime_reason"];
                 overtimeReason.isActive = YES;
             }
             if(![Update save:db]) {
@@ -870,25 +872,25 @@ static BOOL isCanceled;
 + (BOOL)visits:(NSManagedObjectContext *)db delegate:(id)delegate {
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
-    [params setObject:[Get apiKey:db] forKey:@"api_key"];
-    [params setObject:[NSString stringWithFormat:@"%lld", [Get userID:db]] forKey:@"employee_id"];
+    params[@"api_key"] = [Get apiKey:db];
+    params[@"employee_id"] = [NSString stringWithFormat:@"%lld", [Get userID:db]];
     NSDate *currentDate = NSDate.date;
-    [params setObject:[Time getFormattedDate:DATE_FORMAT date:[currentDate dateByAddingTimeInterval:60 * 60 * 24 * -15]] forKey:@"start_date"];
-    [params setObject:[Time getFormattedDate:DATE_FORMAT date:[currentDate dateByAddingTimeInterval:60 * 60 * 24 * 15]] forKey:@"end_date"];
-    [params setObject:@"yes" forKey:@"get_deleted"];
-    [params setObject:@"pending" forKey:@"status"];
+    params[@"start_date"] = [Time getFormattedDate:DATE_FORMAT date:[currentDate dateByAddingTimeInterval:60 * 60 * 24 * -15]];
+    params[@"end_date"] = [Time getFormattedDate:DATE_FORMAT date:[currentDate dateByAddingTimeInterval:60 * 60 * 24 * 15]];
+    params[@"get_deleted"] = @"yes";
+    params[@"status"] = @"pending";
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @"get-itinerary"] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
             for(int x = 0; x < data.count && !isCanceled; x++) {
-                int64_t webVisitID = [[data[x] objectForKey:@"itinerary_id"] intValue];
+                int64_t webVisitID = [data[x][@"itinerary_id"] longLongValue];
                 Visits *visit = [Get visit:db webVisitID:webVisitID];
                 if(visit == nil) {
                     visit = [NSEntityDescription insertNewObjectForEntityForName:@"Visits" inManagedObjectContext:db];
@@ -896,16 +898,16 @@ static BOOL isCanceled;
                     visit.webVisitID = webVisitID;
                 }
 
-                int64_t employeeID = [[data[x] objectForKey:@"employee_id"] intValue];
+                int64_t employeeID = [data[x][@"employee_id"] longLongValue];
                 Employees *employee = [Get employee:db employeeID:employeeID];
                 if(employee == nil) {
                     employee = [NSEntityDescription insertNewObjectForEntityForName:@"Employees" inManagedObjectContext:db];
                     employee.employeeID = employeeID;
                 }
-                employee.firstName = [data[x] objectForKey:@"employee_firstname"];
-                employee.lastName = [data[x] objectForKey:@"employee_lastname"];
+                employee.firstName = data[x][@"employee_firstname"];
+                employee.lastName = data[x][@"employee_lastname"];
 
-                int64_t webStoreID = [[data[x] objectForKey:@"store_id"] intValue];
+                int64_t webStoreID = [data[x][@"store_id"] longLongValue];
                 Stores *store = [Get store:db webStoreID:webStoreID];
                 if(store == nil) {
                     store = [NSEntityDescription insertNewObjectForEntityForName:@"Stores" inManagedObjectContext:db];
@@ -920,30 +922,30 @@ static BOOL isCanceled;
                 store.isSync = YES;
                 store.isUpdate = YES;
                 store.isWebUpdate = YES;
-                store.name = [data[x] objectForKey:@"store_name"];
-                store.shortName = [data[x] objectForKey:@"store_short_name"];
-                store.address = [data[x] objectForKey:@"store_address"];
-                store.contactNumber = [data[x] objectForKey:@"store_contact_number"];
-                store.email = [data[x] objectForKey:@"store_email"];
-                store.latitude = [[data[x] objectForKey:@"store_latitude"] doubleValue];
-                store.longitude = [[data[x] objectForKey:@"store_longitude"] doubleValue];
-                store.geoFenceRadius = [[data[x] objectForKey:@"store_radius"] intValue];
+                store.name = data[x][@"store_name"];
+                store.shortName = data[x][@"store_short_name"];
+                store.address = data[x][@"store_address"];
+                store.contactNumber = data[x][@"store_contact_number"];
+                store.email = data[x][@"store_email"];
+                store.latitude = [data[x][@"store_latitude"] doubleValue];
+                store.longitude = [data[x][@"store_longitude"] doubleValue];
+                store.geoFenceRadius = [data[x][@"store_radius"] longLongValue];
 
                 visit.storeID = store.storeID;
                 visit.name = [Get isSettingEnabled:db settingID:SETTING_STORE_DISPLAY_LONG_NAME teamID:employee.teamID] ? store.name : store.shortName;
                 visit.employeeID = employeeID;
-                visit.startDate = [data[x] objectForKey:@"start_date"];
-                visit.endDate = [data[x] objectForKey:@"end_date"];
-                visit.notes = [data[x] objectForKey:@"notes"];
-                visit.status = [data[x] objectForKey:@"status"];
-                visit.invoice = [data[x] objectForKey:@"mapping_code"];
-                visit.deliveries = [data[x] objectForKey:@"delivery_fee"];
-                visit.isDelete = [[data[x] objectForKey:@"is_deleted"] isEqualToString:@"1"];
-                visit.isCheckIn = ![[data[x] objectForKey:@"date_in"] isEqualToString:@"0000-00-00"];
-                visit.isCheckOut = ![[data[x] objectForKey:@"date_out"] isEqualToString:@"0000-00-00"];
+                visit.startDate = data[x][@"start_date"];
+                visit.endDate = data[x][@"end_date"];
+                visit.notes = data[x][@"notes"];
+                visit.status = data[x][@"status"];
+                visit.invoice = data[x][@"mapping_code"];
+                visit.deliveries = data[x][@"delivery_fee"];
+                visit.isDelete = [data[x][@"is_deleted"] isEqualToString:@"1"];
+                visit.isCheckIn = ![data[x][@"date_in"] isEqualToString:@"0000-00-00"];
+                visit.isCheckOut = ![data[x][@"date_out"] isEqualToString:@"0000-00-00"];
                 
-                for(NSDictionary *dictionary in [data[x] objectForKey:@"inventory"]) {
-                    int64_t inventoryID = [[dictionary objectForKey:@"inventory_id"] intValue];
+                for(NSDictionary *dictionary in data[x][@"inventory"]) {
+                    int64_t inventoryID = [dictionary[@"inventory_id"] longLongValue];
                     VisitInventories *inventory = [Get visitInventory:db visitID:visit.visitID inventoryID:inventoryID];
                     if(inventory == nil) {
                         inventory = [NSEntityDescription insertNewObjectForEntityForName:@"VisitInventories" inManagedObjectContext:db];
@@ -952,12 +954,12 @@ static BOOL isCanceled;
                         inventory.inventoryID = inventoryID;
                         inventory.isFromWeb = YES;
                     }
-                    inventory.name = [dictionary objectForKey:@"inventory_type_name"];
+                    inventory.name = dictionary[@"inventory_type_name"];
                     inventory.isActive = YES;
                 }
                 
-                for(NSDictionary *dictionary in [data[x] objectForKey:@"forms"]) {
-                    int64_t formID = [[dictionary objectForKey:@"form_id"] intValue];
+                for(NSDictionary *dictionary in data[x][@"forms"]) {
+                    int64_t formID = [dictionary[@"form_id"] longLongValue];
                     VisitForms *form = [Get visitForm:db visitID:visit.visitID formID:formID];
                     if(form == nil) {
                         form = [NSEntityDescription insertNewObjectForEntityForName:@"VisitForms" inManagedObjectContext:db];
@@ -966,7 +968,7 @@ static BOOL isCanceled;
                         form.formID = formID;
                         form.isFromWeb = YES;
                     }
-                    form.name = [dictionary objectForKey:@"form_name"];
+                    form.name = dictionary[@"form_name"];
                     form.isActive = YES;
                 }
             }
@@ -990,18 +992,50 @@ static BOOL isCanceled;
 + (BOOL)expenseTypeCategories:(NSManagedObjectContext *)db delegate:(id)delegate {
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
-    NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @""] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    params[@"api_key"] = [Get apiKey:db];
+    NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @"get-expense-categories"] params:params timeout:HTTP_TIMEOUT_RX];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
+            [Update expenseTypeCategoriesDeactivate:db];
+            if([Get expenseType:db expenseTypeID:1] == nil) {
+                ExpenseTypes *expenseType = [NSEntityDescription insertNewObjectForEntityForName:@"ExpenseTypes" inManagedObjectContext:db];
+                expenseType.expenseTypeID = 1;
+                expenseType.name = @"Fuel Consumption";
+                expenseType.isRequired = NO;
+                expenseType.isActive = YES;
+            }
+            if([Get expenseType:db expenseTypeID:2] == nil) {
+                ExpenseTypes *expenseType = [NSEntityDescription insertNewObjectForEntityForName:@"ExpenseTypes" inManagedObjectContext:db];
+                expenseType.expenseTypeID = 2;
+                expenseType.name = @"Fuel Purchase";
+                expenseType.isRequired = NO;
+                expenseType.isActive = YES;
+            }
+            for(int x = 0; x < data.count && !isCanceled; x++) {
+                int64_t expenseTypeCategoryID = [data[x][@"expense_category_id"] longLongValue];
+                ExpenseTypeCategories *expenseTypeCategory = [Get expenseTypeCategory:db expenseTypeCategoryID:expenseTypeCategoryID];
+                if(expenseTypeCategory == nil) {
+                    expenseTypeCategory = [NSEntityDescription insertNewObjectForEntityForName:@"ExpenseTypeCategories" inManagedObjectContext:db];
+                    expenseTypeCategory.expenseTypeCategoryID = expenseTypeCategoryID;
+                }
+                expenseTypeCategory.name = data[x][@"expense_category_name"];
+                expenseTypeCategory.isActive = YES;
+                message = [self expenseTypes:db expenseTypeCategoryID:expenseTypeCategory.expenseTypeCategoryID delegate:delegate];
+                if(message != nil) {
+                    break;
+                }
+            }
             if(![Update save:db]) {
-                message = @"";
+                if(message == nil) {
+                    message = @"";
+                }
             }
         }
     }
@@ -1017,48 +1051,53 @@ static BOOL isCanceled;
     return result;
 }
 
-+ (BOOL)expenseTypes:(NSManagedObjectContext *)db delegate:(id)delegate {
-    BOOL result = NO;
++ (NSString *)expenseTypes:(NSManagedObjectContext *)db expenseTypeCategoryID:(int64_t)expenseTypeCategoryID delegate:(id)delegate {
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
-    NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @""] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    params[@"api_key"] = [Get apiKey:db];
+    params[@"expense_category_id"] = [NSString stringWithFormat:@"%lld", expenseTypeCategoryID];
+    NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @"get-expense-types"] params:params timeout:HTTP_TIMEOUT_RX];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
-            if(![Update save:db]) {
-                message = @"";
+            [Update expenseTypesDeactivate:db expenseTypeCategoryID:expenseTypeCategoryID];
+            for(int x = 0; x < data.count && !isCanceled; x++) {
+                int64_t expenseTypeID = [data[x][@"expense_type_id"] longLongValue];
+                ExpenseTypes *expenseType = [Get expenseType:db expenseTypeID:expenseTypeID];
+                if(expenseType == nil) {
+                    expenseType = [NSEntityDescription insertNewObjectForEntityForName:@"ExpenseTypes" inManagedObjectContext:db];
+                    expenseType.expenseTypeID = expenseTypeID;
+                    expenseType.expenseTypeCategoryID = expenseTypeCategoryID;
+                }
+                expenseType.name = data[x][@"expense_type_name"];
+                expenseType.isRequired = [data[x][@"is_required"] isEqualToString:@"yes"];
+                expenseType.isActive = YES;
             }
         }
     }
-    if(message == nil) {
-        message = @"ok";
-        result = YES;
-    }
     if(isCanceled) {
         message = nil;
-        result = NO;
     }
-    [delegate onProcessResult:message];
-    return result;
+    return message;
 }
 
 + (BOOL)inventories:(NSManagedObjectContext *)db delegate:(id)delegate {
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @""] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
             if(![Update save:db]) {
                 message = @"";
@@ -1081,14 +1120,14 @@ static BOOL isCanceled;
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @""] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
             if(![Update save:db]) {
                 message = @"";
@@ -1111,14 +1150,14 @@ static BOOL isCanceled;
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @""] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
             if(![Update save:db]) {
                 message = @"";
@@ -1141,14 +1180,14 @@ static BOOL isCanceled;
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @""] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
             if(![Update save:db]) {
                 message = @"";
@@ -1171,14 +1210,14 @@ static BOOL isCanceled;
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @""] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
             if(![Update save:db]) {
                 message = @"";
@@ -1201,14 +1240,14 @@ static BOOL isCanceled;
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @""] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
             if(![Update save:db]) {
                 message = @"";
@@ -1231,14 +1270,14 @@ static BOOL isCanceled;
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @""] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
             if(![Update save:db]) {
                 message = @"";
@@ -1261,14 +1300,14 @@ static BOOL isCanceled;
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @""] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
             if(![Update save:db]) {
                 message = @"";
@@ -1291,14 +1330,14 @@ static BOOL isCanceled;
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @""] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
             if(![Update save:db]) {
                 message = @"";
@@ -1321,14 +1360,14 @@ static BOOL isCanceled;
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @""] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
             if(![Update save:db]) {
                 message = @"";
@@ -1351,14 +1390,14 @@ static BOOL isCanceled;
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @""] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
             if(![Update save:db]) {
                 message = @"";
@@ -1381,14 +1420,14 @@ static BOOL isCanceled;
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @""] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
             if(![Update save:db]) {
                 message = @"";
@@ -1411,14 +1450,14 @@ static BOOL isCanceled;
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @""] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
             if(![Update save:db]) {
                 message = @"";
@@ -1441,14 +1480,14 @@ static BOOL isCanceled;
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @""] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
             if(![Update save:db]) {
                 message = @"";
@@ -1471,14 +1510,14 @@ static BOOL isCanceled;
     BOOL result = NO;
     NSMutableDictionary *params = NSMutableDictionary.alloc.init;
     NSDictionary *response = [Http get:[NSString stringWithFormat:@"%@%@", WEB_API, @""] params:params timeout:HTTP_TIMEOUT_RX];
-    NSDictionary *init = [[response objectForKey:@"init"] lastObject];
-    NSString *status = [init objectForKey:@"status"];
+    NSDictionary *init = [response[@"init"] lastObject];
+    NSString *status = init[@"status"];
     NSString *message = nil;
     if([status isEqualToString:@"error"]) {
-        message = [init objectForKey:@"message"];
+        message = init[@"message"];
     }
     if(message == nil) {
-        NSArray<NSDictionary *> *data = [response objectForKey:@"data"];
+        NSArray<NSDictionary *> *data = response[@"data"];
         if(data != nil) {
             if(![Update save:db]) {
                 message = @"";
